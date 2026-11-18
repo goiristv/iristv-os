@@ -742,6 +742,78 @@
       syncActiveLyric();
     }
 
+    function hashStringColors(seed) {
+      let h = 2166136261;
+      for (let i = 0; i < seed.length; i++) {
+        h ^= seed.charCodeAt(i);
+        h = Math.imul(h, 16777619);
+      }
+      const h1 = Math.abs(h) % 360;
+      const h2 = (h1 + 48) % 360;
+      const h3 = (h1 + 305) % 360;
+      return [
+        `hsla(${h1}, 78%, 46%, 0.56)`,
+        `hsla(${h2}, 82%, 40%, 0.52)`,
+        `hsla(${h3}, 72%, 38%, 0.5)`
+      ];
+    }
+
+    function applyTrackHeaderGradient(track, artSrc) {
+      const headerEl = shellEl?.querySelector('.mp-header');
+      if (!headerEl) return;
+      if (!track || store.mode !== 'music') {
+        headerEl.classList.remove('is-music-reactive');
+        return;
+      }
+      const seed = `${track.title || ''}|${track.artist || ''}|${track.id || ''}`;
+      const setColors = (c1, c2, c3) => {
+        headerEl.style.setProperty('--mp-grad-1', c1);
+        headerEl.style.setProperty('--mp-grad-2', c2);
+        headerEl.style.setProperty('--mp-grad-3', c3);
+        headerEl.classList.add('is-music-reactive');
+      };
+
+      const [f1, f2, f3] = hashStringColors(seed);
+      setColors(f1, f2, f3);
+
+      if (!artSrc) return;
+      const probe = new Image();
+      probe.crossOrigin = 'anonymous';
+      probe.onload = () => {
+        try {
+          const canvas = document.createElement('canvas');
+          canvas.width = 16;
+          canvas.height = 16;
+          const ctx = canvas.getContext('2d', { willReadFrequently: true });
+          if (!ctx) return;
+          ctx.drawImage(probe, 0, 0, 16, 16);
+          const data = ctx.getImageData(0, 0, 16, 16).data;
+          const buckets = [];
+          for (let i = 0; i < data.length; i += 16) {
+            const r = data[i], g = data[i + 1], b = data[i + 2];
+            const max = Math.max(r, g, b), min = Math.min(r, g, b);
+            const sat = max === 0 ? 0 : (max - min) / max;
+            const lum = (r + g + b) / 3;
+            if (lum > 28 && lum < 235) {
+              buckets.push({ r, g, b, score: sat * 2 + (lum / 255) });
+            }
+          }
+          if (buckets.length >= 3) {
+            buckets.sort((a, b) => b.score - a.score);
+            const p1 = buckets[0];
+            const p2 = buckets[Math.floor(buckets.length / 3)] || buckets[1];
+            const p3 = buckets[Math.floor((buckets.length * 2) / 3)] || buckets[2];
+            setColors(
+              `rgba(${p1.r}, ${p1.g}, ${p1.b}, 0.62)`,
+              `rgba(${p2.r}, ${p2.g}, ${p2.b}, 0.56)`,
+              `rgba(${p3.r}, ${p3.g}, ${p3.b}, 0.54)`
+            );
+          }
+        } catch (_) {}
+      };
+      probe.src = artSrc;
+    }
+
     function syncVinylCover() {
       const artSrc = currentTrack?.embeddedCover || currentTrack?.onlineCover || '';
       const img = document.getElementById('mp-vinyl-art');
@@ -757,6 +829,7 @@
         }
       }
       syncAmbientArt();
+      applyTrackHeaderGradient(currentTrack, artSrc);
     }
 
     function renderLyricsPanel() {
@@ -824,6 +897,33 @@
       return { cur, dur, rawDur };
     }
 
+    let lyricScrollRaf = 0;
+
+    function smoothScrollLyricsTo(body, targetTop) {
+      if (!body) return;
+      if (lyricScrollRaf) cancelAnimationFrame(lyricScrollRaf);
+      const startTop = body.scrollTop;
+      const diff = targetTop - startTop;
+      if (Math.abs(diff) < 1) {
+        body.scrollTop = targetTop;
+        return;
+      }
+      const duration = 480;
+      const startTime = performance.now();
+      const easeOutCubic = (t) => 1 - Math.pow(1 - t, 3);
+      const step = (now) => {
+        if (!body.isConnected) return;
+        const p = Math.min(1, (now - startTime) / duration);
+        body.scrollTop = startTop + diff * easeOutCubic(p);
+        if (p < 1) {
+          lyricScrollRaf = requestAnimationFrame(step);
+        } else {
+          lyricScrollRaf = 0;
+        }
+      };
+      lyricScrollRaf = requestAnimationFrame(step);
+    }
+
     function syncActiveLyric() {
       if (lyricsStatus !== 'synced' || !lyricsCues.length) return;
       const offset = currentTrack?.lyricsOffsetSec || 0;
@@ -840,17 +940,14 @@
       body.querySelectorAll('.mp-lyric-btn').forEach((node, i) => {
         node.classList.toggle('is-active', i === idx);
         node.classList.toggle('is-past', i < idx);
+        node.classList.toggle('is-near', Math.abs(i - idx) === 1);
       });
       const activeNode = body.querySelector(`.mp-lyric-btn[data-lrc-idx="${idx}"]`);
       if (activeNode) {
-        // Scroll purely inside the lyrics container without moving the outer page
         const bodyRect = body.getBoundingClientRect();
         const nodeRect = activeNode.getBoundingClientRect();
-        const targetScroll = (nodeRect.top - bodyRect.top) + body.scrollTop - (body.clientHeight / 2) + (activeNode.clientHeight / 2);
-        body.scrollTo({
-          top: Math.max(0, targetScroll),
-          behavior: 'smooth'
-        });
+        const targetScroll = Math.max(0, (nodeRect.top - bodyRect.top) + body.scrollTop - (body.clientHeight / 2) + (activeNode.clientHeight / 2));
+        smoothScrollLyricsTo(body, targetScroll);
       }
     }
 
@@ -1248,6 +1345,7 @@
       const activePl = getActiveMusicPl();
       const totalInPl = activePl?.tracks?.length || 0;
       const artSrc = currentTrack?.embeddedCover || currentTrack?.onlineCover || '';
+      applyTrackHeaderGradient(currentTrack, artSrc);
 
       headerActionsEl.innerHTML = `
         <button id="mp-drawer-toggle" class="mp-pill-btn ${drawerOpen ? 'is-active' : ''}" type="button">
@@ -1263,7 +1361,7 @@
           <div class="mp-player-col">
             <div class="mp-disc-stage">
               <div id="mp-vinyl-wrap" class="mp-vinyl-wrap">
-                <div id="mp-vinyl-disc" class="mp-vinyl-disc ${(!audioEl.paused && audioEl.src) ? 'is-spinning' : ''}">
+                <div id="mp-vinyl-disc" class="mp-vinyl-disc ${((!audioEl.paused && !audioEl.ended && audioEl.src) || musicPlayingWanted) ? 'is-spinning' : ''}">
                   <div class="mp-vinyl-grooves"></div>
                   <div class="mp-vinyl-sheen"></div>
                   <div class="mp-vinyl-label">

@@ -8,6 +8,8 @@ const zlib = require('zlib');
 const { execFile, spawn } = require('child_process');
 
 const PORT = Number(process.env.PORT) || 3000;
+// Por padrão só aceita conexões da própria máquina. Para liberar a rede local: IRISTV_HOST=0.0.0.0
+const HOST = process.env.IRISTV_HOST || '127.0.0.1';
 const ROOT_DIR = __dirname;
 const HLS_BUNDLE_PATH = fs.existsSync(path.join(ROOT_DIR, 'vendor', 'hls.min.js'))
   ? path.join(ROOT_DIR, 'vendor', 'hls.min.js')
@@ -2035,10 +2037,29 @@ function startHardwareVolumeKeyWatcher() {
   setInterval(scanInputDevices, 5000).unref();
 }
 
+// Rotas sensíveis (ex.: cofre de senhas) só aceitam acesso local e vindo da própria página do irisTV.
+// Bloqueia outros aparelhos da rede, sites de terceiros abertos no navegador e DNS rebinding.
+function isTrustedLocalRequest(req) {
+  const remote = String(req.socket.remoteAddress || '').replace(/^::ffff:/, '');
+  const isLoopback = remote === '127.0.0.1' || remote === '::1';
+  const hostName = String(req.headers.host || '').replace(/:\d+$/, '').replace(/^\[|\]$/g, '').toLowerCase();
+  const hostOk = hostName === 'localhost' || hostName === '127.0.0.1' || hostName === '::1';
+  let originOk = true;
+  if (req.headers.origin) {
+    try { originOk = new URL(req.headers.origin).host === req.headers.host; } catch (_) { originOk = false; }
+  }
+  return isLoopback && hostOk && originOk;
+}
+
 function createAppServer() {
   const server = http.createServer(async (req, res) => {
     const reqUrl = new URL(req.url, `http://${req.headers.host || 'localhost'}`);
     let pathname = decodeURIComponent(reqUrl.pathname);
+
+    if (pathname.startsWith('/api/passwords/') && !isTrustedLocalRequest(req)) {
+      res.writeHead(403, { 'Content-Type': 'application/json; charset=utf-8', 'Cache-Control': 'no-store' });
+      return res.end(JSON.stringify({ ok: false, error: 'Forbidden' }));
+    }
 
     if (req.method === 'GET' && pathname === '/api/os/events') {
       res.writeHead(200, {
@@ -2551,7 +2572,19 @@ function createAppServer() {
     }
 
     const PASSWORD_VAULT_PATH = path.join(ROOT_DIR, 'iristv-passwords.vault.json');
-    const getVaultKey = () => crypto.scryptSync(`${os.hostname()}:${os.userInfo().username}:irisTV-OS-Vault`, 'iristv-vault-salt-v1', 32);
+    const VAULT_KEY_PATH = path.join(ROOT_DIR, '.iristv-vault.key');
+    // Chave antiga (previsível: derivada de hostname/usuário). Usada só para ler senhas já salvas.
+    const getLegacyVaultKey = () => crypto.scryptSync(`${os.hostname()}:${os.userInfo().username}:irisTV-OS-Vault`, 'iristv-vault-salt-v1', 32);
+    // Chave nova: aleatória, criada uma vez e guardada fora do Git (.gitignore) com permissão 0600.
+    const getVaultKey = () => {
+      try {
+        const hex = fs.readFileSync(VAULT_KEY_PATH, 'utf8').trim();
+        if (/^[0-9a-f]{64}$/i.test(hex)) return Buffer.from(hex, 'hex');
+      } catch (_) {}
+      const key = crypto.randomBytes(32);
+      fs.writeFileSync(VAULT_KEY_PATH, key.toString('hex'), { encoding: 'utf8', mode: 0o600 });
+      return key;
+    };
     const normalizeVaultHost = (h) => String(h || '').toLowerCase().trim().replace(/^www\./, '');
     const readVaultMap = () => {
       try {
@@ -2570,12 +2603,20 @@ function createAppServer() {
       const tag = cipher.getAuthTag();
       return `${iv.toString('hex')}:${tag.toString('hex')}:${enc.toString('hex')}`;
     };
+    const decryptWithKey = (key, ivHex, tagHex, dataHex) => {
+      const decipher = crypto.createDecipheriv('aes-256-gcm', key, Buffer.from(ivHex, 'hex'));
+      decipher.setAuthTag(Buffer.from(tagHex, 'hex'));
+      return Buffer.concat([decipher.update(Buffer.from(dataHex, 'hex')), decipher.final()]).toString('utf8');
+    };
     const decryptSecret = (packed) => {
       const [ivHex, tagHex, dataHex] = String(packed || '').split(':');
       if (!ivHex || !tagHex || !dataHex) return '';
-      const decipher = crypto.createDecipheriv('aes-256-gcm', getVaultKey(), Buffer.from(ivHex, 'hex'));
-      decipher.setAuthTag(Buffer.from(tagHex, 'hex'));
-      return Buffer.concat([decipher.update(Buffer.from(dataHex, 'hex')), decipher.final()]).toString('utf8');
+      try {
+        return decryptWithKey(getVaultKey(), ivHex, tagHex, dataHex);
+      } catch (_) {
+        // Senha salva antes da mudança de chave: lê com a chave antiga (será regravada na próxima vez que for salva).
+        return decryptWithKey(getLegacyVaultKey(), ivHex, tagHex, dataHex);
+      }
     };
 
     if (pathname === '/api/passwords/list') {
@@ -4269,7 +4310,7 @@ function startServer(preferredPort = PORT) {
     server.once('error', (err) => {
       if (err && err.code === 'EADDRINUSE' && preferredPort !== 0) {
         const fallback = createAppServer();
-        fallback.listen(0, '0.0.0.0', () => {
+        fallback.listen(0, HOST, () => {
           const addr = fallback.address();
           triggerBackgroundPrewarm();
           resolve({ server: fallback, port: addr.port, url: `http://127.0.0.1:${addr.port}` });
@@ -4279,7 +4320,7 @@ function startServer(preferredPort = PORT) {
         reject(err);
       }
     });
-    server.listen(preferredPort, '0.0.0.0', () => {
+    server.listen(preferredPort, HOST, () => {
       const addr = server.address();
       triggerBackgroundPrewarm();
       resolve({ server, port: addr.port, url: `http://127.0.0.1:${addr.port}` });

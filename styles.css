@@ -7764,8 +7764,38 @@ textarea.is-focused {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 16px 28px 10px;
+  padding: 16px 28px 12px;
   gap: 16px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  transition: background 0.9s ease, border-color 0.7s ease, box-shadow 0.9s ease;
+}
+
+.mp-header.is-music-reactive {
+  background: linear-gradient(
+    120deg,
+    var(--mp-grad-1, rgba(56, 189, 248, 0.45)),
+    var(--mp-grad-2, rgba(139, 92, 246, 0.42)),
+    var(--mp-grad-3, rgba(236, 72, 153, 0.38)),
+    var(--mp-grad-1, rgba(56, 189, 248, 0.45))
+  );
+  background-size: 260% 260%;
+  animation: mpHeaderGradientFlow 10s ease infinite;
+  border-bottom-color: rgba(255, 255, 255, 0.22);
+  box-shadow: 0 10px 32px rgba(0, 0, 0, 0.28);
+  backdrop-filter: blur(22px) saturate(140%);
+  -webkit-backdrop-filter: blur(22px) saturate(140%);
+}
+
+@keyframes mpHeaderGradientFlow {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
 }
 
 .mp-seg-tabs {
@@ -8008,6 +8038,11 @@ textarea.is-focused {
   z-index: 2;
   width: 88%;
   height: 88%;
+  transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.mp-vinyl-wrap:hover {
+  transform: scale(1.02);
 }
 
 .mp-vinyl-disc {
@@ -8019,17 +8054,13 @@ textarea.is-focused {
   box-shadow: 0 26px 70px rgba(0, 0, 0, 0.75), 0 0 0 2px rgba(255, 255, 255, 0.14), inset 0 0 20px rgba(255, 255, 255, 0.05);
   display: grid;
   place-items: center;
-  animation: mpVinylSpin 16s linear infinite;
+  animation: mpVinylSpin 14s linear infinite;
   animation-play-state: paused;
-  transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-}
-
-.mp-vinyl-disc:hover {
-  transform: scale(1.02);
+  will-change: transform;
 }
 
 .mp-vinyl-disc.is-spinning {
-  animation-play-state: running;
+  animation-play-state: running !important;
 }
 
 @keyframes mpVinylSpin {
@@ -8385,7 +8416,7 @@ textarea.is-focused {
   background: transparent;
   border: none;
   padding: 8px 14px;
-  color: rgba(255, 255, 255, 0.4);
+  color: rgba(255, 255, 255, 0.42);
   font-family: var(--ui-font-family);
   font-size: 1.68rem;
   font-weight: 700;
@@ -8394,21 +8425,29 @@ textarea.is-focused {
   cursor: pointer;
   transform-origin: left center;
   border-radius: 14px;
-  opacity: 0.36;
-  filter: blur(0.9px);
-  transform: scale(0.97) translateZ(0);
-  transition: opacity 0.45s cubic-bezier(0.16, 1, 0.3, 1),
-    filter 0.45s cubic-bezier(0.16, 1, 0.3, 1),
-    transform 0.45s cubic-bezier(0.16, 1, 0.3, 1),
-    color 0.3s ease,
+  opacity: 0.34;
+  filter: blur(1px);
+  transform: scale(0.96) translateY(2px) translateZ(0);
+  will-change: transform, opacity, filter;
+  transition: opacity 0.55s cubic-bezier(0.22, 1, 0.36, 1),
+    filter 0.55s cubic-bezier(0.22, 1, 0.36, 1),
+    transform 0.55s cubic-bezier(0.22, 1, 0.36, 1),
+    color 0.42s ease,
+    text-shadow 0.42s ease,
     background 0.25s ease;
+}
+
+.mp-lyric-btn.is-near {
+  opacity: 0.58;
+  filter: blur(0.25px);
+  transform: scale(0.99) translateZ(0);
 }
 
 .mp-lyric-btn.is-past {
   color: rgba(255, 255, 255, 0.16);
   opacity: 0.18;
-  filter: blur(2px);
-  transform: scale(0.93) translateZ(0);
+  filter: blur(1.8px);
+  transform: scale(0.93) translateY(-2px) translateZ(0);
 }
 
 .mp-lyric-btn:hover {
@@ -8430,7 +8469,7 @@ textarea.is-focused {
   font-weight: 800;
   opacity: 1;
   filter: none;
-  transform: scale(1.06) translateZ(0);
+  transform: scale(1.06) translateX(6px) translateZ(0);
   text-shadow: 0 0 28px var(--wallpaper-glow, var(--accent-glow));
 }
 
