@@ -1,0 +1,178 @@
+/**
+ * irisTV — LG webOS 4.x (Chromium 53) Compatibility & Performance Stylesheet
+ * 
+ * Specifically optimized for 2018-2019 ARM Smart TVs:
+ * 1. Zero-cost rendering: disables expensive GPU backdrop-filter and heavy blurs.
+ * 2. Static positioning fallbacks for missing `inset` property.
+ * 3. Flexbox + margin fallbacks for missing flex/grid `gap`.
+ * 4. Fallbacks for missing `aspect-ratio`.
+ * 5. Magic Remote & D-pad high-contrast focus rings.
+ */
+
+/* ==========================================================================
+   1. Global GPU Performance: Kill heavy blurs on TV hardware
+   ========================================================================== */
+.is-webos,
+.is-webos * {
+  -webkit-backdrop-filter: none !important;
+  backdrop-filter: none !important;
+}
+
+.is-webos {
+  --glass-blur: 0px !important;
+  --glass-bg: rgba(18, 22, 32, 0.94) !important;
+  --glass-surface: rgba(26, 32, 46, 0.92) !important;
+  --glass-pill-bg: rgba(255, 255, 255, 0.12) !important;
+}
+
+/* Remove filter: blur() on background layers and cards */
+.is-webos .ambient-orb,
+.is-webos .ambient-backdrop-img,
+.is-webos .ambient-vignette {
+  filter: none !important;
+}
+
+.is-webos .mp-ambient-art {
+  filter: none !important;
+  opacity: 0.18 !important;
+}
+
+.is-webos .mp-lyric-btn {
+  filter: none !important;
+}
+
+/* ==========================================================================
+   2. Inset Fallbacks (Chromium 53 lacks `inset`)
+   ========================================================================== */
+.is-webos .ambient-stage,
+.is-webos .ambient-wallpaper-bg,
+.is-webos .ambient-wp-layer,
+.is-webos .ambient-backdrop-img,
+.is-webos .ambient-vignette,
+.is-webos .boot-screen,
+.is-webos .cinema-player,
+.is-webos .screensaver-overlay,
+.is-webos .ss-wallpaper-stage,
+.is-webos .ss-wallpaper-bg,
+.is-webos .app-stage-window,
+.is-webos .app-stage-backdrop,
+.is-webos .settings-modal-backdrop,
+.is-webos .offline-gate-overlay,
+.is-webos .channel-list-overlay {
+  top: 0 !important;
+  right: 0 !important;
+  bottom: 0 !important;
+  left: 0 !important;
+}
+
+/* ==========================================================================
+   3. Aspect-Ratio Fallbacks (Chromium 53 lacks `aspect-ratio`)
+   ========================================================================== */
+.is-webos .apps-grid-layout .app-card {
+  height: 120px !important;
+  min-height: 120px !important;
+}
+
+.is-webos .poster-card {
+  height: 250px !important;
+  min-height: 250px !important;
+}
+
+.is-webos .details-poster {
+  height: 380px !important;
+  min-height: 380px !important;
+}
+
+.is-webos .stg-wp-preview {
+  height: 140px !important;
+}
+
+.is-webos .cal-day {
+  height: 34px !important;
+  min-height: 34px !important;
+}
+
+.is-webos .mp-disc-stage {
+  width: 320px !important;
+  height: 320px !important;
+  max-width: 36vh !important;
+  max-height: 36vh !important;
+}
+
+.is-webos .live-preview-stage {
+  height: 180px !important;
+}
+
+/* ==========================================================================
+   4. Flexbox Spacing: Emulate `gap` with margins on Chromium 53
+   ========================================================================== */
+.is-webos .home-dock-apps > * + * {
+  margin-left: 14px !important;
+}
+
+.is-webos .dock-pill-btn + .dock-pill-btn {
+  margin-left: 10px !important;
+}
+
+.is-webos .topbar-actions > * + * {
+  margin-left: 12px !important;
+}
+
+.is-webos .home-row-cards > * + * {
+  margin-left: 16px !important;
+}
+
+.is-webos .mp-controls-bar > * + * {
+  margin-left: 14px !important;
+}
+
+.is-webos .mp-seg-tabs > * + * {
+  margin-left: 8px !important;
+}
+
+.is-webos .settings-nav-item + .settings-nav-item {
+  margin-top: 6px !important;
+}
+
+.is-webos .widget-clock-analog-wrap {
+  margin-bottom: 12px !important;
+}
+
+/* ==========================================================================
+   5. TV Remote Focus Indicator (Magic Remote & D-pad)
+   ========================================================================== */
+.is-webos button:focus,
+.is-webos [tabindex]:focus,
+.is-webos .app-card:focus,
+.is-webos .poster-card:focus,
+.is-webos .dock-pill-btn:focus,
+.is-webos .is-tv-focused {
+  outline: 3px solid #38bdf8 !important;
+  outline-offset: 3px !important;
+  box-shadow: 0 0 16px rgba(56, 189, 248, 0.6) !important;
+}
+
+/* ==========================================================================
+   6. Solid Window & Topbar Backgrounds
+   ========================================================================== */
+.is-webos .app-stage-window {
+  background: #0b0f19 !important;
+}
+
+.is-webos .app-stage-topbar {
+  background: #111726 !important;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.12) !important;
+}
+
+.is-webos .app-stage-window.is-mediaplayer-app .app-stage-topbar.is-music-reactive {
+  background: #151d2d !important;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.16) !important;
+}
+
+.is-webos .settings-modal {
+  background: #0f1422 !important;
+}
+
+.is-webos .channel-list-panel {
+  background: #0d121f !important;
+}

@@ -11,6 +11,7 @@ iristv-passwords.vault.json
 media-finished-cache.json
 recordings/
 lunaria/
+dist/
 site/
 usb_drive/
 compress_1080p.py

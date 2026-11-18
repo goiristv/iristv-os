@@ -7,6 +7,7 @@
     "start": "node launch-webview.js",
     "web": "node server.js",
     "build:webview": "mkdir -p irisTV.app/Contents/MacOS && swiftc -O webview.swift -o irisTV.app/Contents/MacOS/iristv-webview -framework Cocoa -framework WebKit",
+    "build:webos": "python3 webos/build-webos-ipk.py",
     "dev": "node --watch server.js"
   },
   "keywords": [
@@ -20,5 +21,8 @@
   "license": "MIT",
   "dependencies": {
     "hls.js": "^1.6.15"
+  },
+  "devDependencies": {
+    "esbuild": "^0.28.2"
   }
 }

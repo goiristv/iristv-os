@@ -758,27 +758,39 @@
       ];
     }
 
+    const trackGradientCache = new Map();
+
     function applyTrackHeaderGradient(track, artSrc) {
-      const headerEl = shellEl?.querySelector('.mp-header');
-      if (!headerEl) return;
-      if (!track || store.mode !== 'music') {
-        headerEl.classList.remove('is-music-reactive');
+      const topbarEl = document.querySelector('#app-stage-window .app-stage-topbar');
+      if (!topbarEl) return;
+      const isPlaying = Boolean(track && store.mode === 'music' && ((!audioEl.paused && !audioEl.ended && Boolean(audioEl.src)) || musicPlayingWanted));
+      if (!isPlaying) {
+        topbarEl.classList.remove('is-music-reactive');
         return;
       }
       const seed = `${track.title || ''}|${track.artist || ''}|${track.id || ''}`;
       const setColors = (c1, c2, c3) => {
-        headerEl.style.setProperty('--mp-grad-1', c1);
-        headerEl.style.setProperty('--mp-grad-2', c2);
-        headerEl.style.setProperty('--mp-grad-3', c3);
-        headerEl.classList.add('is-music-reactive');
+        topbarEl.style.setProperty('--mp-grad-1', c1);
+        topbarEl.style.setProperty('--mp-grad-2', c2);
+        topbarEl.style.setProperty('--mp-grad-3', c3);
+        topbarEl.classList.add('is-music-reactive');
       };
 
-      const [f1, f2, f3] = hashStringColors(seed);
-      setColors(f1, f2, f3);
+      const cacheKey = artSrc || seed;
+      const cachedColors = trackGradientCache.get(cacheKey);
+      if (cachedColors) {
+        setColors(...cachedColors);
+        return;
+      }
+
+      const fallback = hashStringColors(seed);
+      setColors(...fallback);
 
       if (!artSrc) return;
       const probe = new Image();
-      probe.crossOrigin = 'anonymous';
+      if (/^https?:\/\//i.test(artSrc) && !artSrc.startsWith(location.origin)) {
+        probe.crossOrigin = 'anonymous';
+      }
       probe.onload = () => {
         try {
           const canvas = document.createElement('canvas');
@@ -788,26 +800,42 @@
           if (!ctx) return;
           ctx.drawImage(probe, 0, 0, 16, 16);
           const data = ctx.getImageData(0, 0, 16, 16).data;
-          const buckets = [];
-          for (let i = 0; i < data.length; i += 16) {
+          const hist = new Map();
+          for (let i = 0; i < data.length; i += 4) {
             const r = data[i], g = data[i + 1], b = data[i + 2];
             const max = Math.max(r, g, b), min = Math.min(r, g, b);
             const sat = max === 0 ? 0 : (max - min) / max;
             const lum = (r + g + b) / 3;
-            if (lum > 28 && lum < 235) {
-              buckets.push({ r, g, b, score: sat * 2 + (lum / 255) });
-            }
+            if (lum < 22 || lum > 215 || sat < 0.12) continue;
+            const qr = (r >> 5) << 5;
+            const qg = (g >> 5) << 5;
+            const qb = (b >> 5) << 5;
+            const key = `${qr},${qg},${qb}`;
+            const cur = hist.get(key) || { r: 0, g: 0, b: 0, count: 0, weight: 0 };
+            cur.r += r;
+            cur.g += g;
+            cur.b += b;
+            cur.count += 1;
+            cur.weight += 1 + sat * 1.6;
+            hist.set(key, cur);
           }
-          if (buckets.length >= 3) {
-            buckets.sort((a, b) => b.score - a.score);
-            const p1 = buckets[0];
-            const p2 = buckets[Math.floor(buckets.length / 3)] || buckets[1];
-            const p3 = buckets[Math.floor((buckets.length * 2) / 3)] || buckets[2];
-            setColors(
-              `rgba(${p1.r}, ${p1.g}, ${p1.b}, 0.62)`,
+          const ranked = [...hist.values()].sort((a, b) => b.weight - a.weight);
+          if (ranked.length >= 1) {
+            const pick = (item) => ({
+              r: Math.round(item.r / item.count),
+              g: Math.round(item.g / item.count),
+              b: Math.round(item.b / item.count)
+            });
+            const p1 = pick(ranked[0]);
+            const p2 = pick(ranked[1] || ranked[0]);
+            const p3 = pick(ranked[2] || ranked[1] || ranked[0]);
+            const extracted = [
+              `rgba(${p1.r}, ${p1.g}, ${p1.b}, 0.68)`,
               `rgba(${p2.r}, ${p2.g}, ${p2.b}, 0.56)`,
-              `rgba(${p3.r}, ${p3.g}, ${p3.b}, 0.54)`
-            );
+              `rgba(${p3.r}, ${p3.g}, ${p3.b}, 0.52)`
+            ];
+            trackGradientCache.set(cacheKey, extracted);
+            if (currentTrack?.id === track.id) setColors(...extracted);
           }
         } catch (_) {}
       };
@@ -1078,7 +1106,14 @@
       const seekEl = document.getElementById('mp-seek');
       const playing = Boolean(currentTrack && ((!audioEl.paused && !audioEl.ended && Boolean(audioEl.src)) || musicPlayingWanted));
       if (disc) disc.classList.toggle('is-spinning', playing);
-      if (playBtn) playBtn.innerHTML = playing ? SVG.pause : SVG.play;
+      if (playBtn) {
+        const nextState = playing ? 'pause' : 'play';
+        if (playBtn.dataset.state !== nextState) {
+          playBtn.dataset.state = nextState;
+          playBtn.innerHTML = playing ? SVG.pause : SVG.play;
+          applyTrackHeaderGradient(currentTrack, currentTrack?.embeddedCover || currentTrack?.onlineCover || '');
+        }
+      }
       const { cur, dur } = getEffectiveMusicTimes();
       if (curEl) curEl.textContent = fmtTime(cur);
       if (totEl) totEl.textContent = fmtTime(dur);
@@ -3226,8 +3261,11 @@
         ws.classList.add('mp-view-entering');
       }
       if (store.mode === 'music') renderMusicWorkspace();
-      else if (store.mode === 'video') renderVideoWorkspace();
-      else renderExploreWorkspace();
+      else {
+        applyTrackHeaderGradient(null, '');
+        if (store.mode === 'video') renderVideoWorkspace();
+        else renderExploreWorkspace();
+      }
     }
 
     async function handleAudioFiles(files) {
@@ -3484,9 +3522,14 @@
         videoClockTimer = null;
       }
       audioEl.pause();
-      audioEl.src = '';
+      audioEl.removeAttribute('src');
+      try { audioEl.load(); } catch (_) { }
       const vEl = document.getElementById('mp-video-el');
-      if (vEl) { vEl.pause(); vEl.src = ''; }
+      if (vEl) {
+        vEl.pause();
+        vEl.removeAttribute('src');
+        try { vEl.load(); } catch (_) { }
+      }
       revokeAllObjectUrls();
       appStageWindow.classList.remove('is-mediaplayer-app');
     };

@@ -112,6 +112,10 @@ body {
    ========================================= */
 .ambient-stage {
   position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
   inset: 0;
   z-index: 0;
   overflow: hidden;
@@ -123,6 +127,10 @@ body {
 
 .ambient-wallpaper-bg {
   position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
   inset: 0;
   background-size: cover;
   background-position: center;
@@ -134,6 +142,10 @@ body {
 
 .ambient-wp-layer {
   position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
   inset: 0;
   z-index: 1;
   background-size: cover;
@@ -155,6 +167,10 @@ html.fast-wallpaper-fade .ambient-wp-layer {
 .ambient-wallpaper-bg::after {
   content: "";
   position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
   inset: 0;
   z-index: 2;
   background:
@@ -177,6 +193,10 @@ body.theme-oled .ambient-wallpaper-bg {
 
 .ambient-backdrop-img {
   position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
   inset: 0;
   width: 100%;
   height: 100%;
@@ -263,6 +283,10 @@ body.theme-light .ambient-backdrop-img.is-visible {
 
 .silk-waves {
   position: absolute;
+  top: -4%;
+  right: -6%;
+  bottom: -4%;
+  left: -6%;
   inset: -4% -6%;
   width: 112%;
   height: 108%;
@@ -308,6 +332,10 @@ body.theme-light .ambient-backdrop-img.is-visible {
 
 .ambient-vignette {
   position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
   inset: 0;
   z-index: 5;
   background: radial-gradient(ellipse at 50% 40%, transparent 40%, rgba(4, 7, 14, 0.58) 100%),
@@ -325,6 +353,10 @@ body.theme-light .ambient-vignette {
    ========================================= */
 .boot-screen {
   position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
   inset: 0;
   z-index: 900;
   display: flex;
@@ -1426,6 +1458,10 @@ body.theme-aurora .theme-swatch-dot {
 .spotlight-visual::after {
   content: "";
   position: absolute;
+  top: -100%;
+  right: -100%;
+  bottom: -100%;
+  left: -100%;
   inset: -100%;
   background: linear-gradient(115deg, transparent 40%, rgba(255, 255, 255, 0.22) 50%, transparent 60%);
   transform: translateX(-100%);
@@ -1729,6 +1765,10 @@ body.theme-aurora .theme-swatch-dot {
 .app-card::before {
   content: "";
   position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
   inset: 0;
   z-index: 3;
   border-radius: inherit;
@@ -1920,6 +1960,10 @@ body.theme-aurora .theme-swatch-dot {
 
 .live-card-bg {
   position: absolute;
+  top: -12px;
+  right: -12px;
+  bottom: -12px;
+  left: -12px;
   inset: -12px;
   width: calc(100% + 24px);
   height: calc(100% + 24px);
@@ -1932,6 +1976,10 @@ body.theme-aurora .theme-swatch-dot {
 
 .live-card-scrim {
   position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
   inset: 0;
   background: linear-gradient(180deg, rgba(6, 9, 18, 0.25) 0%, rgba(6, 9, 18, 0.82) 100%);
   pointer-events: none;
@@ -2070,6 +2118,10 @@ body.theme-aurora .theme-swatch-dot {
 .poster-card::after {
   content: "";
   position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
   inset: 0;
   background: linear-gradient(0deg, rgba(5, 6, 12, 0.72) 0%, transparent 40%);
   pointer-events: none;
@@ -2181,6 +2233,10 @@ body.theme-aurora .theme-swatch-dot {
    ========================================= */
 .overlay-backdrop {
   position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
   inset: 0;
   z-index: 200;
   background: rgba(4, 5, 10, 0.66);
@@ -2359,6 +2415,10 @@ kbd {
 /* App Stage Overlay */
 .app-stage-overlay {
   position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
   inset: 0;
   z-index: 300;
   display: flex;
@@ -2369,6 +2429,10 @@ kbd {
 
 .app-stage-backdrop {
   position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
   inset: 0;
   background: radial-gradient(circle at 50% 20%, var(--wallpaper-glow, var(--accent-glow)) 0%, transparent 70%),
               rgba(4, 7, 14, 0.88);
@@ -2727,6 +2791,10 @@ kbd {
 /* Cinema Player - Apple TV Style Reactive Glassmorphism */
 .cinema-player {
   position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
   inset: 0;
   z-index: 350;
   background: rgba(4, 6, 12, 0.94);
@@ -2737,6 +2805,10 @@ kbd {
 
 .player-bg-img {
   position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
   inset: 0;
   width: 100%;
   height: 100%;
@@ -2748,6 +2820,10 @@ kbd {
 
 .player-video {
   position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
   inset: 0;
   width: 100%;
   height: 100%;
@@ -2782,6 +2858,10 @@ body.player-active .player-bg-img {
 
 .player-scrim {
   position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
   inset: 0;
   z-index: 1;
   pointer-events: none;
@@ -3386,6 +3466,10 @@ body.player-active .player-bg-img {
    ============================================================================== */
 .screensaver-overlay {
   position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
   inset: 0;
   z-index: 9999;
   background: #020408;
@@ -3408,6 +3492,10 @@ body.player-active .player-bg-img {
 /* Wallpaper Stage & Ken Burns */
 .ss-wallpaper-stage {
   position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
   inset: 0;
   z-index: 1;
   overflow: hidden;
@@ -3415,6 +3503,10 @@ body.player-active .player-bg-img {
 
 .ss-wallpaper-bg {
   position: absolute;
+  top: -20px;
+  right: -20px;
+  bottom: -20px;
+  left: -20px;
   inset: -20px;
   background-size: cover;
   background-position: center;
@@ -3445,6 +3537,10 @@ body.player-active .player-bg-img {
 
 .ss-vignette-overlay {
   position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
   inset: 0;
   background: radial-gradient(circle at 50% 50%, rgba(3, 5, 10, 0.25) 0%, rgba(3, 5, 10, 0.7) 100%),
     linear-gradient(180deg, rgba(2, 4, 8, 0.65) 0%, transparent 22%, transparent 70%, rgba(2, 4, 8, 0.85) 100%);
@@ -3664,6 +3760,10 @@ body.player-active .player-bg-img {
    ========================================= */
 .onboarding-overlay {
   position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
   inset: 0;
   z-index: 650;
   display: flex;
@@ -3678,6 +3778,10 @@ body.player-active .player-bg-img {
 /* Chosen Wallpaper + Film Grain Filter Overlay */
 .ob-bg-wallpaper {
   position: absolute;
+  top: -4%;
+  right: -4%;
+  bottom: -4%;
+  left: -4%;
   inset: -4%;
   z-index: 0;
   background-image: url('/media/wallpapers/patagonia-fitzroy-sunset.jpg');
@@ -3697,6 +3801,10 @@ body.player-active .player-bg-img {
 
 .ob-bg-vignette {
   position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
   inset: 0;
   z-index: 1;
   pointer-events: none;
@@ -3963,6 +4071,10 @@ body.player-active .player-bg-img {
 
 .ob-prep-orb-glow {
   position: absolute;
+  top: -12px;
+  right: -12px;
+  bottom: -12px;
+  left: -12px;
   inset: -12px;
   border-radius: 50%;
   background: radial-gradient(circle, var(--wallpaper-glow, rgba(0, 210, 255, 0.6)) 0%, transparent 70%);
@@ -6197,6 +6309,10 @@ body.theme-light .settings-hero-card {
 .weather-hero-card::before {
   content: '';
   position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
   inset: 0;
   background: radial-gradient(circle at 80% 20%, rgba(255, 255, 255, 0.15) 0%, transparent 60%);
   pointer-events: none;
@@ -6912,6 +7028,10 @@ body.has-custom-font h3 {
    ========================================================= */
 .iris-osk {
   position: fixed;
+  top: auto;
+  right: 0;
+  bottom: 0;
+  left: 0;
   inset: auto 0 0 0;
   z-index: 450;
   padding: 16px 24px 24px;
@@ -7060,6 +7180,10 @@ textarea.is-focused {
 .app-stage-window.is-fullscreen-app,
 .app-stage-window.is-store-mode {
   position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
   inset: 0;
   width: 100vw;
   height: 100vh;
@@ -7175,6 +7299,10 @@ textarea.is-focused {
 
 .game-over-banner {
   position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
   inset: 0;
   display: flex;
   flex-direction: column;
@@ -7230,6 +7358,10 @@ textarea.is-focused {
 
 .g2048-tiles-layer {
   position: absolute;
+  top: 14px;
+  right: 14px;
+  bottom: 14px;
+  left: 14px;
   inset: 14px;
   pointer-events: none;
 }
@@ -7732,6 +7864,10 @@ textarea.is-focused {
 
 .mp-ambient-bg {
   position: absolute;
+  top: -40px;
+  right: -40px;
+  bottom: -40px;
+  left: -40px;
   inset: -40px;
   z-index: 0;
   pointer-events: none;
@@ -7753,6 +7889,10 @@ textarea.is-focused {
 
 .mp-ambient-scrim {
   position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
   inset: 0;
   background: radial-gradient(circle at center, rgba(6, 9, 18, 0.08) 0%, rgba(5, 7, 14, 0.55) 100%);
   pointer-events: none;
@@ -8008,6 +8148,10 @@ textarea.is-focused {
 .mp-disc-stage::before {
   content: "";
   position: absolute;
+  top: -15%;
+  right: -15%;
+  bottom: -15%;
+  left: -15%;
   inset: -15%;
   border-radius: 50%;
   background: radial-gradient(circle, var(--wallpaper-glow, var(--accent-glow)) 0%, transparent 65%);
@@ -8075,6 +8219,10 @@ textarea.is-focused {
 
 .mp-vinyl-grooves {
   position: absolute;
+  top: 8px;
+  right: 8px;
+  bottom: 8px;
+  left: 8px;
   inset: 8px;
   border-radius: 50%;
   background: repeating-radial-gradient(circle, rgba(255, 255, 255, 0.05) 0 1px, transparent 1px 6px);
@@ -8083,6 +8231,10 @@ textarea.is-focused {
 
 .mp-vinyl-sheen {
   position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
   inset: 0;
   border-radius: 50%;
   background: conic-gradient(from 35deg, transparent 0deg, rgba(255, 255, 255, 0.12) 28deg, transparent 62deg, transparent 180deg, rgba(255, 255, 255, 0.1) 210deg, transparent 248deg);
@@ -8948,6 +9100,10 @@ textarea.is-focused {
 /* Inline Prompt Modal */
 .mp-modal-backdrop {
   position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
   inset: 0;
   background: rgba(4, 7, 14, 0.65);
   display: grid;
@@ -9187,6 +9343,10 @@ html[data-active-tab="news"] .ambient-wallpaper-bg {
 
 .news-lead-fallback {
   position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
   inset: 0;
   z-index: 0;
   background: radial-gradient(ellipse at 75% 25%, rgba(0, 194, 255, 0.28), transparent 60%),
@@ -9195,6 +9355,10 @@ html[data-active-tab="news"] .ambient-wallpaper-bg {
 
 .news-lead-img {
   position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
   inset: 0;
   z-index: 1;
   width: 100%;
@@ -9209,6 +9373,10 @@ html[data-active-tab="news"] .ambient-wallpaper-bg {
 
 .news-lead-scrim {
   position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
   inset: 0;
   z-index: 2;
   background:
@@ -9931,6 +10099,10 @@ html[data-active-tab="news"] .ambient-wallpaper-bg {
 
 .browser-xframe-banner {
   position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
   inset: 0;
   display: flex;
   align-items: center;
@@ -10016,6 +10188,10 @@ html[data-active-tab="news"] .ambient-wallpaper-bg {
    ========================================================= */
 .offline-gate-overlay {
   position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
   inset: 0;
   z-index: 9500;
   display: flex;
@@ -10938,6 +11114,10 @@ html.show-banners-mode .spotlight-right:has(.spotlight-visual.is-wide) {
 
 /* Relógio Centralizado na Lock Screen */
 html[data-lock-clock-style="centered"] .ss-bottom-left {
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
   inset: 0;
   bottom: 0;
   left: 0;
@@ -10951,6 +11131,10 @@ html[data-lock-clock-style="centered"] .ss-clock {
 
 /* Lock Screen em Modo Banners de Shows */
 .screensaver-overlay.is-show-mode .ss-bottom-left {
+  top: auto;
+  right: !important;
+  bottom: auto;
+  left: !important;
   inset: auto !important;
   left: auto !important;
   right: 52px !important;
@@ -11297,6 +11481,10 @@ html[data-lock-clock-style="centered"] .ss-clock {
 /* Player Cinema Fullscreen do Trailer Oficial */
 .trailer-modal-overlay {
   position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
   inset: 0;
   z-index: 9999;
   background: #04070d;
@@ -11395,6 +11583,10 @@ html[data-lock-clock-style="centered"] .ss-clock {
 
 .home-widget-card.is-liquid-glass .weather-widget-specular {
   position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
   inset: 0;
   pointer-events: none;
   background: linear-gradient(

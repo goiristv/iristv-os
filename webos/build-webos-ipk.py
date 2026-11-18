@@ -1,8 +1,12 @@
 #!/usr/bin/env python3
 """
 LG webOS .ipk Packager for irisTV (com.iristv.app)
-Gera um pacote .ipk válido (arquivo ar com debian-binary, control.tar.gz e data.tar.gz)
-pronto para instalação em TVs LG webOS via ares-install ou Dev Manager.
+Gera um pacote .ipk compatível com webOS 4.x (Chromium 53) em Smart TVs LG 2018-2019:
+- Transpilação esbuild com alvo --target=chrome53 (remove ?., ??, async/await nativo, {...x})
+- Inclusão de polyfills mínimos (Object.entries/values, padStart, matchAll, ResizeObserver, etc.)
+- Inclusão do perfil tv-compat.css (sem blurs pesados, flexbox fallback, foco D-pad)
+- Resolução travada em 1920x1080 no appinfo.json para economizar VRAM
+- Empacotamento POSIX ar com debian-binary, control.tar.gz e data.tar.gz
 """
 
 import json
@@ -23,24 +27,49 @@ APP_VERSION = "1.0.0"
 IPK_NAME = f"{APP_ID}_{APP_VERSION}_all.ipk"
 
 
-def minify_css(raw: str) -> str:
-    txt = re.sub(r"/\*[\s\S]*?\*/", "", raw)
-    txt = re.sub(r"\s+", " ", txt)
-    txt = re.sub(r"\s*([{}:;,])\s*", r"\1", txt)
-    return txt.strip()
+def transpile_js_esbuild(src_path: Path, dst_path: Path):
+    dst_path.parent.mkdir(parents=True, exist_ok=True)
+    cmd = [
+        "npx",
+        "esbuild",
+        str(src_path),
+        "--target=chrome53",
+        "--minify",
+        f"--outfile={dst_path}",
+    ]
+    res = subprocess.run(cmd, capture_output=True, text=True)
+    if res.returncode != 0:
+        print(f"[WARN] esbuild falhou para {src_path.name}: {res.stderr}. Usando fallback...")
+        dst_path.write_text(src_path.read_text(encoding="utf-8", errors="ignore"), encoding="utf-8")
 
 
-def minify_js_safe(raw: str) -> str:
-    lines = []
-    for ln in raw.splitlines():
-        s = ln.strip()
-        if not s or s.startswith("//"):
-            continue
-        lines.append(s)
-    return "\n".join(lines)
+def transpile_css_esbuild(src_paths, dst_path: Path):
+    dst_path.parent.mkdir(parents=True, exist_ok=True)
+    combined = []
+    for sp in src_paths:
+        if sp.exists():
+            combined.append(sp.read_text(encoding="utf-8", errors="ignore"))
+    full_css = "\n\n".join(combined)
+    tmp_css = STAGE_DIR / "_temp_combined.css"
+    tmp_css.write_text(full_css, encoding="utf-8")
+
+    cmd = [
+        "npx",
+        "esbuild",
+        str(tmp_css),
+        "--minify",
+        f"--outfile={dst_path}",
+    ]
+    res = subprocess.run(cmd, capture_output=True, text=True)
+    if tmp_css.exists():
+        tmp_css.unlink()
+    if res.returncode != 0:
+        print(f"[WARN] esbuild CSS minify falhou: {res.stderr}. Salvando direto...")
+        dst_path.write_text(full_css, encoding="utf-8")
 
 
 def build_ipk():
+    print(f"[*] Iniciando build do webOS .ipk para {APP_ID} v{APP_VERSION} (alvo Chromium 53)...")
     if STAGE_DIR.exists():
         shutil.rmtree(STAGE_DIR)
     DIST_DIR.mkdir(parents=True, exist_ok=True)
@@ -50,7 +79,7 @@ def build_ipk():
     app_root.mkdir(parents=True, exist_ok=True)
     ctrl_root.mkdir(parents=True, exist_ok=True)
 
-    # 1. appinfo.json oficial webOS
+    # 1. appinfo.json oficial webOS com resolution 1920x1080 (evita render 4K que consome 4x VRAM)
     appinfo = {
         "id": APP_ID,
         "version": APP_VERSION,
@@ -62,6 +91,7 @@ def build_ipk():
         "largeIcon": "largeIcon.png",
         "bgColor": "#0b101b",
         "iconColor": "#0b101b",
+        "resolution": "1920x1080",
         "disableBackHistoryAPI": True,
         "handlesRelaunch": True,
         "transparent": False,
@@ -78,28 +108,43 @@ def build_ipk():
     # 2. Ícones 80x80 e 130x130 exigidos pelo webOS
     src_icon = ROOT_DIR / "docs" / "assets" / "icon.png"
     if src_icon.exists():
-        subprocess.run(["sips", "-z", "80", "80", str(src_icon), "--out", str(app_root / "icon.png")], check=True, stdout=subprocess.DEVNULL)
-        subprocess.run(["sips", "-z", "130", "130", str(src_icon), "--out", str(app_root / "largeIcon.png")], check=True, stdout=subprocess.DEVNULL)
+        subprocess.run(["sips", "-z", "80", "80", str(src_icon), "--out", str(app_root / "icon.png")], check=False, stdout=subprocess.DEVNULL)
+        subprocess.run(["sips", "-z", "130", "130", str(src_icon), "--out", str(app_root / "largeIcon.png")], check=False, stdout=subprocess.DEVNULL)
 
-    # 3. Arquivos web essenciais
-    for fname in ("index.html", "default-theme.json", "logo.svg"):
+    # 3. HTML com polyfills webOS injetados
+    index_html = (ROOT_DIR / "index.html").read_text(encoding="utf-8", errors="ignore")
+    # Injetar polyfills logo antes de vendor/hls ou scripts
+    if "webos/polyfills.js" not in index_html:
+        index_html = index_html.replace(
+            '<script src="vendor/hls.min.js"></script>',
+            '<script src="webos/polyfills.js"></script>\n  <script src="vendor/hls.min.js"></script>'
+        )
+    (app_root / "index.html").write_text(index_html, encoding="utf-8")
+
+    for fname in ("default-theme.json", "logo.svg"):
         src = ROOT_DIR / fname
         if src.exists():
             shutil.copy2(src, app_root / fname)
 
-    (app_root / "webos").mkdir(parents=True, exist_ok=True)
-    shutil.copy2(WEBOS_DIR / "webos-bridge.js", app_root / "webos" / "webos-bridge.js")
+    # 4. Transpilação de CSS (styles.css + webos/tv-compat.css combinados e minificados)
+    print("  -> Transpilando e combinando CSS para TV...")
+    transpile_css_esbuild(
+        [ROOT_DIR / "styles.css", WEBOS_DIR / "tv-compat.css"],
+        app_root / "styles.css"
+    )
 
-    css_src = ROOT_DIR / "styles.css"
-    if css_src.exists():
-        (app_root / "styles.css").write_text(minify_css(css_src.read_text(encoding="utf-8", errors="ignore")), encoding="utf-8")
+    # 5. Transpilação esbuild direcionada ao Chromium 53
+    print("  -> Transpilando JavaScript para Chromium 53 via esbuild...")
+    (app_root / "webos").mkdir(parents=True, exist_ok=True)
+    transpile_js_esbuild(WEBOS_DIR / "polyfills.js", app_root / "webos" / "polyfills.js")
+    transpile_js_esbuild(WEBOS_DIR / "webos-bridge.js", app_root / "webos" / "webos-bridge.js")
 
     for js_name in ("app.js", "app-player.js", "app-store.js", "app-native.js", "app-games.js"):
         jf = ROOT_DIR / js_name
         if jf.exists():
-            (app_root / js_name).write_text(minify_js_safe(jf.read_text(encoding="utf-8", errors="ignore")), encoding="utf-8")
+            transpile_js_esbuild(jf, app_root / js_name)
 
-    # 4. Vendor, icons, sounds e wallpapers essenciais
+    # 6. Vendor, icons, sounds e wallpapers essenciais
     for folder in ("vendor", "icons", "sounds"):
         src_dir = ROOT_DIR / folder
         if src_dir.exists():
@@ -107,11 +152,11 @@ def build_ipk():
 
     wp_src = ROOT_DIR / "media" / "wallpapers"
     if wp_src.exists():
+        print("  -> Otimizando wallpapers para 1080p...")
         wp_dst = app_root / "media" / "wallpapers"
         wp_dst.mkdir(parents=True, exist_ok=True)
         for item in wp_src.iterdir():
             if item.is_file():
-                # Copia em tamanho 1080p para caber com folga na flash interna da TV
                 if item.suffix.lower() in (".jpg", ".jpeg"):
                     subprocess.run(
                         ["sips", "--resampleWidth", "1920", str(item), "--out", str(wp_dst / item.name)],
@@ -122,7 +167,7 @@ def build_ipk():
                 else:
                     shutil.copy2(item, wp_dst / item.name)
 
-    # 5. Calcula tamanho instalado e gera control
+    # 7. Calcula tamanho instalado e gera control
     installed_bytes = sum(f.stat().st_size for f in app_root.rglob("*") if f.is_file())
     installed_kb = max(1, installed_bytes // 1024)
     control_txt = (
@@ -133,14 +178,15 @@ def build_ipk():
         "Architecture: all\n"
         f"Installed-Size: {installed_kb}\n"
         "Maintainer: irisTV <goiristv@github>\n"
-        "Description: irisTV Smart TV Launcher and Media Hub\n"
+        "Description: irisTV Smart TV Launcher and Media Hub (Chromium 53 Compliant)\n"
         "webOS-Package-Format-Version: 2\n"
         "webOS-Mini-Version: 1.0.0\n"
     )
     (ctrl_root / "control").write_text(control_txt, encoding="utf-8")
     (STAGE_DIR / "debian-binary").write_text("2.0\n", encoding="utf-8")
 
-    # 6. Empacota control.tar.gz, data.tar.gz e ar final (.ipk)
+    # 8. Empacota control.tar.gz, data.tar.gz e ar final (.ipk)
+    print("  -> Compactando control.tar.gz e data.tar.gz...")
     ctrl_tar = STAGE_DIR / "control.tar.gz"
     data_tar = STAGE_DIR / "data.tar.gz"
 
@@ -179,7 +225,7 @@ def build_ipk():
 
     shutil.rmtree(STAGE_DIR)
     size_mb = ipk_out.stat().st_size / (1024 * 1024)
-    print(f"[OK] webOS .ipk gerado: {ipk_out} ({size_mb:.2f} MB)")
+    print(f"[OK] webOS .ipk gerado com sucesso: {ipk_out} ({size_mb:.2f} MB)")
 
 
 if __name__ == "__main__":

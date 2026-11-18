@@ -1526,6 +1526,7 @@
   let currentAmbientWpUrl = '';
   let activeAmbientLayer = 'a';
   let activeShowBannerUrl = '';
+  let ambientWpCleanupTimer = null;
 
   function setMainWallpaperUrl(url, fastFade = false) {
     if (!url || url === currentAmbientWpUrl) return;
@@ -1535,6 +1536,7 @@
     const layerA = document.getElementById('ambient-wp-a');
     const layerB = document.getElementById('ambient-wp-b');
     if (layerA && layerB) {
+      clearTimeout(ambientWpCleanupTimer);
       const nextLayer = activeAmbientLayer === 'a' ? layerB : layerA;
       const currLayer = activeAmbientLayer === 'a' ? layerA : layerB;
       nextLayer.style.backgroundImage = `url("${url}")`;
@@ -1542,6 +1544,12 @@
       nextLayer.classList.add('is-active');
       currLayer.classList.remove('is-active');
       activeAmbientLayer = activeAmbientLayer === 'a' ? 'b' : 'a';
+      // Liberar textura decodificada antiga da VRAM/heap logo apos o crossfade
+      ambientWpCleanupTimer = setTimeout(() => {
+        if (!currLayer.classList.contains('is-active')) {
+          currLayer.style.backgroundImage = 'none';
+        }
+      }, 1250);
     } else {
       const ambientWpEl = document.getElementById('ambient-wallpaper-bg');
       if (ambientWpEl) ambientWpEl.style.backgroundImage = `url("${url}")`;
@@ -5609,6 +5617,7 @@
       if (window.IrisNativeApps) window.IrisNativeApps.cleanupActiveNative();
       if (window.IrisNativeGames) window.IrisNativeGames.cleanup();
       if (window.IrisMediaPlayer) window.IrisMediaPlayer.cleanup();
+      if (appStageBody) appStageBody.innerHTML = '';
       appStageWindow.classList.remove('is-details-mode', 'is-store-mode', 'is-fullscreen-app', 'is-mediaplayer-app', 'is-closing');
       appStageOverlay.classList.add('hidden');
       if (state.showsGridDirty && state.activeTab === 'shows') {
@@ -6631,9 +6640,12 @@
     }
 
     const isM3u8 = streamUrl.includes('.m3u8');
+    const isWebOS = Boolean(window.IrisWebOS?.isWebOS || /Web0S|webOS/i.test(navigator.userAgent || ''));
     const canNativeHls = Boolean(
       playerVideo.canPlayType('application/vnd.apple.mpegurl') ||
-      playerVideo.canPlayType('audio/mpegurl')
+      playerVideo.canPlayType('application/x-mpegURL') ||
+      playerVideo.canPlayType('audio/mpegurl') ||
+      isWebOS
     );
     const proxySrc = isM3u8
       ? (streamUrl.startsWith('/api/') ? streamUrl : `/api/stream-proxy/live.m3u8?url=${encodeURIComponent(streamUrl)}`)
@@ -6673,15 +6685,16 @@
         setPlayerStatus('Stream incompatível', false);
         return;
       }
+      const isTv = Boolean(window.IrisWebOS?.isWebOS);
       const hls = new window.Hls({
         enableWorker: true,
         lowLatencyMode: false,
         liveSyncDurationCount: 3,
         liveMaxLatencyDurationCount: 8,
-        maxBufferLength: 45,
-        maxMaxBufferLength: 75,
-        maxBufferSize: 60 * 1024 * 1024,
-        backBufferLength: 12,
+        maxBufferLength: isTv ? 15 : 45,
+        maxMaxBufferLength: isTv ? 25 : 75,
+        maxBufferSize: isTv ? (8 * 1024 * 1024) : (60 * 1024 * 1024),
+        backBufferLength: isTv ? 2 : 12,
         manifestLoadingTimeOut: 12000,
         fragLoadingTimeOut: 20000,
         fragLoadingMaxRetry: 6,
@@ -7515,6 +7528,8 @@
     stopLiveCaptions();
     playerVideo.pause();
     destroyHls();
+    playerVideo.removeAttribute('src');
+    try { playerVideo.load(); } catch (_) { }
     playerMorePopover?.classList.add('hidden');
     document.body.classList.remove('player-active');
     cinemaPlayer.classList.remove('is-playing-video', 'is-idle');
@@ -7969,6 +7984,8 @@
     });
   }
 
+  let ssWpCleanupTimer = null;
+
   function applyScreensaverShow(index) {
     const shows = getAllShowBannersPool();
     if (!shows.length) return;
@@ -7980,10 +7997,16 @@
     const nextBg = ssActiveBg === 'a' ? ssWpBgB : ssWpBgA;
     const currBg = ssActiveBg === 'a' ? ssWpBgA : ssWpBgB;
     if (nextBg && currBg) {
+      clearTimeout(ssWpCleanupTimer);
       nextBg.style.backgroundImage = `url("${show.bgImg}")`;
       nextBg.classList.add('is-active');
       currBg.classList.remove('is-active');
       ssActiveBg = ssActiveBg === 'a' ? 'b' : 'a';
+      ssWpCleanupTimer = setTimeout(() => {
+        if (!currBg.classList.contains('is-active')) {
+          currBg.style.backgroundImage = 'none';
+        }
+      }, 1250);
     }
   }
 
@@ -8012,11 +8035,17 @@
 
     if (!nextBg || !currBg) return;
 
+    clearTimeout(ssWpCleanupTimer);
     nextBg.style.backgroundImage = `url("${wp.path}")`;
     nextBg.classList.add('is-active');
     currBg.classList.remove('is-active');
 
     ssActiveBg = ssActiveBg === 'a' ? 'b' : 'a';
+    ssWpCleanupTimer = setTimeout(() => {
+      if (!currBg.classList.contains('is-active')) {
+        currBg.style.backgroundImage = 'none';
+      }
+    }, 1250);
   }
 
   function syncScreensaverClock() {
@@ -8064,7 +8093,11 @@
     playUiSound('back');
     clearInterval(ssTimer);
     clearInterval(ssWpRotateTimer);
+    clearTimeout(ssWpCleanupTimer);
     screensaverOverlay.classList.add('hidden');
+    // Liberar memoria de texturas do screensaver imediatamente
+    if (ssWpBgA) ssWpBgA.style.backgroundImage = 'none';
+    if (ssWpBgB) ssWpBgB.style.backgroundImage = 'none';
   }
 
   screensaverOverlay.addEventListener('click', () => {
@@ -8857,18 +8890,24 @@
   }
   setTimeout(() => {
     prefetchDefaultShowsCatalog();
-    refreshWifiStatus(false, true);
-    setInterval(() => {
-      const busy = Boolean(
-        wifiConnecting ||
-        wifiSelectedSsid ||
-        (irisOskEl && !irisOskEl.classList.contains('hidden')) ||
-        (document.activeElement && document.activeElement.tagName === 'INPUT')
-      );
-      if (!busy) refreshWifiStatus(false, false);
-    }, 10000);
-    checkChannelsHealth();
-    setInterval(checkChannelsHealth, 25000);
+    const isTvProfile = Boolean(window.IrisWebOS?.isWebOS || /Web0S|webOS/i.test(navigator.userAgent || ''));
+    if (!isTvProfile) {
+      refreshWifiStatus(false, true);
+      setInterval(() => {
+        if (document.hidden) return;
+        const busy = Boolean(
+          wifiConnecting ||
+          wifiSelectedSsid ||
+          (irisOskEl && !irisOskEl.classList.contains('hidden')) ||
+          (document.activeElement && document.activeElement.tagName === 'INPUT')
+        );
+        if (!busy) refreshWifiStatus(false, false);
+      }, 15000);
+      checkChannelsHealth();
+      setInterval(() => {
+        if (!document.hidden) checkChannelsHealth();
+      }, 45000);
+    }
     fetch('/api/news').then((r) => (r.ok ? r.json() : null)).then((d) => {
       if (d?.items?.length) {
         state.newsItems = d.items;
@@ -8877,6 +8916,42 @@
       }
     }).catch(() => { });
   }, 250);
+
+  // CPU/RAM Hygiene: Pausa animacoes secundarias e timers quando a TV desliga a tela ou muda de HDMI
+  document.addEventListener('visibilitychange', () => {
+    if (document.hidden) {
+      document.body.classList.add('is-tv-idle');
+    } else {
+      document.body.classList.remove('is-tv-idle');
+      updateClock();
+    }
+  });
+
+  // Telemetria em tempo real (?debug=1): Heap JS, nos do DOM, FPS e perfil
+  if (location.search.includes('debug=1') || localStorage.getItem('iristv_debug_overlay') === '1') {
+    const hud = document.createElement('div');
+    hud.id = 'iris-debug-hud';
+    hud.style.cssText = 'position:fixed;top:10px;right:10px;z-index:999999;background:rgba(8,12,20,0.85);border:1px solid rgba(56,189,248,0.4);border-radius:10px;padding:6px 12px;font:11px/1.4 monospace;color:#38bdf8;pointer-events:none;box-shadow:0 4px 16px rgba(0,0,0,0.6);';
+    document.body.appendChild(hud);
+    let frames = 0, lastFpsTs = performance.now(), curFps = 60;
+    const calcFps = (now) => {
+      frames++;
+      if (now - lastFpsTs >= 1000) {
+        curFps = Math.round((frames * 1000) / (now - lastFpsTs));
+        frames = 0;
+        lastFpsTs = now;
+      }
+      requestAnimationFrame(calcFps);
+    };
+    requestAnimationFrame(calcFps);
+    setInterval(() => {
+      const heapMb = window.performance?.memory?.usedJSHeapSize
+        ? (window.performance.memory.usedJSHeapSize / 1048576).toFixed(1) + ' MB'
+        : 'N/A';
+      const domCount = document.getElementsByTagName('*').length;
+      hud.innerHTML = `irisTV TV-Profile<br/>Heap: <b>${heapMb}</b> | DOM: <b>${domCount}</b> | FPS: <b>${curFps}</b>`;
+    }, 1000);
+  }
 
   /* Global Developer Debug Tools */
   window.IrisDev = {
