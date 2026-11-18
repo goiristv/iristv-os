@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="128" height="128" viewBox="0 0 128 128">
+  <title>Tempestade</title>
+  <defs>
+    <linearGradient id="tempestade-cd" gradientUnits="userSpaceOnUse" x1="0" y1="4" x2="0" y2="52"><stop offset="0" stop-color="#9aa8bc"/><stop offset="1" stop-color="#56647a"/></linearGradient>
+    <linearGradient id="tempestade-drop" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#79ccff"/><stop offset="1" stop-color="#1f7be0"/></linearGradient>
+    <linearGradient id="tempestade-bolt" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fff7a6"/><stop offset="1" stop-color="#ffae00"/></linearGradient>
+  </defs>
+  <g transform="translate(8.1 5.6) scale(1.3)" fill="url(#tempestade-cd)">
+    <rect x="10" y="30" width="62" height="22" rx="11"/>
+    <circle cx="27" cy="32" r="14"/>
+    <circle cx="46" cy="24" r="20"/>
+    <circle cx="63" cy="35" r="13"/>
+  </g>
+  <path transform="translate(34 92) rotate(14) scale(0.9)" d="M0 -8C3 -3 5 0 5 3.5A5 5 0 0 1 -5 3.5C-5 0 -3 -3 0 -8Z" fill="url(#tempestade-drop)"/>
+  <path transform="translate(94 92) rotate(14) scale(0.9)" d="M0 -8C3 -3 5 0 5 3.5A5 5 0 0 1 -5 3.5C-5 0 -3 -3 0 -8Z" fill="url(#tempestade-drop)"/>
+  <path transform="translate(40 108) rotate(14) scale(0.8)" d="M0 -8C3 -3 5 0 5 3.5A5 5 0 0 1 -5 3.5C-5 0 -3 -3 0 -8Z" fill="url(#tempestade-drop)"/>
+  <path transform="translate(88 108) rotate(14) scale(0.8)" d="M0 -8C3 -3 5 0 5 3.5A5 5 0 0 1 -5 3.5C-5 0 -3 -3 0 -8Z" fill="url(#tempestade-drop)"/>
+  <path transform="translate(56 70) scale(1.6)" d="M4 0L-8 17L-1 17L-5 32L11 11L3 11L9 0Z" fill="url(#tempestade-bolt)" stroke-linejoin="round"/>
+</svg>

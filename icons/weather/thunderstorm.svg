@@ -1,0 +1,74 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" width="100%" height="100%">
+  <defs>
+    <!-- Thunder Storm Cloud -->
+    <linearGradient id="stormCloud" x1="0.2" y1="0" x2="0.5" y2="1">
+      <stop offset="0%" stop-color="#475569"/>
+      <stop offset="50%" stop-color="#334155"/>
+      <stop offset="100%" stop-color="#1E1B4B"/>
+    </linearGradient>
+    <linearGradient id="stormHighlight" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#94A3B8" stop-opacity="0.9"/>
+      <stop offset="100%" stop-color="#94A3B8" stop-opacity="0"/>
+    </linearGradient>
+
+    <!-- 3D Lightning Bolt Gradients -->
+    <linearGradient id="boltCore" x1="0" y1="0" x2="0.8" y2="1">
+      <stop offset="0%" stop-color="#FFF9A6"/>
+      <stop offset="35%" stop-color="#FFD600"/>
+      <stop offset="85%" stop-color="#FF9100"/>
+      <stop offset="100%" stop-color="#FF5722"/>
+    </linearGradient>
+    <filter id="cloudShadow" x="-25%" y="-25%" width="150%" height="150%">
+      <feDropShadow dx="0" dy="8" stdDeviation="8" flood-color="#0F172A" flood-opacity="0.45"/>
+    </filter>
+    <filter id="boltGlow" x="-35%" y="-35%" width="170%" height="170%">
+      <feDropShadow dx="0" dy="0" stdDeviation="8" flood-color="#FFD600" flood-opacity="0.85"/>
+      <feDropShadow dx="0" dy="4" stdDeviation="4" flood-color="#E65100" flood-opacity="0.55"/>
+    </filter>
+    <linearGradient id="dropGrad" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#60A5FA"/>
+      <stop offset="100%" stop-color="#0284C7"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Puffy Storm Cloud -->
+  <g filter="url(#cloudShadow)">
+    <path d="M36 80 
+             L92 80 
+             A18 18 0 0 0 95 44.3 
+             A24 24 0 0 0 54 35.5 
+             A20 20 0 0 0 24 60 
+             A18 18 0 0 0 36 80 Z" 
+          fill="url(#stormCloud)"/>
+    <path d="M26 57 
+             A17 17 0 0 1 48 41 
+             A22 22 0 0 1 82 38 
+             A16 16 0 0 1 96 52" 
+          stroke="url(#stormHighlight)" 
+          stroke-width="3" 
+          stroke-linecap="round" 
+          fill="none"/>
+  </g>
+
+  <!-- Electric Rain Drops -->
+  <g>
+    <path d="M38 92 C38 92 34 100 34 103 C34 105.2 35.8 107 38 107 C40.2 107 42 105.2 42 103 C42 100 38 92 38 92 Z" fill="url(#dropGrad)"/>
+    <path d="M88 92 C88 92 84 100 84 103 C84 105.2 85.8 107 88 107 C90.2 107 92 105.2 92 103 C92 100 88 92 88 92 Z" fill="url(#dropGrad)"/>
+  </g>
+
+  <!-- Cute 3D Zigzag Lightning Bolt -->
+  <g filter="url(#boltGlow)">
+    <path d="M68 64 
+             L50 88 
+             L63 88 
+             L56 116 
+             L82 82 
+             L68 82 Z" 
+          fill="url(#boltCore)" 
+          stroke="#FFE600" 
+          stroke-width="1.8" 
+          stroke-linejoin="round"/>
+    <!-- Specular highlight on bolt -->
+    <path d="M66 68 L53 86 L62 86" stroke="#FFFFFF" stroke-width="2" stroke-linecap="round" fill="none" opacity="0.8"/>
+  </g>
+</svg>

@@ -1,0 +1,38 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 192 192" width="192" height="192">
+  <defs>
+    <linearGradient id="cal-bg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#282C37"/>
+      <stop offset="100%" stop-color="#13151B"/>
+    </linearGradient>
+    <linearGradient id="cal-disp" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#353D4E"/>
+      <stop offset="100%" stop-color="#262C39"/>
+    </linearGradient>
+    <linearGradient id="cal-op" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#FFB338"/>
+      <stop offset="100%" stop-color="#F58200"/>
+    </linearGradient>
+    <linearGradient id="cal-key" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#575E70"/>
+      <stop offset="100%" stop-color="#414756"/>
+    </linearGradient>
+  </defs>
+  <rect width="192" height="192" rx="40" fill="url(#cal-bg)"/>
+  <!-- Sleek Display -->
+  <rect x="26" y="24" width="140" height="40" rx="12" fill="url(#cal-disp)" stroke="rgba(255,255,255,0.12)" stroke-width="1.5"/>
+  <text x="152" y="52" text-anchor="end" fill="#FFFFFF" font-family="system-ui, -apple-system, sans-serif" font-weight="600" font-size="22" opacity="0.92">42</text>
+  <!-- Keypad Row 1 -->
+  <rect x="26" y="76" width="30" height="24" rx="12" fill="url(#cal-key)"/>
+  <rect x="63" y="76" width="30" height="24" rx="12" fill="url(#cal-key)"/>
+  <rect x="100" y="76" width="30" height="24" rx="12" fill="url(#cal-key)"/>
+  <rect x="137" y="76" width="29" height="24" rx="12" fill="url(#cal-op)"/>
+  <!-- Keypad Row 2 -->
+  <rect x="26" y="108" width="30" height="24" rx="12" fill="url(#cal-key)"/>
+  <rect x="63" y="108" width="30" height="24" rx="12" fill="url(#cal-key)"/>
+  <rect x="100" y="108" width="30" height="24" rx="12" fill="url(#cal-key)"/>
+  <rect x="137" y="108" width="29" height="24" rx="12" fill="url(#cal-op)"/>
+  <!-- Keypad Row 3 -->
+  <rect x="26" y="140" width="67" height="24" rx="12" fill="url(#cal-key)"/>
+  <rect x="100" y="140" width="30" height="24" rx="12" fill="url(#cal-key)"/>
+  <rect x="137" y="140" width="29" height="24" rx="12" fill="url(#cal-op)"/>
+</svg>

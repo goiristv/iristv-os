@@ -1,0 +1,19 @@
+{
+  "manifest_version": 3,
+  "name": "irisOS TV Spatial Navigation & Virtual Remote",
+  "version": "1.0.0",
+  "description": "Transforma qualquer web app de streaming (Netflix, Prime Video, Disney+, Max, Globoplay, YouTube) em uma interface navegável por controle remoto (Setas, Cursor Virtual Air-Mouse e Teclado Virtual na Tela) no irisTV.",
+  "content_scripts": [
+    {
+      "matches": ["<all_urls>"],
+      "exclude_matches": [
+        "http://localhost:3000/*",
+        "http://127.0.0.1:3000/*"
+      ],
+      "js": ["tv-SpatialNav.js"],
+      "run_at": "document_idle",
+      "all_frames": false
+    }
+  ]
+}
+

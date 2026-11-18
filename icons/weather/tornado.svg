@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="128" height="128" viewBox="0 0 128 128">
+  <title>Tornado</title>
+  <defs>
+    <linearGradient id="tornado-cd" gradientUnits="userSpaceOnUse" x1="0" y1="4" x2="0" y2="52"><stop offset="0" stop-color="#9aa8bc"/><stop offset="1" stop-color="#56647a"/></linearGradient>
+    <linearGradient id="tornado-tor" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#dfe6f1"/><stop offset="1" stop-color="#8d9bb1"/></linearGradient>
+  </defs>
+  <g transform="translate(14.55 0.8) scale(1.15)" fill="url(#tornado-cd)">
+    <rect x="10" y="30" width="62" height="22" rx="11"/>
+    <circle cx="27" cy="32" r="14"/>
+    <circle cx="46" cy="24" r="20"/>
+    <circle cx="63" cy="35" r="13"/>
+  </g>
+  <rect x="22" y="59.5" width="84" height="9" rx="4.5" fill="url(#tornado-tor)"/>
+  <rect x="35" y="73.5" width="66" height="9" rx="4.5" fill="url(#tornado-tor)"/>
+  <rect x="36" y="86.5" width="50" height="9" rx="4.5" fill="url(#tornado-tor)"/>
+  <rect x="48" y="99.5" width="36" height="9" rx="4.5" fill="url(#tornado-tor)"/>
+  <rect x="51" y="112.5" width="22" height="9" rx="4.5" fill="url(#tornado-tor)"/>
+</svg>

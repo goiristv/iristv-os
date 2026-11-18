@@ -1,0 +1,620 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>irisTV — Smart TV Experience</title>
+  <link rel="icon" type="image/svg+xml" href="logo.svg" />
+  <link rel="preload" href="styles.css?v=15" as="style" />
+  <link rel="preload" href="app.js?v=15" as="script" />
+  <link rel="preload" href="icons/netflix.jpg" as="image" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css?v=15" />
+</head>
+<body class="theme-prism">
+  <!-- Fullscreen Ambient Canvas + Cinematic 4K Wallpaper + Backdrop Bleed + Silk Waves -->
+  <div class="ambient-stage" aria-hidden="true">
+    <div id="ambient-wallpaper-bg" class="ambient-wallpaper-bg">
+      <div id="ambient-wp-a" class="ambient-wp-layer is-active"></div>
+      <div id="ambient-wp-b" class="ambient-wp-layer"></div>
+    </div>
+    <img id="ambient-backdrop-img" class="ambient-backdrop-img" alt="" decoding="async" />
+    <div class="ambient-orb orb-1" id="orb-1"></div>
+    <div class="ambient-orb orb-2" id="orb-2"></div>
+    <div class="ambient-orb orb-3" id="orb-3"></div>
+    <svg class="silk-waves" viewBox="0 0 1600 900" preserveAspectRatio="none" fill="none">
+      <path class="wave-line wl-1" d="M-120 340 C 260 190, 620 490, 1020 310 C 1320 175, 1520 260, 1740 180" stroke="currentColor" stroke-width="1.4" />
+      <path class="wave-line wl-2" d="M-140 540 C 310 680, 740 360, 1140 530 C 1410 645, 1580 510, 1760 440" stroke="currentColor" stroke-width="1.2" />
+      <path class="wave-line wl-3" d="M-80 710 C 360 560, 760 760, 1180 610 C 1420 520, 1600 660, 1760 590" stroke="currentColor" stroke-width="1" />
+    </svg>
+    <div class="ambient-vignette"></div>
+  </div>
+
+  <!-- Boot / Wake Sequence -->
+  <div id="boot-screen" class="boot-screen" role="status" aria-label="Inicializando">
+    <div class="boot-glow"></div>
+    <div class="boot-logo-wrap">
+      <svg class="iris-prism-svg boot-svg" viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <radialGradient id="boot-pupil-grad" cx="38%" cy="32%" r="68%">
+            <stop offset="0%" stop-color="#222845" />
+            <stop offset="55%" stop-color="#0a0c16" />
+            <stop offset="100%" stop-color="#020307" />
+          </radialGradient>
+          <linearGradient id="ip-c1" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#FFE600"/><stop offset="100%" stop-color="#FF9900"/></linearGradient>
+          <linearGradient id="ip-c2" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#FF8800"/><stop offset="100%" stop-color="#FF3B30"/></linearGradient>
+          <linearGradient id="ip-c3" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#FF2D6F"/><stop offset="100%" stop-color="#D9006C"/></linearGradient>
+          <linearGradient id="ip-c4" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#E040FB"/><stop offset="100%" stop-color="#8A2BE2"/></linearGradient>
+          <linearGradient id="ip-c5" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#7C4DFF"/><stop offset="100%" stop-color="#3D5AFE"/></linearGradient>
+          <linearGradient id="ip-c6" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#00B0FF"/><stop offset="100%" stop-color="#00E5FF"/></linearGradient>
+          <linearGradient id="ip-c7" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#00E5A3"/><stop offset="100%" stop-color="#00C853"/></linearGradient>
+          <linearGradient id="ip-c8" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#AEEA00"/><stop offset="100%" stop-color="#FFD600"/></linearGradient>
+        </defs>
+        <g class="iris-prism-ring">
+          <g transform="rotate(0 100 100)"><ellipse class="iris-petal ip-1" cx="100" cy="40" rx="18" ry="34" fill="url(#ip-c3)" /></g>
+          <g transform="rotate(30 100 100)"><ellipse class="iris-petal ip-2" cx="100" cy="40" rx="18" ry="34" fill="url(#ip-c4)" /></g>
+          <g transform="rotate(60 100 100)"><ellipse class="iris-petal ip-3" cx="100" cy="40" rx="18" ry="34" fill="url(#ip-c5)" /></g>
+          <g transform="rotate(90 100 100)"><ellipse class="iris-petal ip-4" cx="100" cy="40" rx="18" ry="34" fill="url(#ip-c6)" /></g>
+          <g transform="rotate(120 100 100)"><ellipse class="iris-petal ip-5" cx="100" cy="40" rx="18" ry="34" fill="url(#ip-c6)" /></g>
+          <g transform="rotate(150 100 100)"><ellipse class="iris-petal ip-6" cx="100" cy="40" rx="18" ry="34" fill="url(#ip-c7)" /></g>
+          <g transform="rotate(180 100 100)"><ellipse class="iris-petal ip-7" cx="100" cy="40" rx="18" ry="34" fill="url(#ip-c7)" /></g>
+          <g transform="rotate(210 100 100)"><ellipse class="iris-petal ip-8" cx="100" cy="40" rx="18" ry="34" fill="url(#ip-c8)" /></g>
+          <g transform="rotate(240 100 100)"><ellipse class="iris-petal ip-9" cx="100" cy="40" rx="18" ry="34" fill="url(#ip-c1)" /></g>
+          <g transform="rotate(270 100 100)"><ellipse class="iris-petal ip-10" cx="100" cy="40" rx="18" ry="34" fill="url(#ip-c2)" /></g>
+          <g transform="rotate(300 100 100)"><ellipse class="iris-petal ip-11" cx="100" cy="40" rx="18" ry="34" fill="url(#ip-c2)" /></g>
+          <g transform="rotate(330 100 100)"><ellipse class="iris-petal ip-12" cx="100" cy="40" rx="18" ry="34" fill="url(#ip-c3)" /></g>
+        </g>
+        <circle class="iris-ring-outer" cx="100" cy="100" r="46" fill="#070912" stroke="rgba(255,255,255,0.28)" stroke-width="2" />
+        <circle class="iris-ring-inner" cx="100" cy="100" r="36" fill="url(#boot-pupil-grad)" stroke="rgba(255,255,255,0.22)" stroke-width="1.5" />
+        <circle cx="100" cy="100" r="18" fill="#030409" stroke="rgba(255,255,255,0.4)" stroke-width="1" />
+        <circle cx="88" cy="87" r="7" fill="#ffffff" opacity="0.88" />
+        <circle cx="112" cy="112" r="3" fill="#00E5FF" opacity="0.72" />
+      </svg>
+      <div class="boot-wordmark">
+        <span class="brand-iris">iris</span><span class="brand-os">OS</span>
+      </div>
+      <div class="boot-progress-track" aria-hidden="true">
+        <div class="boot-progress-fill"></div>
+      </div>
+    </div>
+    <button id="skip-boot-btn" class="skip-boot-btn" type="button">Pular</button>
+  </div>
+
+  <!-- Offline Internet Gate Overlay (Blocks irisTV when there is no internet and shows Wi-Fi connector below) -->
+  <section id="offline-gate-overlay" class="offline-gate-overlay hidden" role="dialog" aria-modal="true" aria-label="Sem conexão com a Internet">
+    <div class="offline-gate-card">
+      <div class="offline-gate-alert">
+        <div class="offline-gate-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="2" y1="2" x2="22" y2="22"/>
+            <path d="M8.5 16.5a5 5 0 0 1 7 0"/>
+            <path d="M2 8.82a15 15 0 0 1 4.17-2.65"/>
+            <path d="M10.66 5c4.01-.36 8.14.9 11.34 3.76"/>
+            <path d="M16.85 11.25a10 10 0 0 1 2.22 1.68"/>
+            <path d="M5 12.86a10 10 0 0 1 5.17-2.89"/>
+            <line x1="12" y1="20" x2="12.01" y2="20"/>
+          </svg>
+        </div>
+        <div class="offline-gate-text">
+          <h2>Sem Conexão com a Internet</h2>
+          <p>O irisTV precisa estar conectado à internet para abrir. Escolha uma rede Wi-Fi abaixo e conecte-se para continuar.</p>
+        </div>
+      </div>
+      <div id="offline-wifi-container" class="offline-wifi-container"></div>
+    </div>
+  </section>
+
+  <!-- First-Time Smart TV Onboarding Experience -->
+  <section id="onboarding-overlay" class="onboarding-overlay hidden" role="dialog" aria-modal="true"
+    aria-label="Configuração Inicial irisTV">
+    <audio id="onboarding-audio" src="assets/audio/onboarding.mp3" preload="auto" loop></audio>
+
+    <!-- Wallpaper Background Overlay -->
+    <div id="ob-bg-wallpaper" class="ob-bg-wallpaper" aria-hidden="true"></div>
+    <div class="ob-bg-vignette" aria-hidden="true"></div>
+
+    <!-- Floating Audio Control Pill -->
+    <div class="ob-audio-dock">
+      <button id="ob-audio-toggle" class="ob-audio-pill focusable" type="button" aria-label="Alternar áudio">
+        <span class="ob-audio-icon" id="ob-audio-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14"/></svg>
+        </span>
+        <span id="ob-audio-label">Música Ativa</span>
+      </button>
+    </div>
+
+    <!-- Stage 1: Cinematic Greeting ("Olá" + ao lado "Bem-vindo ao irisTV!" + subtítulo embaixo) -->
+    <div id="ob-greeting-stage" class="ob-greeting-stage">
+      <div class="ob-greeting-row">
+        <div class="ob-ola-wrap">
+          <h1 class="ob-word-ola" id="ob-word-ola">Olá,</h1>
+        </div>
+        <div class="ob-welcome-inline" id="ob-welcome-inline">
+          <h2 class="ob-welcome-title">Bem-vindo ao irisTV!</h2>
+        </div>
+      </div>
+
+      <div class="ob-welcome-box" id="ob-welcome-box">
+        <p class="ob-welcome-tagline">Uma experiência cinematográfica desenhada especialmente para a sua sala.</p>
+        <button id="ob-start-btn" class="btn-prism ob-start-btn focusable" type="button">
+          <span>Começar Configuração</span>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+        </button>
+      </div>
+    </div>
+
+    <!-- Stage 2: Interactive Wizard Card (5 Steps) -->
+    <div class="onboarding-card hidden" id="ob-wizard-card">
+      <div class="ob-progress-dots" id="ob-dots">
+        <span class="ob-dot active"></span>
+        <span class="ob-dot"></span>
+        <span class="ob-dot"></span>
+        <span class="ob-dot"></span>
+        <span class="ob-dot"></span>
+      </div>
+
+      <div id="ob-step-body" class="ob-step-body"></div>
+
+      <div class="ob-footer">
+        <button id="ob-skip-btn" class="btn-glass ob-skip-btn focusable" type="button">Pular</button>
+        <div class="ob-nav-btns">
+          <button id="ob-back-btn" class="btn-glass hidden focusable" type="button">Voltar</button>
+          <button id="ob-next-btn" class="btn-prism focusable" type="button">Continuar →</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Stage 3: Loading Preparation ("Preparando o irisTV...") -->
+    <div id="ob-prep-stage" class="ob-prep-stage hidden">
+      <div class="ob-prep-orb-wrap">
+        <div class="ob-prep-orb-glow"></div>
+        <div class="ob-prep-orb-core">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="15" x="2" y="7" rx="3"/><polyline points="17 2 12 7 7 2"/></svg>
+        </div>
+      </div>
+      <h2 class="ob-prep-title">Preparando o irisTV</h2>
+      <div class="ob-prep-status" id="ob-prep-status">Calibrando aceleração gráfica e HDR...</div>
+      <div class="ob-prep-bar-track">
+        <div class="ob-prep-bar-fill" id="ob-prep-bar-fill"></div>
+      </div>
+      <div class="ob-prep-pct" id="ob-prep-pct">0%</div>
+    </div>
+  </section>
+
+  <!-- Main Minimalist TV Shell -->
+  <div id="tv-shell" class="tv-shell">
+    <!-- Minimal 3-Zone Top Bar (NavaTV-inspired) -->
+    <header class="top-bar" id="top-bar">
+      <div class="top-bar-left">
+        <button id="brand-home-btn" class="brand-clean focusable" data-nav="top" aria-label="irisTV Início">
+          <svg class="iris-prism-mini" viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <g class="mini-iris-spin">
+              <ellipse cx="100" cy="40" rx="18" ry="34" fill="#FF2D6F" transform="rotate(0 100 100)"/>
+              <ellipse cx="100" cy="40" rx="18" ry="34" fill="#E040FB" transform="rotate(30 100 100)"/>
+              <ellipse cx="100" cy="40" rx="18" ry="34" fill="#7C4DFF" transform="rotate(60 100 100)"/>
+              <ellipse cx="100" cy="40" rx="18" ry="34" fill="#00B0FF" transform="rotate(90 100 100)"/>
+              <ellipse cx="100" cy="40" rx="18" ry="34" fill="#00E5FF" transform="rotate(120 100 100)"/>
+              <ellipse cx="100" cy="40" rx="18" ry="34" fill="#00E5A3" transform="rotate(150 100 100)"/>
+              <ellipse cx="100" cy="40" rx="18" ry="34" fill="#00C853" transform="rotate(180 100 100)"/>
+              <ellipse cx="100" cy="40" rx="18" ry="34" fill="#AEEA00" transform="rotate(210 100 100)"/>
+              <ellipse cx="100" cy="40" rx="18" ry="34" fill="#FFD600" transform="rotate(240 100 100)"/>
+              <ellipse cx="100" cy="40" rx="18" ry="34" fill="#FF8800" transform="rotate(270 100 100)"/>
+              <ellipse cx="100" cy="40" rx="18" ry="34" fill="#FF3B30" transform="rotate(300 100 100)"/>
+              <ellipse cx="100" cy="40" rx="18" ry="34" fill="#FF2D6F" transform="rotate(330 100 100)"/>
+            </g>
+            <circle cx="100" cy="100" r="44" fill="#090c16" stroke="rgba(255,255,255,0.35)" stroke-width="4" />
+            <circle cx="100" cy="100" r="22" fill="#030409" stroke="rgba(255,255,255,0.5)" stroke-width="2" />
+            <circle cx="88" cy="87" r="7" fill="#fff" />
+          </svg>
+          <span class="brand-text"><span class="brand-iris">iris</span><span class="brand-tv-tag">TV</span></span>
+        </button>
+      </div>
+
+      <!-- Centered Glass Pill Navigation -->
+      <nav class="nav-center-pill" id="nav-pills" aria-label="Navegação principal">
+        <div id="nav-pill-indicator" class="nav-pill-indicator" aria-hidden="true"></div>
+        <button class="nav-pill focusable active" data-nav="top" data-tab="home">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M3 10.5 12 3l9 7.5V20a1 1 0 0 1-1 1h-5.5v-6.5h-5V21H4a1 1 0 0 1-1-1v-9.5Z"/></svg>
+          <span>Início</span>
+        </button>
+        <button class="nav-pill focusable" data-nav="top" data-tab="shows">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="2.5"/><path d="m10 9 5 3-5 3V9Z"/></svg>
+          <span>Séries &amp; Filmes</span>
+        </button>
+        <button class="nav-pill focusable" data-nav="top" data-tab="news">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M4 22h16a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2H8a2 2 0 0 0-2 2v16a2 2 0 0 1-2 2Zm0 0a2 2 0 0 1-2-2v-9c0-1.1.9-2 2-2h2"/><path d="M18 14h-8M15 18h-5M10 6h8v4h-8z"/></svg>
+          <span>Notícias</span>
+        </button>
+        <button class="nav-pill focusable" data-nav="top" data-tab="apps">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1.8"/><rect x="14" y="3" width="7" height="7" rx="1.8"/><rect x="3" y="14" width="7" height="7" rx="1.8"/><rect x="14" y="14" width="7" height="7" rx="1.8"/></svg>
+          <span>Apps</span>
+        </button>
+        <button id="search-trigger" class="nav-pill focusable" data-nav="top" data-action="search">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+          <span>Buscar</span>
+        </button>
+        <div class="nav-more-wrap" id="nav-more-wrap">
+          <button id="nav-more-btn" class="nav-pill focusable" data-nav="top" type="button" aria-haspopup="true" aria-expanded="false">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"><circle cx="12" cy="12" r="1.4"/><circle cx="18.5" cy="12" r="1.4"/><circle cx="5.5" cy="12" r="1.4"/></svg>
+            <span>Mais</span>
+            <svg class="nav-more-caret" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>
+          </button>
+          <div id="nav-more-menu" class="nav-more-menu" role="menu" aria-label="Mais seções">
+            <button class="nav-more-item" type="button" data-more-action="live" role="menuitem">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="2.2"/><path d="M16.24 7.76a6 6 0 0 1 0 8.49M7.76 16.24a6 6 0 0 1 0-8.49M19.07 4.93a10 10 0 0 1 0 14.14M4.93 19.07a10 10 0 0 1 0-14.14"/></svg>
+              <span>Ao Vivo</span>
+            </button>
+            <button class="nav-more-item" type="button" data-more-action="guide" role="menuitem">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2.5"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
+              <span>Programação</span>
+            </button>
+            <button class="nav-more-item" type="button" data-more-action="mychannels" role="menuitem">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="14" rx="2.5"/><path d="m17 2-5 5-5-5"/></svg>
+              <span>Meus Canais</span>
+            </button>
+            <button class="nav-more-item" type="button" data-more-action="settings" role="menuitem">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+              <span>Ajustes</span>
+            </button>
+          </div>
+        </div>
+      </nav>
+
+      <!-- Unified Status & Telemetry Pill (Som, Wi-Fi, Clima e Data/Hora em uma pill só) -->
+      <div class="top-bar-right">
+        <div class="unified-telemetry-pill" id="unified-telemetry-pill" role="group" aria-label="Central de Status e Configurações Rápidas">
+          <button id="sound-trigger-btn" class="pill-seg pill-sound-seg focusable" data-nav="top" type="button" aria-haspopup="true" aria-expanded="false" aria-label="Controle de Som" title="Controle de Som (Mudo)">
+            <svg class="sound-mini" id="topbar-sound-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/>
+              <line x1="23" y1="9" x2="17" y2="15"/>
+              <line x1="17" y1="9" x2="23" y2="15"/>
+            </svg>
+            <span id="topbar-sound-label" class="topbar-sound-label">Mudo</span>
+          </button>
+
+          <span class="pill-divider" aria-hidden="true"></span>
+
+          <button id="wifi-trigger-btn" class="pill-seg pill-wifi-seg focusable" data-nav="top" type="button" aria-haspopup="true" aria-expanded="false" aria-label="Redes Wi-Fi" title="Redes Wi-Fi">
+            <svg class="wifi-mini" id="topbar-wifi-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+              <path d="M5 12.55a11 11 0 0 1 14.08 0" />
+              <path d="M8.53 16.11a6 6 0 0 1 6.95 0" />
+              <line x1="12" y1="20" x2="12.01" y2="20" />
+            </svg>
+            <span class="wifi-status-dot" id="topbar-wifi-dot"></span>
+          </button>
+
+          <span class="pill-divider" aria-hidden="true"></span>
+
+          <button id="topbar-weather-btn" class="pill-seg pill-weather-seg focusable" data-nav="top" type="button" aria-label="Clima" title="Abrir Aplicativo de Clima">
+            <img id="topbar-weather-icon" src="icons/weather/sol.svg" width="20" height="20" class="topbar-weather-icon" alt="Clima" />
+            <span id="topbar-weather-temp" class="topbar-weather-temp">--°</span>
+          </button>
+
+          <span class="pill-divider" aria-hidden="true"></span>
+
+          <button id="calendar-trigger-btn" class="pill-seg pill-date-seg focusable" data-nav="top" type="button" aria-haspopup="true" aria-expanded="false" aria-label="Abrir Calendário" title="Abrir Calendário e Relógio">
+            <svg class="clock-mini" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <rect x="3" y="4" width="18" height="18" rx="3"/>
+              <line x1="16" y1="2" x2="16" y2="6"/>
+              <line x1="8" y1="2" x2="8" y2="6"/>
+              <line x1="3" y1="10" x2="21" y2="10"/>
+            </svg>
+            <span id="live-date" class="live-date"></span>
+            <time id="live-clock" class="live-clock">--:--</time>
+          </button>
+
+          <!-- Popovers anchored inside the unified pill -->
+          <div id="sound-popover" class="telemetry-popover sound-popover hidden" role="dialog" aria-label="Menu de Som">
+            <div class="sound-popover-title">Controle de Áudio</div>
+            <div class="sound-popover-row">
+              <button id="sound-popover-mute-btn" class="sound-popover-mute-btn focusable" type="button" aria-label="Alternar Mudo">
+                <svg id="sound-popover-mute-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/>
+                  <line x1="23" y1="9" x2="17" y2="15"/>
+                  <line x1="17" y1="9" x2="23" y2="15"/>
+                </svg>
+              </button>
+              <input type="range" id="sound-popover-range" min="0" max="100" value="0" step="5" class="sound-popover-range focusable" aria-label="Volume">
+              <span id="sound-popover-val" class="sound-popover-val">Mudo</span>
+            </div>
+            <div class="sound-popover-hint">Teclas - / + ou M no controle</div>
+          </div>
+
+          <div id="wifi-popover" class="telemetry-popover wifi-popover hidden" role="dialog" aria-label="Menu Wi-Fi"></div>
+          <div id="calendar-popover" class="telemetry-popover calendar-popover hidden" role="dialog" aria-label="Calendário"></div>
+        </div>
+
+        <button id="profile-btn" class="profile-pill focusable" data-nav="top" aria-label="Trocar perfil">
+          <span class="profile-avatar" id="current-avatar">H</span>
+        </button>
+      </div>
+    </header>
+
+    <!-- Main Open-Canvas TV Stage -->
+    <main id="tv-content" class="tv-content">
+      <!-- Open-Canvas Spotlight Hero (No box, floats directly over ambient canvas!) -->
+      <section class="spotlight-hero" id="hero-section" aria-label="Destaque">
+        <div class="spotlight-left">
+          <h1 class="spotlight-title" id="hero-title">Netflix</h1>
+          <div class="spotlight-meta" id="hero-meta">Brasil • Aplicativo TV</div>
+          <p class="spotlight-desc" id="hero-subtitle">Séries, filmes e documentários para assistir a qualquer hora.</p>
+          <div class="spotlight-actions">
+            <button id="hero-play-btn" class="btn-prism focusable" data-nav="hero">
+              <svg viewBox="0 0 24 24" fill="currentColor"><path d="M7 4v16l13-8z" /></svg>
+              <span id="hero-play-label">Abrir</span>
+            </button>
+            <button id="hero-list-btn" class="btn-glass focusable" data-nav="hero">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" /></svg>
+              <span id="hero-fav-label">Favoritos</span>
+            </button>
+          </div>
+        </div>
+
+        <div class="spotlight-right">
+          <div id="spotlight-visual" class="spotlight-visual">
+            <img id="spotlight-img" src="icons/netflix.jpg" alt="Netflix" />
+          </div>
+        </div>
+      </section>
+
+      <!-- Spacious Content Rows Container -->
+      <div id="rows-container" class="rows-container"></div>
+    </main>
+  </div>
+
+  <!-- Spotlight Search Overlay -->
+  <div id="search-overlay" class="overlay-backdrop hidden" role="dialog" aria-modal="true" aria-label="Busca irisTV">
+    <div class="spotlight-panel">
+      <div class="spotlight-input-wrap">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round">
+          <circle cx="11" cy="11" r="7" />
+          <path d="M20 20L16.2 16.2" />
+        </svg>
+        <input id="search-input" type="text" placeholder="Buscar apps, séries, canais ou jogos..." autocomplete="off" />
+        <button id="close-search-btn" class="kbd-close" type="button">ESC</button>
+      </div>
+      <div class="spotlight-filters" id="search-filters">
+        <button class="filter-chip active" data-filter="all">Tudo</button>
+        <button class="filter-chip" data-filter="streaming">Streaming</button>
+        <button class="filter-chip" data-filter="music">Música &amp; Vídeo</button>
+        <button class="filter-chip" data-filter="games">Jogos</button>
+        <button class="filter-chip" data-filter="utilities">Sistema &amp; Casa</button>
+      </div>
+      <div id="search-results" class="spotlight-results"></div>
+    </div>
+  </div>
+
+  <!-- Profile Switcher Modal -->
+  <div id="profile-overlay" class="overlay-backdrop hidden" role="dialog" aria-modal="true" aria-label="Perfis">
+    <div class="profile-modal">
+      <h2>Quem está assistindo?</h2>
+      <p>Escolha seu perfil do irisTV</p>
+      <div class="profiles-grid" id="profiles-grid"></div>
+      <button id="close-profile-btn" class="btn-glass" type="button">Fechar</button>
+    </div>
+  </div>
+
+  <!-- Custom M3U IPTV Import Modal -->
+  <div id="m3u-overlay" class="overlay-backdrop hidden" role="dialog" aria-modal="true" aria-label="Importar Lista M3U">
+    <div class="profile-modal m3u-modal">
+      <h2>Minha Lista M3U (TV a Cabo)</h2>
+      <p>Cole uma URL .m3u / .m3u8 ou carregue um arquivo M3U do seu Mac para trocar de canais pelos números.</p>
+      <div class="m3u-input-row">
+        <input id="m3u-url-input" class="m3u-input" type="url" placeholder="https://exemplo.com/lista.m3u" autocomplete="off" />
+        <button id="m3u-import-url-btn" class="btn-prism" type="button">Carregar URL</button>
+      </div>
+      <div class="m3u-actions-row">
+        <button id="m3u-file-btn" class="btn-glass" type="button">Escolher Arquivo .m3u…</button>
+        <button id="m3u-reset-btn" class="btn-glass" type="button">Restaurar Canais Padrão</button>
+        <button id="close-m3u-btn" class="btn-glass" type="button">Fechar</button>
+      </div>
+      <div id="m3u-status-msg" class="m3u-status-msg"></div>
+      <input id="m3u-file-input" type="file" accept=".m3u,.m3u8,audio/x-mpegurl,application/x-mpegurl,text/plain" class="hidden" />
+    </div>
+  </div>
+
+  <!-- Interactive App / Media Launch Stage -->
+  <div id="app-stage-overlay" class="app-stage-overlay hidden" role="dialog" aria-modal="true" aria-label="Aplicativo em execução">
+    <div class="app-stage-backdrop" id="app-stage-backdrop"></div>
+    <div class="app-stage-window" id="app-stage-window">
+      <div class="app-stage-topbar">
+        <div class="app-stage-brand" id="app-stage-brand"></div>
+        <div class="app-stage-actions">
+          <button id="close-app-stage" class="close-stage-btn" type="button">
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg>
+            <span>Voltar</span>
+          </button>
+        </div>
+      </div>
+      <div id="app-stage-body" class="app-stage-body"></div>
+    </div>
+  </div>
+
+  <!-- Cinema Video Player Overlay (Ultra-Minimalist + Auto-Hide + Live CC) -->
+  <div id="cinema-player" class="cinema-player hidden" role="dialog" aria-modal="true" aria-label="Reprodutor de Vídeo">
+    <img id="player-bg-img" class="player-bg-img" alt="" />
+    <video id="player-video" class="player-video hidden" playsinline></video>
+    <div class="player-scrim"></div>
+    <div class="player-ui">
+      <div class="player-top">
+        <div class="player-top-left">
+          <button id="player-close-btn" class="player-circle-btn" type="button" title="Voltar (ESC)" aria-label="Voltar para irisTV">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg>
+          </button>
+          <div class="player-top-meta">
+            <span id="player-title-inline" class="player-title-inline">irisTV</span>
+            <span id="player-status-pill" class="player-status-pill">Pronto</span>
+          </div>
+        </div>
+        <div class="player-specs">
+          <button id="player-ch-prev-btn" class="player-pill-btn hidden" type="button" title="Canal anterior">◀ Ch-</button>
+          <button id="player-channels-btn" class="player-pill-btn hidden" type="button">Canais</button>
+          <button id="player-ch-next-btn" class="player-pill-btn hidden" type="button" title="Próximo canal">Ch+ ▶</button>
+          <button id="player-guide-btn" class="player-pill-btn hidden" type="button" title="Programação e Gravações"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align:middle;margin-right:4px;"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>Guia</button>
+          <button id="player-rec-btn" class="player-pill-btn hidden" type="button" title="Gravar programa ao vivo"><svg width="12" height="12" viewBox="0 0 24 24" fill="red" stroke="red" stroke-width="2" style="vertical-align:middle;margin-right:4px;"><circle cx="12" cy="12" r="10"/></svg>Gravar</button>
+        </div>
+      </div>
+
+      <div id="player-ch-osd" class="player-ch-osd hidden" aria-live="polite"></div>
+
+      <div class="player-center" id="player-center">
+        <span id="player-app-label" class="player-kicker">APPLE TV+</span>
+        <h2 id="player-title" class="player-title">Severance</h2>
+        <p id="player-sub" class="player-sub"></p>
+      </div>
+
+      <div id="player-captions-wrap" class="player-captions-wrap hidden" aria-live="polite">
+        <div class="player-captions-pill">
+          <span id="player-captions-meta" class="player-captions-meta hidden"></span>
+          <div id="player-captions-text" class="player-captions-text"></div>
+        </div>
+      </div>
+
+      <div class="player-bottom">
+        <div id="player-zap-bar" class="player-zap-bar hidden"></div>
+        <div id="player-timeline-row" class="player-timeline-row">
+          <span id="player-cur-time">00:00</span>
+          <div id="player-track" class="player-track">
+            <div id="player-fill" class="player-fill"></div>
+          </div>
+          <span id="player-tot-time">00:00</span>
+        </div>
+        <div class="player-controls-dock">
+          <div class="player-dock-group">
+            <button id="player-rew-btn" class="player-icon-ctl" type="button" title="Voltar 10s" aria-label="Voltar">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 3-6.7L3 8"/><path d="M3 3v5h5"/></svg>
+            </button>
+            <button id="player-toggle-btn" class="player-play-ctl" type="button" title="Play / Pausar" aria-label="Play ou Pausar"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/></svg></button>
+            <button id="player-fwd-btn" class="player-icon-ctl" type="button" title="Avançar 10s" aria-label="Avançar">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-3-6.7L21 8"/><path d="M21 3v5h-5"/></svg>
+            </button>
+            <div class="player-vol-wrap">
+              <button id="player-mute-btn" class="player-icon-ctl" type="button" title="Silenciar" aria-label="Silenciar"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/></svg></button>
+              <input id="player-vol-range" class="tv-range player-vol-range" type="range" min="0" max="100" step="5" value="85" aria-label="Volume do player" />
+            </div>
+          </div>
+
+          <div class="player-dock-group">
+            <button id="player-cc-btn" class="player-pill-btn" type="button" title="Legendas ao vivo (C)">CC</button>
+            <div class="player-more-wrap">
+              <button id="player-more-btn" class="player-icon-ctl" type="button" title="Mais opções" aria-label="Opções">
+                <svg viewBox="0 0 24 24" fill="currentColor"><circle cx="5" cy="12" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="19" cy="12" r="2"/></svg>
+              </button>
+              <div id="player-more-popover" class="player-more-popover hidden">
+                <button id="player-cc-lang-btn" class="player-pop-item" type="button">Idioma CC: Auto</button>
+                <button id="player-audio-btn" class="player-pop-item" type="button">Áudio: Padrão</button>
+                <button id="player-quality-btn" class="player-pop-item" type="button">Qualidade: Auto</button>
+                <button id="player-sub-btn" class="player-pop-item" type="button">Carregar Legenda (.srt / .vtt)…</button>
+                <button id="player-local-btn" class="player-pop-item" type="button">Abrir Vídeo Local…</button>
+              </div>
+            </div>
+            <button id="player-fs-btn" class="player-icon-ctl" type="button" title="Tela Cheia" aria-label="Tela Cheia">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"/></svg>
+            </button>
+          </div>
+          <input id="player-local-file" type="file" accept="video/*,.m3u8" class="hidden" />
+          <input id="player-sub-file" type="file" accept=".srt,.vtt,text/vtt" class="hidden" />
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Virtual Remote (Atalho R) -->
+  <aside id="virtual-remote" class="virtual-remote hidden" aria-label="Controle Remoto Virtual">
+    <div class="vr-header">
+      <span>Controle</span>
+      <button id="vr-close" class="vr-close" type="button" aria-label="Fechar Controle">&times;</button>
+    </div>
+    <div class="vr-dpad">
+      <button class="vr-btn vr-up" data-vr="up" aria-label="Cima">▲</button>
+      <button class="vr-btn vr-left" data-vr="left" aria-label="Esquerda">◀</button>
+      <button class="vr-ok" data-vr="ok">OK</button>
+      <button class="vr-btn vr-right" data-vr="right" aria-label="Direita">▶</button>
+      <button class="vr-btn vr-down" data-vr="down" aria-label="Baixo">▼</button>
+    </div>
+    <div class="vr-actions">
+      <button class="vr-pill" data-vr="back">↩ Voltar</button>
+      <button class="vr-pill" data-vr="home">Início</button>
+    </div>
+    <div class="vr-vol-row">
+      <button class="vr-mini-ctl" data-vr="volDown" title="Diminuir Volume">Vol −</button>
+      <button class="vr-mini-ctl" data-vr="mute" title="Silenciar">Mudo</button>
+      <button class="vr-mini-ctl" data-vr="volUp" title="Aumentar Volume">Vol +</button>
+    </div>
+    <div class="vr-actions">
+      <button class="vr-pill" data-vr="keyboard">Teclado</button>
+      <button class="vr-pill" data-vr="search">Buscar</button>
+    </div>
+    <div class="vr-shortcuts">
+      <button class="vr-app" data-vr-app="netflix" title="Netflix"><img src="icons/netflix.jpg" alt="Netflix" /></button>
+      <button class="vr-app" data-vr-app="youtube" title="YouTube"><img src="icons/youtube.jpg" alt="YouTube" /></button>
+      <button class="vr-app" data-vr-app="spotify" title="Spotify"><img src="icons/spotify.jpg" alt="Spotify" /></button>
+      <button class="vr-app" data-vr-app="disney" title="Disney+"><img src="icons/disney.jpg" alt="Disney+" /></button>
+    </div>
+  </aside>
+
+  <!-- Floating System Volume HUD -->
+  <div id="volume-osd" class="volume-osd hidden" role="status" aria-live="polite">
+    <span id="volume-osd-icon" class="volume-osd-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14"/></svg></span>
+    <div class="volume-osd-meta">
+      <div class="volume-osd-head">
+        <span>Volume</span>
+        <strong id="volume-osd-val">50%</strong>
+      </div>
+      <div class="volume-osd-track">
+        <div id="volume-osd-fill" class="volume-osd-fill" style="width:50%"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Custom TV On-Screen Keyboard (Atalho K / Enter em campos de texto) -->
+  <section id="iris-osk" class="iris-osk hidden" role="dialog" aria-modal="true" aria-label="Teclado na Tela">
+    <div class="osk-panel">
+      <div class="osk-topbar">
+        <span id="osk-field-label" class="osk-field-label">Digitar texto</span>
+        <div id="osk-preview" class="osk-preview"><span id="osk-preview-text"></span><span class="osk-cursor"></span></div>
+        <button id="osk-close-btn" class="osk-action-top" type="button">Fechar (ESC)</button>
+      </div>
+      <div id="osk-rows" class="osk-rows"></div>
+    </div>
+  </section>
+
+  <!-- Ambient Mode / Cinematic 4K Lock Screen (Atalho S) -->
+  <div id="screensaver-overlay" class="screensaver-overlay hidden" role="dialog" aria-label="irisTV Lock Screen">
+    <!-- Cinematic 4K Wallpaper Stage with Crossfade & Ken Burns effect -->
+    <div id="ss-wallpaper-stage" class="ss-wallpaper-stage">
+      <div id="ss-wallpaper-bg-a" class="ss-wallpaper-bg is-active"></div>
+      <div id="ss-wallpaper-bg-b" class="ss-wallpaper-bg"></div>
+      <div class="ss-vignette-overlay"></div>
+    </div>
+
+    <!-- Minimalist Bottom-Left Display: Relógio e Data (ou Título + Ver no modo Banners de Shows) -->
+    <div class="ss-bottom-left" id="ss-clock-wrap">
+      <time id="ss-clock" class="ss-clock">--:--</time>
+      <p id="ss-date" class="ss-date"></p>
+      <span class="ss-hint-subtle">Pressione qualquer tecla ou clique para acordar</span>
+    </div>
+
+    <div class="ss-show-info hidden" id="ss-show-info">
+      <h2 id="ss-show-title" class="ss-show-title"></h2>
+      <p id="ss-show-sub" class="ss-show-sub"></p>
+      <button id="ss-show-watch-btn" class="ss-show-watch-btn" type="button">
+        <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><polygon points="6 4 20 12 6 20 6 4"/></svg>
+        <span>Ver</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- Toast Notification -->
+  <div id="toast-pill" class="toast-pill hidden" role="status" aria-live="polite"></div>
+
+  <script src="/vendor/hls.min.js"></script>
+  <script src="app-store.js"></script>
+  <script src="app-native.js"></script>
+  <script src="app-games.js"></script>
+  <script src="app-player.js"></script>
+  <script src="app.js?v=15"></script>
+</body>
+</html>

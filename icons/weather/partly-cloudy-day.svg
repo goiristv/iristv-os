@@ -1,0 +1,75 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" width="100%" height="100%">
+  <defs>
+    <!-- Yolk Sun Gradients -->
+    <radialGradient id="eggSunAura" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#FFDD33" stop-opacity="0.85"/>
+      <stop offset="65%" stop-color="#FF9500" stop-opacity="0.25"/>
+      <stop offset="100%" stop-color="#FF5722" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="eggSunCore" x1="0.15" y1="0.1" x2="0.85" y2="0.95">
+      <stop offset="0%" stop-color="#FFF875"/>
+      <stop offset="38%" stop-color="#FFB300"/>
+      <stop offset="78%" stop-color="#FF7000"/>
+      <stop offset="100%" stop-color="#FA4200"/>
+    </linearGradient>
+
+    <!-- Cloud Marshmallow Gradients -->
+    <linearGradient id="cloudBody" x1="0.2" y1="0" x2="0.5" y2="1">
+      <stop offset="0%" stop-color="#FFFFFF"/>
+      <stop offset="50%" stop-color="#F1F5F9"/>
+      <stop offset="82%" stop-color="#D9E6F7"/>
+      <stop offset="100%" stop-color="#BACFE6"/>
+    </linearGradient>
+
+    <!-- 3D Cloud Rim / Specular -->
+    <linearGradient id="cloudHighlight" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#FFFFFF" stop-opacity="0.95"/>
+      <stop offset="100%" stop-color="#FFFFFF" stop-opacity="0"/>
+    </linearGradient>
+
+    <!-- Drop Shadows -->
+    <filter id="eggShadow" x="-30%" y="-30%" width="160%" height="160%">
+      <feDropShadow dx="0" dy="7" stdDeviation="6" flood-color="#E65100" flood-opacity="0.35"/>
+    </filter>
+    <filter id="cloudShadow" x="-25%" y="-25%" width="150%" height="150%">
+      <feDropShadow dx="0" dy="8" stdDeviation="8" flood-color="#0F2444" flood-opacity="0.26"/>
+      <feDropShadow dx="0" dy="2" stdDeviation="2" flood-color="#0F2444" flood-opacity="0.14"/>
+    </filter>
+  </defs>
+
+  <!-- Ambient Glow from Sun -->
+  <circle cx="82" cy="46" r="38" fill="url(#eggSunAura)"/>
+
+  <!-- THE SUN: Cute 3D Egg Yolk peaking over the cloud -->
+  <g filter="url(#eggShadow)">
+    <circle cx="82" cy="46" r="27" fill="url(#eggSunCore)"/>
+    <!-- Specular highlight on yolk (fried egg yolk shine) -->
+    <ellipse cx="73" cy="35" rx="9" ry="5.5" transform="rotate(-30 73 35)" fill="#FFFFFF" opacity="0.65"/>
+    <ellipse cx="77" cy="32" rx="3.5" ry="2" transform="rotate(-30 77 32)" fill="#FFFFFF" opacity="0.9"/>
+    <ellipse cx="91" cy="57" rx="9" ry="3.2" transform="rotate(-15 91 57)" fill="#FF7700" opacity="0.45"/>
+  </g>
+
+  <!-- THE CLOUD: Samsung Style Puffy Marshmallow Cloud -->
+  <g filter="url(#cloudShadow)">
+    <path d="M36 94 
+             L92 94 
+             A18 18 0 0 0 95 58.3 
+             A24 24 0 0 0 54 49.5 
+             A20 20 0 0 0 24 74 
+             A18 18 0 0 0 36 94 Z" 
+          fill="url(#cloudBody)"/>
+
+    <!-- Puffy highlight curve -->
+    <path d="M26 71 
+             A17 17 0 0 1 48 55 
+             A22 22 0 0 1 82 52 
+             A16 16 0 0 1 96 66" 
+          stroke="url(#cloudHighlight)" 
+          stroke-width="3" 
+          stroke-linecap="round" 
+          fill="none"/>
+
+    <!-- Bottom volume softness -->
+    <path d="M34 92 L94 92" stroke="#BACFE6" stroke-width="2.5" stroke-linecap="round" opacity="0.6"/>
+  </g>
+</svg>

@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="128" height="128" viewBox="0 0 128 128">
+  <title>Ensolarado</title>
+  <defs>
+    <radialGradient id="sol-sun" cx=".38" cy=".32" r=".8"><stop offset="0" stop-color="#fff6a8"/><stop offset="0.5" stop-color="#ffd34a"/><stop offset="1" stop-color="#ffa51f"/></radialGradient>
+  </defs>
+  <path d="M64.0 28.5L64.0 17.8M89.1 38.9L96.7 31.3M99.5 64.0L110.2 64.0M89.1 89.1L96.7 96.7M64.0 99.5L64.0 110.2M38.9 89.1L31.3 96.7M28.5 64.0L17.8 64.0M38.9 38.9L31.3 31.3" fill="none" stroke="#ffbd2e" stroke-width="7.5" stroke-linecap="round"/>
+  <circle cx="64" cy="64" r="25" fill="url(#sol-sun)"/>
+</svg>

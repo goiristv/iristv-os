@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120" fill="none">
+  <defs>
+    <linearGradient id="mpBg" x1="12" y1="8" x2="108" y2="112" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#191b2e"/>
+      <stop offset="55%" stop-color="#0f1221"/>
+      <stop offset="100%" stop-color="#070913"/>
+    </linearGradient>
+    <linearGradient id="mpDisc" x1="28" y1="24" x2="92" y2="96" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#ff2d6f"/>
+      <stop offset="50%" stop-color="#9b4dff"/>
+      <stop offset="100%" stop-color="#00c2ff"/>
+    </linearGradient>
+  </defs>
+  <rect x="6" y="6" width="108" height="108" rx="26" fill="url(#mpBg)"/>
+  <circle cx="60" cy="60" r="36" fill="#090b12" stroke="url(#mpDisc)" stroke-width="4.5"/>
+  <circle cx="60" cy="60" r="25" stroke="rgba(255,255,255,0.12)" stroke-width="1.5"/>
+  <circle cx="60" cy="60" r="17" fill="url(#mpDisc)"/>
+  <path d="M56 52.5L68 60L56 67.5V52.5Z" fill="#ffffff"/>
+</svg>
+

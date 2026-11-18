@@ -1,0 +1,24 @@
+{
+  "name": "iristv",
+  "version": "1.0.0",
+  "description": "irisTV - Smart TV OS in Pure Node.js, Native macOS WKWebView, Live HLS Video & Real OS Controls",
+  "main": "launch-webview.js",
+  "scripts": {
+    "start": "node launch-webview.js",
+    "web": "node server.js",
+    "build:webview": "mkdir -p irisTV.app/Contents/MacOS && swiftc -O webview.swift -o irisTV.app/Contents/MacOS/iristv-webview -framework Cocoa -framework WebKit",
+    "dev": "node --watch server.js"
+  },
+  "keywords": [
+    "smart-tv",
+    "os",
+    "wkwebview",
+    "hls",
+    "nodejs",
+    "vanilla-js"
+  ],
+  "license": "MIT",
+  "dependencies": {
+    "hls.js": "^1.6.15"
+  }
+}

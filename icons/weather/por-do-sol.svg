@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="128" height="128" viewBox="0 0 128 128">
+  <title>Pôr do sol</title>
+  <defs>
+    <radialGradient id="por-do-sol-sun" cx=".38" cy=".32" r=".8"><stop offset="0" stop-color="#fff6a8"/><stop offset="0.5" stop-color="#ffd34a"/><stop offset="1" stop-color="#ffa51f"/></radialGradient>
+  </defs>
+  <path d="M37.2 58.5L26.8 52.5M48.5 47.2L42.5 36.8M64.0 43.0L64.0 31.0M79.5 47.2L85.5 36.8M90.8 58.5L101.2 52.5" fill="none" stroke="#ffbd2e" stroke-width="7" stroke-linecap="round"/>
+  <path d="M40 74A24 24 0 0 1 88 74Z" fill="url(#por-do-sol-sun)"/>
+  <path d="M12 82H116" fill="none" stroke="#ffffff" stroke-width="6" stroke-linecap="round"/>
+  <path d="M64 96V114M55 106L64 114L73 106" fill="none" stroke="#ffffff" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>

@@ -1,0 +1,114 @@
+[
+  {
+    "id": "patagonia-fitzroy",
+    "file": "patagonia-fitzroy-sunset.jpg",
+    "title": "Monte Fitz Roy ao Entardecer",
+    "location": "Patagônia, Argentina",
+    "resolution": "3840x2160 • 4K Ultra HD",
+    "url": "https://images.unsplash.com/photo-1506744038136-46273834b3fb?q=85&w=3840&h=2160&auto=format&fit=crop"
+  },
+  {
+    "id": "nordic-aurora",
+    "file": "nordic-aurora-borealis.jpg",
+    "title": "Aurora Boreal sobre os Fjords",
+    "location": "Tromsø, Noruega",
+    "resolution": "3840x2160 • 4K Ultra HD",
+    "url": "https://images.unsplash.com/photo-1531366936337-7c912a4589a7?q=85&w=3840&h=2160&auto=format&fit=crop"
+  },
+  {
+    "id": "dolomites-alpine",
+    "file": "dolomites-alpine-lake.jpg",
+    "title": "Picos Alpinos e Lago Esmeralda",
+    "location": "Dolomitas, Itália",
+    "resolution": "3840x2160 • 4K Ultra HD",
+    "url": "https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?q=85&w=3840&h=2160&auto=format&fit=crop"
+  },
+  {
+    "id": "cyberpunk-tokyo",
+    "file": "cyberpunk-tokyo-rain.jpg",
+    "title": "Tóquio Neon na Chuva",
+    "location": "Shibuya, Tóquio, Japão",
+    "resolution": "3840x2160 • 4K Ultra HD",
+    "url": "https://images.unsplash.com/photo-1542051841857-5f90071e7989?q=85&w=3840&h=2160&auto=format&fit=crop"
+  },
+  {
+    "id": "space-nebula",
+    "file": "deep-space-nebula-carina.jpg",
+    "title": "Nebulosa Cósmica e Campo Estelar",
+    "location": "Espaço Profundo",
+    "resolution": "3840x2160 • 4K Ultra HD",
+    "url": "https://images.unsplash.com/photo-1506703719100-a0f3a48c0f86?q=85&w=3840&h=2160&auto=format&fit=crop"
+  },
+  {
+    "id": "fuji-spring",
+    "file": "fuji-sakura-spring.jpg",
+    "title": "Monte Fuji com Flores de Cerejeira",
+    "location": "Honshu, Japão",
+    "resolution": "3840x2160 • 4K Ultra HD",
+    "url": "https://images.unsplash.com/photo-1493976040374-85c8e12f0c0e?q=85&w=3840&h=2160&auto=format&fit=crop"
+  },
+  {
+    "id": "maldives-ocean",
+    "file": "maldives-aerial-atoll.jpg",
+    "title": "Águas Cristalinas e Barreira de Coral",
+    "location": "Ilhas Maldivas",
+    "resolution": "3840x2160 • 4K Ultra HD",
+    "url": "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?q=85&w=3840&h=2160&auto=format&fit=crop"
+  },
+  {
+    "id": "iceland-landscape",
+    "file": "iceland-black-sand-beach.jpg",
+    "title": "Cânions Glaciais e Névoa Nórdica",
+    "location": "Costa Sul, Islândia",
+    "resolution": "3840x2160 • 4K Ultra HD",
+    "url": "https://images.unsplash.com/photo-1476514525535-07fb3b4ae5f1?q=85&w=3840&h=2160&auto=format&fit=crop"
+  },
+  {
+    "id": "yosemite-twilight",
+    "file": "yosemite-twilight.jpg",
+    "title": "Vale Alpino ao Crepúsculo",
+    "location": "Serra Nevada, Califórnia",
+    "resolution": "4K Ultra HD",
+    "url": "/media/wallpapers/yosemite-twilight.jpg"
+  },
+  {
+    "id": "yosemite-sunlit-valley",
+    "file": "yosemite-sunlit-valley.jpg",
+    "title": "Vale do Yosemite Ensolarado",
+    "location": "Serra Nevada, Califórnia",
+    "resolution": "HD Wallpaper",
+    "url": "/media/wallpapers/yosemite-sunlit-valley.jpg"
+  },
+  {
+    "id": "alpine-glacier-river",
+    "file": "alpine-glacier-river.jpg",
+    "title": "Rio Glacial e Picos Nevados",
+    "location": "Alpes Suíços",
+    "resolution": "HD Wallpaper",
+    "url": "/media/wallpapers/alpine-glacier-river.jpg"
+  },
+  {
+    "id": "tropical-emerald-cove",
+    "file": "tropical-emerald-cove.jpg",
+    "title": "Enseada Tropical Esmeralda",
+    "location": "Litoral Brasileiro",
+    "resolution": "HD Wallpaper",
+    "url": "/media/wallpapers/tropical-emerald-cove.jpg"
+  },
+  {
+    "id": "winter-pine-river",
+    "file": "winter-pine-river.jpg",
+    "title": "Vale Nevado e Rio Cristalino",
+    "location": "Montanhas Rochosas",
+    "resolution": "4K Ultra HD",
+    "url": "/media/wallpapers/winter-pine-river.jpg"
+  },
+  {
+    "id": "alpine-ridge-valley",
+    "file": "alpine-ridge-valley.jpg",
+    "title": "Cordilheira Alpina e Rio Sinuoso",
+    "location": "Alpes Canadenses",
+    "resolution": "4K Ultra HD",
+    "url": "/media/wallpapers/alpine-ridge-valley.jpg"
+  }
+]

@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="128" height="128" viewBox="0 0 128 128">
+  <title>Chuva (noite)</title>
+  <defs>
+    <linearGradient id="chuva-noite-moon" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#fffbe3"/><stop offset="1" stop-color="#ffdf7a"/></linearGradient>
+    <linearGradient id="chuva-noite-cg" gradientUnits="userSpaceOnUse" x1="0" y1="4" x2="0" y2="52"><stop offset="0" stop-color="#dbe3ee"/><stop offset="1" stop-color="#97a6bc"/></linearGradient>
+    <linearGradient id="chuva-noite-drop" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#79ccff"/><stop offset="1" stop-color="#1f7be0"/></linearGradient>
+  </defs>
+  <path d="M66.7 43.9A24 24 0 1 1 42.7 12.0A20 20 0 0 0 66.7 43.9Z" fill="url(#chuva-noite-moon)"/>
+  <path d="M92.0 17.0L93.3 20.7L97.0 22.0L93.3 23.3L92.0 27.0L90.7 23.3L87.0 22.0L90.7 20.7 Z" fill="#fff4b8"/>
+  <g transform="translate(18.4 32.4) scale(1.2)" fill="url(#chuva-noite-cg)">
+    <rect x="10" y="30" width="62" height="22" rx="11"/>
+    <circle cx="27" cy="32" r="14"/>
+    <circle cx="46" cy="24" r="20"/>
+    <circle cx="63" cy="35" r="13"/>
+  </g>
+  <path transform="translate(48 100) rotate(14) scale(0.9)" d="M0 -8C3 -3 5 0 5 3.5A5 5 0 0 1 -5 3.5C-5 0 -3 -3 0 -8Z" fill="url(#chuva-noite-drop)"/>
+  <path transform="translate(70 108) rotate(14) scale(0.9)" d="M0 -8C3 -3 5 0 5 3.5A5 5 0 0 1 -5 3.5C-5 0 -3 -3 0 -8Z" fill="url(#chuva-noite-drop)"/>
+  <path transform="translate(92 100) rotate(14) scale(0.9)" d="M0 -8C3 -3 5 0 5 3.5A5 5 0 0 1 -5 3.5C-5 0 -3 -3 0 -8Z" fill="url(#chuva-noite-drop)"/>
+</svg>

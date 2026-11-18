@@ -1,0 +1,37 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 192 192" width="192" height="192">
+  <defs>
+    <linearGradient id="w-sky" x1="0.2" y1="0" x2="0.8" y2="1">
+      <stop offset="0%" stop-color="#1E62D8"/>
+      <stop offset="55%" stop-color="#359CF5"/>
+      <stop offset="100%" stop-color="#76CAFF"/>
+    </linearGradient>
+    <radialGradient id="w-sun-halo" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#FFE066" stop-opacity="0.65"/>
+      <stop offset="65%" stop-color="#FFA928" stop-opacity="0.18"/>
+      <stop offset="100%" stop-color="#FFA928" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="w-sun" x1="0.2" y1="0" x2="0.8" y2="1">
+      <stop offset="0%" stop-color="#FFF08A"/>
+      <stop offset="55%" stop-color="#FFC72C"/>
+      <stop offset="100%" stop-color="#FF8E1A"/>
+    </linearGradient>
+    <linearGradient id="w-cloud" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#FFFFFF"/>
+      <stop offset="72%" stop-color="#F2F7FF"/>
+      <stop offset="100%" stop-color="#D7E7FA"/>
+    </linearGradient>
+    <filter id="w-cloud-shadow" x="-15%" y="-15%" width="130%" height="140%">
+      <feDropShadow dx="0" dy="8" stdDeviation="7" flood-color="#0D3E8A" flood-opacity="0.28"/>
+    </filter>
+  </defs>
+  <rect width="192" height="192" rx="40" fill="url(#w-sky)"/>
+  <!-- Warm atmospheric corona -->
+  <circle cx="122" cy="70" r="62" fill="url(#w-sun-halo)"/>
+  <!-- Sun sphere -->
+  <circle cx="122" cy="70" r="34" fill="url(#w-sun)"/>
+  <!-- Volumetric Cloud -->
+  <g filter="url(#w-cloud-shadow)">
+    <path d="M58 144h76a25 25 0 0 0 4.5-49.6A35 35 0 0 0 70 86.5 27 27 0 0 0 58 144Z" fill="url(#w-cloud)"/>
+    <path d="M62 142h69a23 23 0 0 0 2-45.8" fill="none" stroke="rgba(255,255,255,0.65)" stroke-width="1.5"/>
+  </g>
+</svg>

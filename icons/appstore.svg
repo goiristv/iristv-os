@@ -1,0 +1,59 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 192 192" width="192" height="192">
+  <defs>
+    <linearGradient id="bg" x1="0.15" y1="0" x2="0.85" y2="1">
+      <stop offset="0%" stop-color="#141C32"/>
+      <stop offset="55%" stop-color="#0B0F1D"/>
+      <stop offset="100%" stop-color="#04060C"/>
+    </linearGradient>
+    <radialGradient id="topAura" cx="30%" cy="18%" r="68%">
+      <stop offset="0%" stop-color="#00C2FF" stop-opacity="0.24"/>
+      <stop offset="50%" stop-color="#7C4DFF" stop-opacity="0.12"/>
+      <stop offset="100%" stop-color="#05070E" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="botAura" cx="76%" cy="85%" r="55%">
+      <stop offset="0%" stop-color="#FF2D6F" stop-opacity="0.16"/>
+      <stop offset="100%" stop-color="#05070E" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="bagGrad" x1="0.2" y1="0" x2="0.8" y2="1">
+      <stop offset="0%" stop-color="#FFFFFF"/>
+      <stop offset="65%" stop-color="#F1F6FF"/>
+      <stop offset="100%" stop-color="#DAE5FA"/>
+    </linearGradient>
+    <linearGradient id="handleGrad" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#FFFFFF"/>
+      <stop offset="100%" stop-color="#B9CBE8"/>
+    </linearGradient>
+    <linearGradient id="irisRing" x1="0.15" y1="0.1" x2="0.85" y2="0.9">
+      <stop offset="0%" stop-color="#00E5FF"/>
+      <stop offset="32%" stop-color="#6E56FF"/>
+      <stop offset="66%" stop-color="#FF2D6F"/>
+      <stop offset="100%" stop-color="#FFB800"/>
+    </linearGradient>
+    <radialGradient id="pupil" cx="38%" cy="32%" r="70%">
+      <stop offset="0%" stop-color="#202945"/>
+      <stop offset="100%" stop-color="#060811"/>
+    </radialGradient>
+    <filter id="drop" x="-18%" y="-18%" width="136%" height="140%">
+      <feDropShadow dx="0" dy="8" stdDeviation="8" flood-color="#000000" flood-opacity="0.55"/>
+    </filter>
+  </defs>
+
+  <rect width="192" height="192" fill="url(#bg)"/>
+  <rect width="192" height="192" fill="url(#topAura)"/>
+  <rect width="192" height="192" fill="url(#botAura)"/>
+
+  <g filter="url(#drop)">
+    <!-- Handle -->
+    <path d="M 76 68 V 55 A 20 20 0 0 1 116 55 V 68"
+          fill="none" stroke="url(#handleGrad)" stroke-width="9" stroke-linecap="round"/>
+
+    <!-- Tapered Minimalist Shopping Bag Silhouette -->
+    <path d="M 62 64 H 130 C 138 64 142 70 143.5 78 L 150 132 C 151.5 143 144 152 132 152 H 60 C 48 152 40.5 143 42 132 L 48.5 78 C 50 70 54 64 62 64 Z"
+          fill="url(#bagGrad)"/>
+
+    <!-- Seamless Chromatic Iris Ring -->
+    <circle cx="96" cy="110" r="21" fill="none" stroke="url(#irisRing)" stroke-width="7"/>
+    <circle cx="96" cy="110" r="14.5" fill="url(#pupil)"/>
+    <circle cx="91" cy="105" r="3.4" fill="#FFFFFF" opacity="0.92"/>
+  </g>
+</svg>

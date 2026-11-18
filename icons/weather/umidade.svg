@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="128" height="128" viewBox="0 0 128 128">
+  <title>Umidade</title>
+  <defs>
+    <linearGradient id="umidade-drop" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#79ccff"/><stop offset="1" stop-color="#1f7be0"/></linearGradient>
+  </defs>
+  <path transform="translate(64 64) scale(6.2)" d="M0 -8C3 -3 5 0 5 3.5A5 5 0 0 1 -5 3.5C-5 0 -3 -3 0 -8Z" fill="url(#umidade-drop)" stroke-width="0"/>
+  <path d="M48 78C48 86 53 91 60 93" fill="none" stroke="#ffffff" stroke-width="5" stroke-linecap="round" opacity="0.65"/>
+  <path transform="translate(100 98) rotate(14) scale(1.5)" d="M0 -8C3 -3 5 0 5 3.5A5 5 0 0 1 -5 3.5C-5 0 -3 -3 0 -8Z" fill="url(#umidade-drop)"/>
+  <path transform="translate(24 102) rotate(14) scale(1.1)" d="M0 -8C3 -3 5 0 5 3.5A5 5 0 0 1 -5 3.5C-5 0 -3 -3 0 -8Z" fill="url(#umidade-drop)"/>
+</svg>
