@@ -611,9 +611,9 @@ body.theme-light .ambient-vignette {
   gap: 4px;
   padding: 5px;
   border-radius: 999px;
-  background: rgba(255, 255, 255, 0.14);
-  backdrop-filter: blur(28px) saturate(160%);
-  -webkit-backdrop-filter: blur(28px) saturate(160%);
+  background: var(--glass-pill-bg, rgba(255, 255, 255, 0.14));
+  backdrop-filter: blur(var(--glass-blur, 28px)) saturate(160%);
+  -webkit-backdrop-filter: blur(var(--glass-blur, 28px)) saturate(160%);
   border: 1px solid rgba(255, 255, 255, 0.22);
   box-shadow: 0 4px 18px rgba(0, 0, 0, 0.12);
 }
@@ -814,9 +814,9 @@ body.theme-light .ambient-vignette {
   height: 40px;
   padding: 4px 8px;
   border-radius: 999px;
-  background: rgba(255, 255, 255, 0.14);
-  backdrop-filter: blur(28px) saturate(160%);
-  -webkit-backdrop-filter: blur(28px) saturate(160%);
+  background: var(--glass-pill-bg, rgba(255, 255, 255, 0.14));
+  backdrop-filter: blur(var(--glass-blur, 28px)) saturate(160%);
+  -webkit-backdrop-filter: blur(var(--glass-blur, 28px)) saturate(160%);
   border: 1px solid rgba(255, 255, 255, 0.22);
   opacity: 0.9;
   user-select: none;
@@ -1794,29 +1794,39 @@ body.theme-aurora .theme-swatch-dot {
   color: var(--text-primary);
 }
 
-/* Home Screen Settings Category Cards (Ícones Reais e Estilo Moderno) */
+/* Home Screen Settings Category Cards (Lucide Icons + Glass) */
 .settings-home-card {
-  flex: 0 0 240px;
-  height: 94px;
+  position: relative;
+  flex: 0 0 264px;
+  height: 96px;
   display: flex;
   align-items: center;
   gap: 14px;
-  padding: 12px 16px;
+  padding: 14px 16px;
   border-radius: var(--card-radius, 22px);
-  background: var(--card-bg, rgba(255, 255, 255, 0.05));
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  background:
+    radial-gradient(120% 100% at 8% 0%, var(--cat-glow, rgba(255, 255, 255, 0.14)) 0%, transparent 62%),
+    var(--glass-bg, rgba(72, 88, 114, 0.6));
+  border: 1px solid var(--glass-border-strong, rgba(255, 255, 255, 0.24));
+  box-shadow: 0 10px 28px rgba(0, 0, 0, 0.28), inset 0 1px 0 rgba(255, 255, 255, 0.26);
+  backdrop-filter: blur(var(--glass-blur, 18px));
+  -webkit-backdrop-filter: blur(var(--glass-blur, 18px));
   cursor: pointer;
   text-align: left;
+  overflow: hidden;
   transition: transform 0.28s var(--spring-ease), box-shadow 0.26s ease, border-color 0.2s ease, background 0.2s ease;
   user-select: none;
 }
 
 .settings-home-card:hover,
+.settings-home-card.focused,
 .settings-home-card.is-focused {
-  background: rgba(255, 255, 255, 0.12);
+  background:
+    radial-gradient(120% 100% at 8% 0%, var(--cat-glow, rgba(255, 255, 255, 0.22)) 0%, transparent 65%),
+    var(--glass-bg-hover, rgba(255, 255, 255, 0.16));
   border-color: #ffffff;
-  box-shadow: 0 0 0 2.5px #ffffff, 0 14px 32px rgba(0, 0, 0, 0.4);
-  transform: scale(1.05) translateY(-3px);
+  box-shadow: 0 0 0 2.5px var(--accent, #ffffff), 0 16px 36px rgba(0, 0, 0, 0.42);
+  transform: scale(1.035) translateY(-3px);
   outline: none;
 }
 
@@ -1827,7 +1837,7 @@ body.theme-aurora .theme-swatch-dot {
   display: grid;
   place-items: center;
   flex-shrink: 0;
-  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.28);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.3);
   color: #ffffff;
 }
 
@@ -1840,11 +1850,13 @@ body.theme-aurora .theme-swatch-dot {
   display: flex;
   flex-direction: column;
   gap: 3px;
+  flex: 1;
+  min-width: 0;
   overflow: hidden;
 }
 
 .settings-home-title {
-  font-size: 0.92rem;
+  font-size: 0.96rem;
   font-weight: 700;
   color: var(--text-primary);
   white-space: nowrap;
@@ -1858,6 +1870,20 @@ body.theme-aurora .theme-swatch-dot {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+}
+
+.settings-home-arrow {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--text-secondary, rgba(255, 255, 255, 0.65));
+  flex-shrink: 0;
+  transition: transform 0.2s ease, color 0.2s ease;
+}
+
+.settings-home-card:hover .settings-home-arrow,
+.settings-home-card.focused .settings-home-arrow {
+  transform: translateX(3px);
+  color: #ffffff;
 }
 
 /* Live TV Cards with Real Official Channel Logos & Backdrops */
@@ -3542,10 +3568,18 @@ body.player-active .player-bg-img {
   position: relative;
   width: 100%;
   aspect-ratio: 16 / 9;
+  overflow: hidden;
   background-size: cover;
   background-position: center;
   background-color: #0b0f19;
   border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.stg-wp-preview-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
 }
 
 .stg-wp-badge {
@@ -11275,3 +11309,389 @@ html[data-lock-clock-style="centered"] .ss-clock {
   display: block;
   background: #000;
 }
+
+/* =========================================================
+   Home Widgets & Liquid Glass Weather Widget
+   ========================================================= */
+.home-widgets-row {
+  margin-bottom: 10px;
+}
+
+.home-widgets-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 18px;
+  padding: 6px 4px 12px;
+}
+
+.home-widget-card {
+  position: relative;
+  display: flex;
+  width: min(390px, 100%);
+  min-height: 174px;
+  padding: 18px 20px 16px;
+  border-radius: var(--radius-lg, 20px);
+  text-align: left;
+  color: var(--text-primary, #f8fafc);
+  cursor: pointer;
+  overflow: hidden;
+  transition: transform 0.24s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.24s ease, border-color 0.24s ease, background 0.24s ease;
+}
+
+.weather-widget-card {
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.home-widget-card.is-liquid-glass {
+  background: var(--glass-bg, rgba(72, 88, 114, 0.6));
+  border: 1px solid var(--glass-border-strong, rgba(255, 255, 255, 0.28));
+  box-shadow:
+    0 14px 36px rgba(0, 0, 0, 0.3),
+    inset 0 1.5px 0 rgba(255, 255, 255, 0.42),
+    inset 0 -1px 0 rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(var(--glass-blur, 22px)) saturate(145%);
+  -webkit-backdrop-filter: blur(var(--glass-blur, 22px)) saturate(145%);
+}
+
+.home-widget-card.is-liquid-glass .weather-widget-specular {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: linear-gradient(
+    118deg,
+    rgba(255, 255, 255, 0.22) 0%,
+    rgba(255, 255, 255, 0.04) 30%,
+    transparent 54%,
+    rgba(255, 255, 255, 0.08) 86%,
+    rgba(255, 255, 255, 0.18) 100%
+  );
+  mix-blend-mode: screen;
+}
+
+.home-widget-card.is-solid-matte,
+html.no-transparency .home-widget-card {
+  background: var(--glass-surface, rgba(58, 72, 96, 0.94));
+  border: 1px solid var(--glass-border, rgba(255, 255, 255, 0.14));
+  box-shadow: 0 10px 28px rgba(0, 0, 0, 0.34);
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+}
+
+.home-widget-card.is-solid-matte .weather-widget-specular,
+html.no-transparency .home-widget-card .weather-widget-specular {
+  display: none;
+}
+
+.home-widget-card:hover,
+.home-widget-card.focused {
+  transform: translateY(-2px) scale(1.015);
+  border-color: var(--glass-border-strong, rgba(255, 255, 255, 0.65));
+  box-shadow: 0 18px 42px rgba(0, 0, 0, 0.42), 0 0 0 2px var(--accent-soft, rgba(0, 194, 255, 0.45));
+}
+
+.weather-widget-top,
+.weather-widget-main,
+.weather-widget-footer {
+  position: relative;
+  z-index: 1;
+}
+
+.weather-widget-top {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.weather-widget-loc {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.weather-widget-badge {
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: rgba(224, 242, 254, 0.85);
+}
+
+.weather-widget-city {
+  font-size: 1.08rem;
+  font-weight: 700;
+  color: #ffffff;
+}
+
+.weather-widget-icon {
+  width: 48px;
+  height: 48px;
+  object-fit: contain;
+  filter: drop-shadow(0 4px 10px rgba(0, 0, 0, 0.28));
+}
+
+.weather-widget-main {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin: 10px 0 12px;
+}
+
+.weather-widget-temp {
+  font-size: 2.85rem;
+  font-weight: 800;
+  line-height: 1;
+  letter-spacing: -0.03em;
+  color: #ffffff;
+}
+
+.weather-widget-meta {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.weather-widget-cond {
+  font-size: 1rem;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.94);
+}
+
+.weather-widget-feels {
+  font-size: 0.84rem;
+  color: rgba(226, 232, 240, 0.78);
+}
+
+.weather-widget-footer {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.weather-widget-pill {
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  background: rgba(255, 255, 255, 0.12);
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  color: rgba(248, 250, 252, 0.92);
+}
+
+.weather-widget-action {
+  margin-left: auto;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: rgba(186, 230, 253, 0.95);
+}
+
+/* Calendar Widget */
+.calendar-widget-card {
+  width: min(440px, 100%);
+  align-items: stretch;
+  justify-content: space-between;
+  gap: 18px;
+}
+
+.cal-widget-left,
+.cal-widget-grid {
+  position: relative;
+  z-index: 1;
+}
+
+.cal-widget-left {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  min-width: 132px;
+}
+
+.cal-widget-top {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.cal-widget-month {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--text-primary, #ffffff);
+}
+
+.cal-widget-today-num {
+  font-size: 3.1rem;
+  font-weight: 800;
+  line-height: 1;
+  letter-spacing: -0.04em;
+  color: var(--text-primary, #ffffff);
+  margin: 6px 0 4px;
+}
+
+.cal-widget-weekday {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--text-secondary, rgba(255, 255, 255, 0.78));
+}
+
+.cal-widget-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 26px);
+  gap: 3px;
+  align-content: center;
+}
+
+.cal-widget-dow {
+  font-size: 0.68rem;
+  font-weight: 700;
+  text-align: center;
+  color: var(--text-muted, rgba(255, 255, 255, 0.52));
+  padding-bottom: 2px;
+}
+
+.cal-widget-day {
+  height: 22px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 999px;
+  font-size: 0.74rem;
+  font-weight: 600;
+  color: var(--text-primary, rgba(248, 250, 252, 0.9));
+}
+
+.cal-widget-day.is-empty {
+  visibility: hidden;
+}
+
+.cal-widget-day.is-today {
+  background: var(--accent, #00c2ff);
+  color: #07111c;
+  font-weight: 800;
+  box-shadow: 0 2px 10px var(--accent-glow, rgba(0, 194, 255, 0.45));
+}
+
+/* Analog Clock Widget */
+.clock-widget-card {
+  width: min(350px, 100%);
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
+}
+
+.clock-widget-dial-wrap,
+.clock-widget-info {
+  position: relative;
+  z-index: 1;
+}
+
+.clock-widget-dial-wrap {
+  flex-shrink: 0;
+  width: 132px;
+  height: 132px;
+  display: grid;
+  place-items: center;
+}
+
+.clock-widget-svg {
+  width: 132px;
+  height: 132px;
+  filter: drop-shadow(0 8px 18px rgba(0, 0, 0, 0.28));
+}
+
+.clock-dial-ring {
+  fill: rgba(255, 255, 255, 0.08);
+  stroke: rgba(255, 255, 255, 0.28);
+  stroke-width: 1.5;
+}
+
+.clock-dial-face {
+  fill: rgba(10, 14, 24, 0.34);
+  stroke: rgba(255, 255, 255, 0.12);
+  stroke-width: 1;
+}
+
+.clock-tick-major {
+  stroke: rgba(255, 255, 255, 0.85);
+  stroke-width: 1.6;
+  stroke-linecap: round;
+}
+
+.clock-tick-minor {
+  stroke: rgba(255, 255, 255, 0.3);
+  stroke-width: 1;
+  stroke-linecap: round;
+}
+
+.clock-num {
+  fill: rgba(255, 255, 255, 0.88);
+  font-size: 9px;
+  font-weight: 700;
+  text-anchor: middle;
+  font-family: inherit;
+}
+
+.clock-hand-hour {
+  stroke: #ffffff;
+  stroke-width: 3.4;
+  stroke-linecap: round;
+}
+
+.clock-hand-minute {
+  stroke: rgba(248, 250, 252, 0.94);
+  stroke-width: 2.3;
+  stroke-linecap: round;
+}
+
+.clock-hand-second {
+  stroke: var(--accent, #00c2ff);
+  stroke-width: 1.3;
+  stroke-linecap: round;
+}
+
+.clock-hand-second-tail {
+  fill: var(--accent, #00c2ff);
+}
+
+.clock-center-outer {
+  fill: var(--accent, #00c2ff);
+}
+
+.clock-center-inner {
+  fill: #0b111e;
+}
+
+.clock-widget-info {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: center;
+  gap: 4px;
+  flex: 1;
+  min-width: 0;
+}
+
+.clock-widget-digital {
+  font-size: 2.05rem;
+  font-weight: 800;
+  line-height: 1.05;
+  letter-spacing: -0.03em;
+  color: var(--text-primary, #ffffff);
+  font-variant-numeric: tabular-nums;
+  margin-top: 2px;
+}
+
+.clock-widget-tz {
+  font-size: 0.84rem;
+  font-weight: 600;
+  color: var(--text-secondary, rgba(255, 255, 255, 0.72));
+  margin-bottom: 6px;
+}
+
+.clock-widget-date-pill {
+  text-transform: capitalize;
+}
+
+
+

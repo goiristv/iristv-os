@@ -279,6 +279,7 @@
     silkWaves: true,
     glassTransparency: true,
     glassTransparencyLevel: 45,
+    glassBrightness: 100,
     glassBlur: 22,
     uiScale: 1,
     cardRadius: 18,
@@ -299,6 +300,11 @@
     highContrastFocus: false,
     kidsMode: false,
     hideHeroBanner: false,
+    showHomeWidgets: true,
+    widgetWeather: true,
+    widgetCalendar: true,
+    widgetClock: true,
+    widgetWeatherLiquidGlass: true,
     showHomeApps: true,
     showHomeLive: true,
     showHomeContinue: true,
@@ -307,7 +313,7 @@
     gridDensity: 'comfortable',
     focusStyle: 'neutral',
     autoHideTopbar: false,
-    homeSectionOrder: ['apps', 'live', 'continue', 'trending', 'settings'],
+    homeSectionOrder: ['widgets', 'settings', 'apps', 'live', 'continue', 'trending'],
     wallpaperDim: 'medium',
     hideAppLabels: false,
     lockClockStyle: 'corner',
@@ -329,7 +335,7 @@
 
   async function loadDefaultThemeFromJson() {
     try {
-      const res = await fetch('/default-theme.json', { cache: 'no-store' });
+      const res = await fetch('default-theme.json', { cache: 'no-store' });
       if (!res.ok) return;
       const rawText = await res.text();
       const data = JSON.parse(rawText);
@@ -1569,25 +1575,41 @@
     aurora: { bg: '10, 30, 38', surface: '8, 25, 33' }
   };
 
+  function scaleGlassRgb(rgbStr, factor) {
+    return rgbStr
+      .split(',')
+      .map((n) => Math.max(0, Math.min(255, Math.round(Number(n.trim()) * factor))))
+      .join(', ');
+  }
+
   function applyGlassTransparency() {
     const s = state.settings;
     const root = document.documentElement;
     const palette = THEME_GLASS_RGB[state.theme] || THEME_GLASS_RGB.prism;
+    const brightFactor = Math.max(0.5, Math.min(1.8, Number(s.glassBrightness ?? 100) / 100));
+    const bgRgb = scaleGlassRgb(palette.bg, brightFactor);
+    const surfRgb = scaleGlassRgb(palette.surface, brightFactor);
     const enabled = s.glassTransparency !== false && Number(s.glassTransparencyLevel) > 0;
     root.classList.toggle('no-transparency', !enabled);
     if (!enabled) {
       root.style.setProperty('--glass-blur', '0px');
-      root.style.setProperty('--glass-bg', `rgba(${palette.bg}, 1)`);
-      root.style.setProperty('--glass-surface', `rgba(${palette.surface}, 1)`);
+      root.style.setProperty('--glass-bg', `rgba(${bgRgb}, 1)`);
+      root.style.setProperty('--glass-surface', `rgba(${surfRgb}, 1)`);
+      root.style.setProperty('--glass-pill-bg', `rgba(${bgRgb}, 1)`);
       return;
     }
     const level = Math.max(0, Math.min(90, Number(s.glassTransparencyLevel ?? 45))) / 100;
     const bgAlpha = +(1 - level * 0.82).toFixed(3);
     const surfAlpha = +(1 - level * 0.65).toFixed(3);
     const autoBlur = Math.round((level / 0.9) * 36);
+    const pillAlpha = state.theme === 'light'
+      ? +(Math.max(0.28, Math.min(0.95, 0.68 * brightFactor))).toFixed(3)
+      : +(Math.max(0.04, Math.min(0.42, 0.14 * Math.pow(brightFactor, 1.5)))).toFixed(3);
+    const pillRgb = state.theme === 'light' ? '255, 255, 255' : '255, 255, 255';
     root.style.setProperty('--glass-blur', `${autoBlur}px`);
-    root.style.setProperty('--glass-bg', `rgba(${palette.bg}, ${bgAlpha})`);
-    root.style.setProperty('--glass-surface', `rgba(${palette.surface}, ${surfAlpha})`);
+    root.style.setProperty('--glass-bg', `rgba(${bgRgb}, ${bgAlpha})`);
+    root.style.setProperty('--glass-surface', `rgba(${surfRgb}, ${surfAlpha})`);
+    root.style.setProperty('--glass-pill-bg', `rgba(${pillRgb}, ${pillAlpha})`);
   }
 
   let syncingSystemTheme = false;
@@ -1706,6 +1728,78 @@
     if (weatherApp) launchApp(weatherApp);
   });
 
+  function resolveWeatherMeta(code, isDay) {
+    let icon = isDay ? 'sol.svg' : 'lua.svg';
+    let label = isDay ? 'Céu Limpo' : 'Noite Limpa';
+    if (code === 0) {
+      icon = isDay ? 'sol.svg' : 'lua.svg';
+      label = isDay ? 'Céu Limpo' : 'Noite Limpa';
+    } else if (code === 1 || code === 2) {
+      icon = isDay ? 'parcialmente-nublado.svg' : 'parcialmente-nublado-noite.svg';
+      label = 'Parcialmente Nublado';
+    } else if (code === 3) {
+      icon = isDay ? 'nublado.svg' : 'encoberto.svg';
+      label = isDay ? 'Nublado' : 'Encoberto';
+    } else if (code === 45 || code === 48) {
+      icon = 'neblina.svg';
+      label = 'Neblina';
+    } else if ([51, 53, 55, 56, 57].includes(code)) {
+      icon = 'garoa.svg';
+      label = 'Garoa';
+    } else if ([61, 63, 80].includes(code)) {
+      icon = isDay ? 'chuva.svg' : 'chuva-noite.svg';
+      label = 'Chuva';
+    } else if ([65, 66, 67, 81, 82].includes(code)) {
+      icon = 'chuva-forte.svg';
+      label = 'Chuva Forte';
+    } else if ([71, 73, 75, 77, 85, 86].includes(code)) {
+      icon = 'neve.svg';
+      label = 'Neve';
+    } else if (code === 95) {
+      icon = 'trovoada.svg';
+      label = 'Trovoada';
+    } else if ([96, 99].includes(code)) {
+      icon = 'tempestade.svg';
+      label = 'Tempestade';
+    }
+    return { icon, label };
+  }
+
+  function hydrateWeatherWidgetEl(btn) {
+    if (!btn) return;
+    const w = state.homeWeather;
+    const city = w?.city || localStorage.getItem('iristv_weather_city') || 'São Paulo';
+    const tempText = w ? `${w.temp}°` : '--°';
+    const condText = w?.label || 'Carregando clima...';
+    const iconSrc = w?.icon ? `icons/weather/${w.icon}` : 'icons/weather/parcialmente-nublado.svg';
+    const feelsText = w && typeof w.feelsLike === 'number' ? `Sensação ${w.feelsLike}°` : 'Sensação --°';
+    const humText = w && typeof w.humidity === 'number' ? `${w.humidity}%` : '--%';
+    const windText = w && typeof w.wind === 'number' ? `${w.wind} km/h` : '-- km/h';
+
+    btn.innerHTML = `
+      <div class="weather-widget-specular" aria-hidden="true"></div>
+      <div class="weather-widget-top">
+        <div class="weather-widget-loc">
+          <span class="weather-widget-badge">Clima Agora</span>
+          <span class="weather-widget-city">${escHtml(city)}</span>
+        </div>
+        <img class="weather-widget-icon" src="${iconSrc}" alt="${escHtml(condText)}" />
+      </div>
+      <div class="weather-widget-main">
+        <div class="weather-widget-temp">${tempText}</div>
+        <div class="weather-widget-meta">
+          <span class="weather-widget-cond">${escHtml(condText)}</span>
+          <span class="weather-widget-feels">${feelsText}</span>
+        </div>
+      </div>
+      <div class="weather-widget-footer">
+        <span class="weather-widget-pill">Umidade ${humText}</span>
+        <span class="weather-widget-pill">Vento ${windText}</span>
+        <span class="weather-widget-action">Abrir Clima →</span>
+      </div>
+    `;
+  }
+
   async function updateTopbarWeather() {
     if (!topbarWeatherIcon || !topbarWeatherTemp) return;
     try {
@@ -1717,24 +1811,27 @@
       const code = Number(data.current.weather_code ?? 0);
       const isDay = Number(data.current.is_day ?? 1);
       const temp = Math.round(data.current.temperature_2m ?? 0);
+      const { icon, label } = resolveWeatherMeta(code, isDay);
 
-      let icon = isDay ? 'sol.svg' : 'lua.svg';
-      if (code === 0) icon = isDay ? 'sol.svg' : 'lua.svg';
-      else if (code === 1 || code === 2) icon = isDay ? 'parcialmente-nublado.svg' : 'parcialmente-nublado-noite.svg';
-      else if (code === 3) icon = isDay ? 'nublado.svg' : 'encoberto.svg';
-      else if (code === 45 || code === 48) icon = 'neblina.svg';
-      else if ([51, 53, 55, 56, 57].includes(code)) icon = 'garoa.svg';
-      else if ([61, 63, 80].includes(code)) icon = isDay ? 'chuva.svg' : 'chuva-noite.svg';
-      else if ([65, 66, 67, 81, 82].includes(code)) icon = 'chuva-forte.svg';
-      else if ([71, 73, 75, 77, 85, 86].includes(code)) icon = 'neve.svg';
-      else if (code === 95) icon = 'trovoada.svg';
-      else if ([96, 99].includes(code)) icon = 'tempestade.svg';
+      state.homeWeather = {
+        city: data.location?.city || city,
+        country: data.location?.country || '',
+        temp,
+        feelsLike: typeof data.current.apparent_temperature === 'number' ? Math.round(data.current.apparent_temperature) : null,
+        humidity: typeof data.current.relative_humidity_2m === 'number' ? Math.round(data.current.relative_humidity_2m) : null,
+        wind: typeof data.current.wind_speed_10m === 'number' ? Math.round(data.current.wind_speed_10m) : null,
+        code,
+        isDay,
+        icon,
+        label
+      };
 
       topbarWeatherIcon.src = `icons/weather/${icon}`;
       topbarWeatherTemp.textContent = `${temp}°`;
       if (topbarWeatherBtn) {
-        topbarWeatherBtn.title = `Clima em ${data.location?.city || city}: ${temp}°C • Clique para abrir`;
+        topbarWeatherBtn.title = `Clima em ${state.homeWeather.city}: ${temp}°C • Clique para abrir`;
       }
+      hydrateWeatherWidgetEl(document.getElementById('home-weather-widget'));
     } catch (_) {}
   }
 
@@ -1759,6 +1856,7 @@
 
   async function openExternalAppUrl(url, name, appMeta = {}) {
     if (!url && !appMeta?.id) return;
+    if (window.IrisWebOS?.isWebOS && window.IrisWebOS.launchApp(appMeta.id, url)) return;
     if (postWebViewAction('openAppUrl', { url, name: name || 'App' })) return;
     try {
       const r = await fetch('/api/os/launch-tv-app', {
@@ -2972,17 +3070,229 @@
     rowsContainer.classList.add(isForward ? 'tab-anim-enter-right' : 'tab-anim-enter-left');
     rowsContainer.innerHTML = '';
 
-    const activeShows = state.settings.kidsMode ? TRENDING_SHOWS.filter((s) => s.kidsSafe) : TRENDING_SHOWS;
+    const isKidsSafeShow = (s) => {
+      if (typeof s.kidsSafe === 'boolean') return s.kidsSafe;
+      const age = String(s.ageRating || '').toUpperCase();
+      return ['L', 'AL', '10', '12', 'G', 'PG', 'TV-Y', 'TV-Y7', 'TV-G', 'TV-PG'].includes(age);
+    };
+    const getLiveTrendingList = () => {
+      const cachedAll = showsCatalogCache.get('all||');
+      const source = (cachedAll?.items && cachedAll.items.length > 0) ? cachedAll.items : TRENDING_SHOWS;
+      return state.settings.kidsMode ? source.filter(isKidsSafeShow) : source;
+    };
+    const activeShows = getLiveTrendingList();
     const frag = document.createDocumentFragment();
 
     if (tab === 'home') {
       const sHome = state.settings;
-      const defaultOrder = ['apps', 'live', 'continue', 'trending', 'settings'];
+      const defaultOrder = ['widgets', 'settings', 'apps', 'live', 'continue', 'trending'];
       const order = Array.isArray(sHome.homeSectionOrder) && sHome.homeSectionOrder.length
         ? [...new Set([...sHome.homeSectionOrder, ...defaultOrder])]
         : defaultOrder;
 
+      const buildCalendarWidgetEl = (useLiquidGlass) => {
+        const now = new Date();
+        const year = now.getFullYear();
+        const month = now.getMonth();
+        const today = now.getDate();
+        const weekdays = ['Domingo', 'Segunda-feira', 'Terça-feira', 'Quarta-feira', 'Quinta-feira', 'Sexta-feira', 'Sábado'];
+        const months = ['Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho', 'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'];
+        const firstDay = new Date(year, month, 1).getDay();
+        const daysInMonth = new Date(year, month + 1, 0).getDate();
+
+        let cellsHtml = ['D', 'S', 'T', 'Q', 'Q', 'S', 'S']
+          .map((d) => `<span class="cal-widget-dow">${d}</span>`)
+          .join('');
+        for (let i = 0; i < firstDay; i++) {
+          cellsHtml += '<span class="cal-widget-day is-empty" aria-hidden="true"></span>';
+        }
+        for (let d = 1; d <= daysInMonth; d++) {
+          cellsHtml += `<span class="cal-widget-day${d === today ? ' is-today' : ''}">${d}</span>`;
+        }
+
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.id = 'home-calendar-widget';
+        btn.dataset.nav = 'row-widgets';
+        btn.className = `home-widget-card calendar-widget-card focusable ${useLiquidGlass ? 'is-liquid-glass' : 'is-solid-matte'}`;
+        btn.setAttribute('aria-label', `Calendário — ${weekdays[now.getDay()]}, ${today} de ${months[month]} de ${year}`);
+        btn.innerHTML = `
+          <div class="weather-widget-specular" aria-hidden="true"></div>
+          <div class="cal-widget-left">
+            <div class="cal-widget-top">
+              <span class="weather-widget-badge">Calendário</span>
+              <span class="cal-widget-month">${months[month]} ${year}</span>
+            </div>
+            <div class="cal-widget-today-num">${today}</div>
+            <div class="cal-widget-weekday">${weekdays[now.getDay()]}</div>
+          </div>
+          <div class="cal-widget-grid" aria-hidden="true">${cellsHtml}</div>
+        `;
+        btn.addEventListener('mouseenter', () => setFocus(btn, false));
+        btn.addEventListener('click', () => playUiSound('select'));
+        return btn;
+      };
+
+      const updateAnalogClockWidget = (widgetEl) => {
+        if (!widgetEl || !widgetEl.isConnected) return;
+        const now = new Date();
+        const sec = now.getSeconds();
+        const min = now.getMinutes();
+        const hr = now.getHours() % 12;
+
+        const secDeg = sec * 6;
+        const minDeg = min * 6 + sec * 0.1;
+        const hrDeg = hr * 30 + min * 0.5;
+
+        const hHand = widgetEl.querySelector('[data-hand="hour"]');
+        const mHand = widgetEl.querySelector('[data-hand="minute"]');
+        const sHand = widgetEl.querySelector('[data-hand="second"]');
+        if (hHand) hHand.setAttribute('transform', `rotate(${hrDeg} 60 60)`);
+        if (mHand) mHand.setAttribute('transform', `rotate(${minDeg} 60 60)`);
+        if (sHand) sHand.setAttribute('transform', `rotate(${secDeg} 60 60)`);
+
+        const digEl = widgetEl.querySelector('.clock-widget-digital');
+        if (digEl) {
+          const use24 = state.settings.clock24h !== false;
+          const showSec = !!state.settings.showSeconds;
+          digEl.textContent = now.toLocaleTimeString('pt-BR', {
+            hour: '2-digit',
+            minute: '2-digit',
+            ...(showSec ? { second: '2-digit' } : {}),
+            hour12: !use24
+          });
+        }
+      };
+
+      const buildClockWidgetEl = (useLiquidGlass) => {
+        const now = new Date();
+        const ticks = [];
+        for (let i = 0; i < 60; i++) {
+          const isHour = i % 5 === 0;
+          const angle = i * 6;
+          const y1 = isHour ? 8 : 9.5;
+          const y2 = isHour ? 15 : 13;
+          ticks.push(
+            `<line x1="60" y1="${y1}" x2="60" y2="${y2}" transform="rotate(${angle} 60 60)" class="${isHour ? 'clock-tick-major' : 'clock-tick-minor'}" />`
+          );
+        }
+
+        const dateLabel = now.toLocaleDateString('pt-BR', { weekday: 'short', day: '2-digit', month: 'short' }).replace('.', '');
+        const tzName = Intl.DateTimeFormat().resolvedOptions().timeZone?.split('/').pop()?.replace(/_/g, ' ') || 'Local';
+
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.id = 'home-clock-widget';
+        btn.dataset.nav = 'row-widgets';
+        btn.className = `home-widget-card clock-widget-card focusable ${useLiquidGlass ? 'is-liquid-glass' : 'is-solid-matte'}`;
+        btn.setAttribute('aria-label', 'Widget de Relógio Analógico');
+        btn.innerHTML = `
+          <div class="weather-widget-specular" aria-hidden="true"></div>
+          <div class="clock-widget-dial-wrap">
+            <svg class="clock-widget-svg" viewBox="0 0 120 120" aria-hidden="true">
+              <circle cx="60" cy="60" r="56" class="clock-dial-ring" />
+              <circle cx="60" cy="60" r="52" class="clock-dial-face" />
+              ${ticks.join('')}
+              <text x="60" y="25" class="clock-num">12</text>
+              <text x="97" y="63.5" class="clock-num">3</text>
+              <text x="60" y="101" class="clock-num">6</text>
+              <text x="23" y="63.5" class="clock-num">9</text>
+              <line data-hand="hour" x1="60" y1="64" x2="60" y2="33" class="clock-hand-hour" />
+              <line data-hand="minute" x1="60" y1="66" x2="60" y2="21" class="clock-hand-minute" />
+              <g data-hand="second">
+                <line x1="60" y1="73" x2="60" y2="17" class="clock-hand-second" />
+                <circle cx="60" cy="73" r="2.2" class="clock-hand-second-tail" />
+              </g>
+              <circle cx="60" cy="60" r="4.2" class="clock-center-outer" />
+              <circle cx="60" cy="60" r="1.8" class="clock-center-inner" />
+            </svg>
+          </div>
+          <div class="clock-widget-info">
+            <span class="weather-widget-badge">Relógio</span>
+            <div class="clock-widget-digital">--:--</div>
+            <div class="clock-widget-tz">${escHtml(tzName)}</div>
+            <span class="weather-widget-pill clock-widget-date-pill">${escHtml(dateLabel)}</span>
+          </div>
+        `;
+        updateAnalogClockWidget(btn);
+        if (window.__irisAnalogClockTimer) clearInterval(window.__irisAnalogClockTimer);
+        window.__irisAnalogClockTimer = setInterval(() => {
+          const el = document.getElementById('home-clock-widget');
+          if (!el) {
+            clearInterval(window.__irisAnalogClockTimer);
+            window.__irisAnalogClockTimer = null;
+            return;
+          }
+          updateAnalogClockWidget(el);
+        }, 1000);
+
+        btn.addEventListener('mouseenter', () => setFocus(btn, false));
+        btn.addEventListener('click', () => {
+          playUiSound('select');
+          state.activeSettingsSection = 'controls';
+          renderTab('settings');
+        });
+        return btn;
+      };
+
+      const buildHomeWidgetsSection = () => {
+        if (sHome.showHomeWidgets === false) return null;
+        if (sHome.widgetWeather === false && sHome.widgetCalendar === false && sHome.widgetClock === false) return null;
+
+        const section = document.createElement('section');
+        section.className = 'tv-row home-widgets-row';
+        const header = document.createElement('div');
+        header.className = 'row-header';
+        header.innerHTML = `
+          <div class="row-title-wrap">
+            <h2 class="row-title">Widgets</h2>
+            <span class="row-subtitle-tag">Tela Inicial</span>
+          </div>
+          <button class="row-action-btn focusable" type="button" data-nav="row-widgets">Personalizar →</button>
+        `;
+        header.querySelector('.row-action-btn')?.addEventListener('click', () => {
+          playUiSound('select');
+          state.activeSettingsSection = 'style';
+          renderTab('settings');
+        });
+
+        const grid = document.createElement('div');
+        grid.className = 'home-widgets-grid';
+        const useLiquidGlass = sHome.widgetWeatherLiquidGlass !== false;
+
+        if (sHome.widgetWeather !== false) {
+          const weatherBtn = document.createElement('button');
+          weatherBtn.type = 'button';
+          weatherBtn.id = 'home-weather-widget';
+          weatherBtn.dataset.nav = 'row-widgets';
+          weatherBtn.className = `home-widget-card weather-widget-card focusable ${useLiquidGlass ? 'is-liquid-glass' : 'is-solid-matte'}`;
+          weatherBtn.setAttribute('aria-label', 'Widget de Clima — Clique para abrir o app Clima');
+          hydrateWeatherWidgetEl(weatherBtn);
+          if (!state.homeWeather) updateTopbarWeather();
+          weatherBtn.addEventListener('click', () => {
+            playUiSound('select');
+            const weatherApp = APPS.find((a) => a.id === 'weather');
+            if (weatherApp) launchApp(weatherApp);
+          });
+          weatherBtn.addEventListener('mouseenter', () => setFocus(weatherBtn, false));
+          grid.appendChild(weatherBtn);
+        }
+
+        if (sHome.widgetCalendar !== false) {
+          grid.appendChild(buildCalendarWidgetEl(useLiquidGlass));
+        }
+
+        if (sHome.widgetClock !== false) {
+          grid.appendChild(buildClockWidgetEl(useLiquidGlass));
+        }
+
+        section.appendChild(header);
+        section.appendChild(grid);
+        return section;
+      };
+
       const buildHomeSection = {
+        widgets: buildHomeWidgetsSection,
         apps: () => (sHome.showHomeApps !== false ? buildRow('Apps', `Brasil • ${APPS.length} instalados`, 'Ver todos & Loja →', () => renderTab('apps'), (track) => {
           APPS.slice(0, 20).forEach((app, idx) => track.appendChild(createAppTile(app, 'row-1', idx)));
         }) : null),
@@ -2993,58 +3303,87 @@
           CONTINUE_WATCHING.forEach((item) => track.appendChild(createContinueCard(item, 'row-3')));
         }) : null),
         trending: () => (sHome.showHomeTrending !== false ? buildRow('Em Alta Agora', state.settings.kidsMode ? 'Modo Família Ativo' : 'Séries & Filmes', `Ver tudo →`, () => renderTab('shows'), (track) => {
-          activeShows.slice(0, 10).forEach((show, idx) => track.appendChild(createPosterCard(show, 'row-4', idx)));
+          activeShows.slice(0, 14).forEach((show, idx) => track.appendChild(createPosterCard(show, 'row-4', idx)));
+          const cachedAll = showsCatalogCache.get('all||');
+          const isFresh = cachedAll && (Date.now() - cachedAll.ts < 5 * 60 * 1000);
+          if (!isFresh) {
+            const { lang, country } = getCurrentUiLocale();
+            fetch(`/api/media/discover?type=ALL&genre=&q=&lang=${encodeURIComponent(lang)}&country=${encodeURIComponent(country)}&limit=40`)
+              .then((r) => (r.ok ? r.json() : null))
+              .then((j) => {
+                if (!j?.items?.length) return;
+                showsCatalogCache.set('all||', { ts: Date.now(), items: j.items });
+                if (!track.isConnected) return;
+                const liveList = state.settings.kidsMode ? j.items.filter(isKidsSafeShow) : j.items;
+                if (!liveList.length) return;
+                const f = document.createDocumentFragment();
+                liveList.slice(0, 14).forEach((show, idx) => f.appendChild(createPosterCard(show, 'row-4', idx)));
+                track.innerHTML = '';
+                track.appendChild(f);
+              })
+              .catch(() => { });
+          }
         }) : null),
-        settings: () => (sHome.showHomeSettings !== false ? buildRow('Ajustes do Sistema', 'Configure tela, áudio, rede, controles e sistema', null, null, (track) => {
+        settings: () => (sHome.showHomeSettings !== false ? buildRow('Ajustes do Sistema', 'Acesso rápido às configurações', 'Abrir Todos →', () => {
+          playUiSound('select');
+          renderTab('settings');
+        }, (track) => {
           const homeSettingsCats = [
             {
               id: 'system',
               title: 'Rede & Wi-Fi',
               sub: 'Conexões sem fio e internet',
+              glow: 'rgba(0, 194, 255, 0.24)',
               iconGrad: 'linear-gradient(135deg, #0070f3, #00c2ff)',
-              icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.55a11 11 0 0 1 14.08 0"/><path d="M8.53 16.11a6 6 0 0 1 6.95 0"/><line x1="12" y1="20" x2="12.01" y2="20"/></svg>'
+              icon: '<svg class="lucide lucide-wifi" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h.01"/><path d="M2 8.82a15 15 0 0 1 20 0"/><path d="M5 12.859a10 10 0 0 1 14 0"/><path d="M8.5 16.429a5 5 0 0 1 7 0"/></svg>'
             },
             {
               id: 'display',
               title: 'Tela & Cores',
               sub: 'Brilho, temas e resolução',
+              glow: 'rgba(255, 0, 128, 0.22)',
               iconGrad: 'linear-gradient(135deg, #7928ca, #ff0080)',
-              icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>'
+              icon: '<svg class="lucide lucide-monitor" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="14" x="2" y="3" rx="2"/><line x1="8" x2="16" y1="21" y2="21"/><line x1="12" x2="12" y1="17" y2="21"/></svg>'
             },
             {
               id: 'audio',
               title: 'Som & Volume',
               sub: 'Saídas, volume geral e mudo',
+              glow: 'rgba(255, 77, 77, 0.22)',
               iconGrad: 'linear-gradient(135deg, #ff0080, #ff4d4d)',
-              icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14"/></svg>'
+              icon: '<svg class="lucide lucide-volume-2" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4.702a.705.705 0 0 0-1.203-.498L6.413 7.587A1.4 1.4 0 0 1 5.416 8H3a1 1 0 0 0-1 1v6a1 1 0 0 0 1 1h2.416a1.4 1.4 0 0 1 .997.413l3.383 3.384A.705.705 0 0 0 11 19.298z"/><path d="M16 9a5 5 0 0 1 0 6"/><path d="M19.364 18.364a9 9 0 0 0 0-12.728"/></svg>'
             },
             {
               id: 'style',
               title: 'Personalização',
-              sub: 'Cores de destaque e fontes',
+              sub: 'Cores, widgets e transparência',
+              glow: 'rgba(245, 166, 35, 0.22)',
               iconGrad: 'linear-gradient(135deg, #f5a623, #ff7a00)',
-              icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="13.5" cy="6.5" r="2.5"/><circle cx="17.5" cy="10.5" r="2.5"/><circle cx="8.5" cy="7.5" r="2.5"/><circle cx="6.5" cy="12.5" r="2.5"/><path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10c1.1 0 2-.9 2-2 0-.5-.2-1-.5-1.3-.3-.3-.5-.8-.5-1.3 0-1.1.9-2 2-2h2.5c2.5 0 4.5-2 4.5-4.5C22 6 17.5 2 12 2z"/></svg>'
+              icon: '<svg class="lucide lucide-palette" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22a1 1 0 0 1 0-20 10 9 0 0 1 10 9 5 5 0 0 1-5 5h-2.25a1.75 1.75 0 0 0-1.4 2.8l.3.4a1.75 1.75 0 0 1-1.4 2.8z"/><circle cx="13.5" cy="6.5" r=".5" fill="currentColor"/><circle cx="17.5" cy="10.5" r=".5" fill="currentColor"/><circle cx="6.5" cy="12.5" r=".5" fill="currentColor"/><circle cx="8.5" cy="7.5" r=".5" fill="currentColor"/></svg>'
             },
             {
               id: 'playback',
               title: 'Vídeo & Player',
               sub: 'Qualidade e descanso de tela',
+              glow: 'rgba(0, 229, 137, 0.2)',
               iconGrad: 'linear-gradient(135deg, #00b86b, #00e589)',
-              icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="2.18"/><line x1="7" y1="2" x2="7" y2="22"/><line x1="17" y1="2" x2="17" y2="22"/><line x1="2" y1="12" x2="22" y2="12"/><line x1="2" y1="7" x2="7" y2="7"/><line x1="2" y1="17" x2="7" y2="17"/><line x1="17" y1="17" x2="22" y2="17"/><line x1="17" y1="7" x2="22" y2="7"/></svg>'
+              icon: '<svg class="lucide lucide-clapperboard" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m12.296 3.464 3.02 3.956"/><path d="M20.2 6 3 11l-.9-2.4c-.3-1.1.3-2.2 1.3-2.5l13.5-4c1.1-.3 2.2.3 2.5 1.3z"/><path d="M3 11h18v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><path d="m6.18 5.276 3.1 3.899"/></svg>'
             },
             {
               id: 'controls',
               title: 'Controles & Remoto',
               sub: 'Navegação, D-pad e hora',
+              glow: 'rgba(6, 182, 212, 0.22)',
               iconGrad: 'linear-gradient(135deg, #4f46e5, #06b6d4)',
-              icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="6" y1="12" x2="10" y2="12"/><line x1="8" y1="10" x2="8" y2="14"/><line x1="15" y1="13" x2="15.01" y2="13"/><line x1="18" y1="11" x2="18.01" y2="11"/><rect x="2" y="6" width="20" height="12" rx="2"/></svg>'
+              icon: '<svg class="lucide lucide-gamepad-2" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="6" x2="10" y1="11" y2="11"/><line x1="8" x2="8" y1="9" y2="13"/><line x1="15" x2="15.01" y1="12" y2="12"/><line x1="18" x2="18.01" y1="10" y2="10"/><path d="M17.32 5H6.68a4 4 0 0 0-3.978 3.59c-.006.052-.01.101-.017.152C2.604 9.416 2 14.456 2 16a3 3 0 0 0 3 3c1 0 1.5-.5 2-1l1.414-1.414A2 2 0 0 1 9.828 16h4.344a2 2 0 0 1 1.414.586L17 18c.5.5 1 1 2 1a3 3 0 0 0 3-3c0-1.545-.604-6.584-.685-7.258-.007-.05-.011-.1-.017-.151A4 4 0 0 0 17.32 5z"/></svg>'
             },
             {
               id: 'system',
               title: 'Sobre o irisOS',
               sub: 'Hardware, versão e energia',
+              glow: 'rgba(148, 163, 184, 0.2)',
               iconGrad: 'linear-gradient(135deg, #1e293b, #475569)',
-              icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>'
+              icon: '<svg class="lucide lucide-info" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg>'
             }
           ];
 
@@ -3053,6 +3392,7 @@
             btn.type = 'button';
             btn.className = 'settings-home-card focusable';
             btn.setAttribute('data-nav', 'row-5');
+            btn.style.setProperty('--cat-glow', cat.glow);
             btn.innerHTML = `
               <div class="settings-home-icon-box" style="background:${cat.iconGrad}">
                 ${cat.icon}
@@ -3061,7 +3401,9 @@
                 <span class="settings-home-title">${cat.title}</span>
                 <span class="settings-home-sub">${cat.sub}</span>
               </div>
+              <span class="settings-home-arrow" aria-hidden="true">→</span>
             `;
+            btn.addEventListener('mouseenter', () => setFocus(btn, false));
             btn.addEventListener('click', () => {
               playUiSound('select');
               state.activeSettingsSection = cat.id;
@@ -3216,6 +3558,11 @@
       return;
     }
     if (app.webUrl) {
+      if (window.IrisWebOS?.isWebOS && window.IrisWebOS.launchApp(app.id, app.webUrl)) {
+        playUiSound('open');
+        closeAppStage();
+        return;
+      }
       if (isNativeWebView) {
         playUiSound('open');
         closeAppStage();
@@ -4307,7 +4654,8 @@
         const isCurrent = (s.activeWallpaperId || activeWallpapersList[0].id) === wp.id;
         return `
                 <div class="stg-wallpaper-card ${isCurrent ? 'is-active' : ''}" data-select-wp="${wp.id}" tabindex="0" role="button" aria-pressed="${isCurrent}">
-                  <div class="stg-wp-preview" style="background-image: url('${wp.path}');">
+                  <div class="stg-wp-preview">
+                    <img class="stg-wp-preview-img" src="/media/wallpapers/thumbs/${wp.file}" alt="${escHtml(wp.title)}" loading="lazy" decoding="async" onerror="this.onerror=null;this.src='${wp.path}'" />
                     ${isCurrent ? '<span class="stg-wp-status"><svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg> Ativo</span>' : ''}
                   </div>
                   <div class="stg-wp-meta">
@@ -4382,6 +4730,11 @@
         title: 'Nível de Transparência',
         desc: 'Controla o quanto o fundo aparece através dos painéis (0% = sólido)',
         controlHtml: settingRangeMarkup('glassTransparencyLevel', 0, 90, 5, s.glassTransparencyLevel ?? 45, '%')
+      })}
+          ${settingRowMarkup({
+        title: 'Brilho da Transparência',
+        desc: 'Ajusta a claridade global da transparência em toda a interface',
+        controlHtml: settingRangeMarkup('glassBrightness', 50, 180, 5, s.glassBrightness ?? 100, '%')
       })}
           ${settingRowMarkup({
         title: 'Linhas Decorativas no Fundo',
@@ -4460,6 +4813,34 @@
       })}
         </div>
         <div class="settings-group">
+          <div class="settings-group-title">Widgets da Tela Inicial</div>
+          ${settingRowMarkup({
+        title: 'Widgets na Tela Inicial',
+        desc: 'Exibe a área de widgets interativos na tela inicial',
+        controlHtml: settingToggleMarkup('showHomeWidgets', s.showHomeWidgets !== false)
+      })}
+          ${settingRowMarkup({
+        title: 'Widget de Clima',
+        desc: 'Mostra previsão atual, sensação térmica, umidade e vento na tela inicial',
+        controlHtml: settingToggleMarkup('widgetWeather', s.widgetWeather !== false)
+      })}
+          ${settingRowMarkup({
+        title: 'Widget de Calendário',
+        desc: 'Mostra a data de hoje e o calendário mensal na tela inicial',
+        controlHtml: settingToggleMarkup('widgetCalendar', s.widgetCalendar !== false)
+      })}
+          ${settingRowMarkup({
+        title: 'Widget de Relógio Analógico',
+        desc: 'Mostra um relógio analógico animado com ponteiros em tempo real',
+        controlHtml: settingToggleMarkup('widgetClock', s.widgetClock !== false)
+      })}
+          ${settingRowMarkup({
+        title: 'Efeito Liquid Glass nos Widgets',
+        desc: 'Ativa vidro translúcido com reflexo especular nos widgets (desative para estilo sólido)',
+        controlHtml: settingToggleMarkup('widgetWeatherLiquidGlass', s.widgetWeatherLiquidGlass !== false)
+      })}
+        </div>
+        <div class="settings-group">
           <div class="settings-group-title">Tela Inicial (Seções Visíveis e Ordem)</div>
           ${settingRowMarkup({
         title: 'Ocultar Banner de Destaque',
@@ -4468,13 +4849,14 @@
       })}
           ${(() => {
         const HOME_SEC_META = {
+          widgets: { key: 'showHomeWidgets', title: 'Widgets', desc: 'Cartões interativos na tela inicial (Clima e mais)' },
           apps: { key: 'showHomeApps', title: 'Apps', desc: 'Fileira de aplicativos instalados na tela inicial' },
           live: { key: 'showHomeLive', title: 'TV ao Vivo', desc: 'Canais ao vivo na tela inicial' },
           continue: { key: 'showHomeContinue', title: 'Continuar Assistindo', desc: 'Filmes e séries em andamento' },
           trending: { key: 'showHomeTrending', title: 'Em Alta Agora', desc: 'Destaques de séries e filmes' },
           settings: { key: 'showHomeSettings', title: 'Ajustes do Sistema', desc: 'Atalhos de configuração no final da tela inicial' }
         };
-        const defOrder = ['apps', 'live', 'continue', 'trending', 'settings'];
+        const defOrder = ['widgets', 'settings', 'apps', 'live', 'continue', 'trending'];
         const curOrder = Array.isArray(s.homeSectionOrder) && s.homeSectionOrder.length
           ? [...new Set([...s.homeSectionOrder, ...defOrder])]
           : defOrder;

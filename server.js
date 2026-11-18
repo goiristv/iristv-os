@@ -3299,7 +3299,7 @@ function createAppServer() {
       return res.end('403 Forbidden');
     }
 
-    const allowedFiles = new Set(['index.html', 'styles.css', 'app.js', 'app-store.js', 'app-native.js', 'app-games.js', 'app-player.js', 'logo.svg', 'default-theme.json', 'NOTICIA_MIGRACAO_WPE_WEBKIT_E_REQUISITOS.md']);
+    const allowedFiles = new Set(['index.html', 'styles.css', 'app.js', 'app-store.js', 'app-native.js', 'app-games.js', 'app-player.js', 'logo.svg', 'default-theme.json', 'webos/webos-bridge.js', 'NOTICIA_MIGRACAO_WPE_WEBKIT_E_REQUISITOS.md']);
     const relPath = path.relative(ROOT_DIR, resolvedPath).replace(/\\/g, '/');
     const isSiteAsset = /^site\/[a-z0-9_.\/-]+\.(html|css|js|svg|png|jpg|webp)$/i.test(relPath);
     const isMediaAsset = /^(icons|media|sounds)\/[a-z0-9_.\/-]+\.(jpg|jpeg|png|mp3|svg|webp|json)$/i.test(relPath);
