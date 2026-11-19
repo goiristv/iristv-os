@@ -2545,6 +2545,7 @@
       for (let i = renderedCount; i < end; i++) {
         const card = createCardFn(items[i], i);
         if (card) {
+          card.style.setProperty('--batch-i', String(i - renderedCount));
           card.classList.add('iris-card-reveal');
           totalImgs += enhanceProgressiveImages(card, () => {
             loadedImgs++;

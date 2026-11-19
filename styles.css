@@ -1638,16 +1638,20 @@ body.theme-aurora .theme-swatch-dot {
 @keyframes irisCardReveal {
   0% {
     opacity: 0;
-    transform: translate3d(0, 10px, 0);
+    transform: translate3d(0, 24px, 0) scale(0.96);
   }
   100% {
     opacity: 1;
-    transform: translate3d(0, 0, 0);
+    transform: translate3d(0, 0, 0) scale(1);
   }
 }
 
-.iris-card-reveal {
-  animation: irisCardReveal 0.22s cubic-bezier(0.22, 1, 0.36, 1) both;
+.iris-card-reveal,
+.app-tile-item.iris-card-reveal,
+.poster-card.iris-card-reveal,
+.news-list-item.iris-card-reveal {
+  opacity: 0;
+  animation: irisCardReveal 0.34s cubic-bezier(0.22, 1, 0.36, 1) calc(var(--batch-i, 0) * 24ms) forwards;
 }
 
 /* Shimmer placeholder while poster/icon/news image is loading */
