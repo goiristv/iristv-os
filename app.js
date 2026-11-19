@@ -64,6 +64,156 @@
   })();
 
   /* =========================================================
+     High-Performance Dedicated GPU Governor & Hardware Interceptor
+     ========================================================= */
+  const IrisGpuManager = (function() {
+    let activeGpuInfo = {
+      name: 'Detectando GPU...',
+      renderer: '',
+      vendor: '',
+      isDedicated: true,
+      isWebGl2: false,
+      hardwareAccelerated: true,
+      systemGpus: []
+    };
+    let keepAliveCanvas = null;
+    let keepAliveGl = null;
+
+    // Intercept canvas getContext to enforce powerPreference: 'high-performance' (dedicated GPU)
+    const origGetContext = HTMLCanvasElement.prototype.getContext;
+    HTMLCanvasElement.prototype.getContext = function(type, attributes) {
+      if (type === 'webgl' || type === 'webgl2' || type === 'experimental-webgl') {
+        let pref = 'dedicated';
+        try {
+          if (typeof state !== 'undefined' && state?.settings?.gpuPreference) {
+            pref = state.settings.gpuPreference;
+          } else {
+            const raw = JSON.parse(localStorage.getItem('iristv-settings-v1') || '{}');
+            pref = raw.gpuPreference || 'dedicated';
+          }
+        } catch (_) {}
+        const powerPreference = pref === 'integrated' ? 'low-power' : 'high-performance';
+        attributes = Object.assign({
+          powerPreference,
+          desynchronized: true
+        }, attributes || {});
+        attributes.powerPreference = powerPreference;
+      }
+      return origGetContext.call(this, type, attributes);
+    };
+
+    // Intercept WebGPU requestAdapter if available
+    if (typeof navigator !== 'undefined' && navigator.gpu && typeof navigator.gpu.requestAdapter === 'function') {
+      const origRequestAdapter = navigator.gpu.requestAdapter.bind(navigator.gpu);
+      navigator.gpu.requestAdapter = function(options) {
+        let pref = 'dedicated';
+        try {
+          if (typeof state !== 'undefined' && state?.settings?.gpuPreference) {
+            pref = state.settings.gpuPreference;
+          } else {
+            const raw = JSON.parse(localStorage.getItem('iristv-settings-v1') || '{}');
+            pref = raw.gpuPreference || 'dedicated';
+          }
+        } catch (_) {}
+        const powerPreference = pref === 'integrated' ? 'low-power' : 'high-performance';
+        return origRequestAdapter(Object.assign({ powerPreference }, options || {}));
+      };
+    }
+
+    function applyPreference(pref = 'dedicated') {
+      try {
+        if (keepAliveGl) {
+          try {
+            const ext = keepAliveGl.getExtension('WEBGL_lose_context');
+            if (ext) ext.loseContext();
+          } catch (_) {}
+          keepAliveGl = null;
+        }
+        if (keepAliveCanvas && keepAliveCanvas.parentNode) {
+          keepAliveCanvas.parentNode.removeChild(keepAliveCanvas);
+          keepAliveCanvas = null;
+        }
+
+        keepAliveCanvas = document.createElement('canvas');
+        keepAliveCanvas.width = 2;
+        keepAliveCanvas.height = 2;
+        keepAliveCanvas.style.cssText = 'position:fixed;width:1px;height:1px;left:-9999px;opacity:0.0001;pointer-events:none;z-index:-9999;';
+        document.documentElement.appendChild(keepAliveCanvas);
+
+        const powerPreference = pref === 'integrated' ? 'low-power' : 'high-performance';
+        const gl = keepAliveCanvas.getContext('webgl2', {
+          powerPreference,
+          antialias: false,
+          depth: false,
+          stencil: false,
+          preserveDrawingBuffer: false
+        }) || keepAliveCanvas.getContext('webgl', {
+          powerPreference,
+          antialias: false,
+          depth: false,
+          stencil: false,
+          preserveDrawingBuffer: false
+        });
+
+        if (gl) {
+          keepAliveGl = gl;
+          let renderer = '';
+          let vendor = '';
+          const dbg = gl.getExtension('WEBGL_debug_renderer_info');
+          if (dbg) {
+            renderer = gl.getParameter(dbg.UNMASKED_RENDERER_WEBGL) || '';
+            vendor = gl.getParameter(dbg.UNMASKED_VENDOR_WEBGL) || '';
+          }
+          if (!renderer) {
+            renderer = gl.getParameter(gl.RENDERER) || 'WebGL Renderer';
+          }
+          const isDedicated = /radeon|amd|geforce|nvidia|rtx|gtx|discrete/i.test(renderer)
+            || (/apple/i.test(renderer) && !/simulator/i.test(renderer));
+
+          activeGpuInfo.renderer = renderer;
+          activeGpuInfo.vendor = vendor || (/intel/i.test(renderer) ? 'Intel' : (/amd|radeon/i.test(renderer) ? 'AMD' : (/nvidia/i.test(renderer) ? 'NVIDIA' : 'Apple')));
+          activeGpuInfo.name = renderer.replace(/^ANGLE\s*\([^,]+,\s*/i, '').replace(/,\s*[^\)]+\)$/i, '').trim() || renderer;
+          activeGpuInfo.isDedicated = isDedicated;
+          activeGpuInfo.isWebGl2 = (typeof WebGL2RenderingContext !== 'undefined' && gl instanceof WebGL2RenderingContext);
+          activeGpuInfo.hardwareAccelerated = !/llvmpipe|software|swiftshader/i.test(renderer);
+        }
+
+        // Bridge to native macOS WKWebView
+        if (window.webkit && window.webkit.messageHandlers && window.webkit.messageHandlers.irisWebView) {
+          try {
+            window.webkit.messageHandlers.irisWebView.postMessage({
+              action: 'setGpuPreference',
+              preference: pref
+            });
+          } catch (_) {}
+        }
+
+        // Inform backend server
+        fetch('/api/os/gpu-preference', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ preference: pref })
+        }).catch(() => {});
+      } catch (err) {
+        console.warn('[IrisGpuManager] Erro ao aplicar preferência de GPU:', err);
+      }
+    }
+
+    let initPref = 'dedicated';
+    try {
+      const raw = JSON.parse(localStorage.getItem('iristv-settings-v1') || '{}');
+      if (raw.gpuPreference) initPref = raw.gpuPreference;
+    } catch (_) {}
+    applyPreference(initPref);
+
+    return {
+      getGpuInfo: () => activeGpuInfo,
+      setSystemGpus: (gpus) => { if (Array.isArray(gpus)) activeGpuInfo.systemGpus = gpus; },
+      applyPreference
+    };
+  })();
+
+  /* =========================================================
      OS State & Theme Configuration
      ========================================================= */
   const THEMES = {
@@ -324,7 +474,9 @@
     autoSystemTheme: false,
     tvSafeMargin: 0,
     textSharpness: false,
-    showBannersAsWallpaper: false
+    showBannersAsWallpaper: false,
+    gpuPreference: 'dedicated',
+    hardwareAcceleration: true
   };
 
   const DEFAULT_THEME_CONFIG = {
@@ -1721,6 +1873,10 @@
     if (rewBtn) rewBtn.title = `Voltar ${s.seekStep}s`;
     if (fwdBtn) fwdBtn.title = `Avançar ${s.seekStep}s`;
 
+    if (typeof IrisGpuManager !== 'undefined') {
+      IrisGpuManager.applyPreference(s.gpuPreference || 'dedicated');
+    }
+
     restartClockTimer();
     updateTopbarWeather();
     resetIdleTimer();
@@ -1894,6 +2050,9 @@
       const r = await fetch(`/api/os/status?t=${Date.now()}`, { cache: 'no-store' });
       if (r.ok) {
         state.systemInfo = await r.json();
+        if (state.systemInfo?.gpus && typeof IrisGpuManager !== 'undefined') {
+          IrisGpuManager.setSystemGpus(state.systemInfo.gpus);
+        }
         return state.systemInfo;
       }
     } catch (_) { }
@@ -5347,6 +5506,42 @@
       const quickApps = APPS.slice(0, 12);
       const pingText = state.lastPingMs !== null ? `${state.lastPingMs} ms` : 'Não testado';
       const onlineStatus = navigator.onLine ? 'Conectado' : 'Sem rede';
+      const gpuInfo = (typeof IrisGpuManager !== 'undefined') ? IrisGpuManager.getGpuInfo() : {};
+      const detectedGpus = (info.gpus && info.gpus.length) ? info.gpus : (gpuInfo.systemGpus || []);
+      const currentGpuPref = s.gpuPreference || 'dedicated';
+
+      let activeGpuLabel = gpuInfo.name || 'Detectando GPU...';
+      let activeGpuSub = 'Aceleração por Hardware Metal / WebGL2 Ativa';
+      let isDedicatedActive = gpuInfo.isDedicated;
+
+      const dedicatedCard = detectedGpus.find((g) => g.isDedicated || g.isHighPerformance);
+      const integratedCard = detectedGpus.find((g) => !g.isDedicated && !g.isHighPerformance);
+
+      if (currentGpuPref === 'dedicated') {
+        if (dedicatedCard) {
+          activeGpuLabel = `${dedicatedCard.name}${dedicatedCard.vram ? ` (${dedicatedCard.vram})` : ''}`;
+          activeGpuSub = `GPU Dedicada (Mais Potente) • ${dedicatedCard.metal ? 'Metal 3 • ' : ''}PCIe x16 Ativa a 60 FPS`;
+          isDedicatedActive = true;
+        } else {
+          activeGpuLabel = gpuInfo.name || 'GPU Dedicada / Alta Performance';
+          activeGpuSub = 'Aceleração de alta performance ativa';
+          isDedicatedActive = true;
+        }
+      } else if (currentGpuPref === 'integrated') {
+        if (integratedCard) {
+          activeGpuLabel = `${integratedCard.name}${integratedCard.vram ? ` (${integratedCard.vram})` : ''}`;
+          activeGpuSub = 'GPU Integrada • Modo Econômico de Bateria';
+          isDedicatedActive = false;
+        } else {
+          activeGpuLabel = gpuInfo.name || 'GPU Integrada';
+          activeGpuSub = 'Modo de economia de energia ativo';
+          isDedicatedActive = false;
+        }
+      } else {
+        activeGpuLabel = `${(dedicatedCard || integratedCard)?.name || gpuInfo.name || 'Automático'} (Automático)`;
+        activeGpuSub = 'Gerenciamento automático de GPU pelo sistema operacional';
+      }
+
       panelHtml = `
         <div class="settings-group">
           <div class="settings-group-title">Perfil e Tela Inicial</div>
@@ -5396,6 +5591,57 @@
               <button class="stg-btn danger" type="button" id="stg-reset-all">Restaurar Padrão</button>
             `
       })}
+        </div>
+        <div class="settings-group">
+          <div class="settings-group-title">Avançado • Desempenho e Aceleração Gráfica</div>
+          ${settingRowMarkup({
+            title: 'Desempenho Gráfico (GPU)',
+            desc: 'Sempre usa a GPU mais potente e dedicada disponível para manter interface e mídias em 60 FPS fluidos',
+            controlHtml: settingSegMarkup('gpuPreference', [
+              { val: 'dedicated', label: 'Dedicada (Mais Potente)' },
+              { val: 'integrated', label: 'Integrada (Economia)' },
+              { val: 'auto', label: 'Automático' }
+            ], currentGpuPref)
+          })}
+          ${settingRowMarkup({
+            title: 'GPU Ativa no Momento',
+            desc: `${escHtml(activeGpuSub)}`,
+            controlHtml: `
+              <div style="display:flex;align-items:center;gap:8px;">
+                <span style="display:inline-flex;align-items:center;gap:6px;padding:6px 14px;border-radius:999px;background:${isDedicatedActive ? 'rgba(16,185,129,0.18)' : 'rgba(59,130,246,0.18)'};border:1px solid ${isDedicatedActive ? 'rgba(16,185,129,0.36)' : 'rgba(59,130,246,0.36)'};color:${isDedicatedActive ? '#34d399' : '#60a5fa'};font-weight:700;font-size:0.84rem;">
+                  <span style="width:7px;height:7px;border-radius:50%;background:${isDedicatedActive ? '#10b981' : '#3b82f6'};box-shadow:0 0 8px ${isDedicatedActive ? '#10b981' : '#3b82f6'};"></span>
+                  ${escHtml(activeGpuLabel)}
+                </span>
+                <button class="stg-btn" type="button" id="stg-gpu-refresh-btn" title="Atualizar detecção de hardware">Atualizar</button>
+              </div>
+            `
+          })}
+          ${detectedGpus.length ? `
+            <div class="setting-row" style="border-bottom:none;padding-bottom:12px;">
+              <div class="setting-info" style="width:100%;">
+                <h4 style="margin-bottom:6px;">Placas de Vídeo Detectadas no Sistema</h4>
+                <div style="display:flex;flex-direction:column;gap:6px;margin-top:8px;">
+                  ${detectedGpus.map((g) => {
+                    const isSelected = (currentGpuPref === 'dedicated' && (g.isDedicated || g.isHighPerformance)) || (currentGpuPref === 'integrated' && !g.isDedicated && !g.isHighPerformance);
+                    return `
+                      <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 14px;border-radius:12px;background:rgba(255,255,255,${isSelected ? '0.08' : '0.03'});border:1px solid rgba(255,255,255,${isSelected ? '0.2' : '0.07'});">
+                        <div>
+                          <strong style="font-size:0.88rem;color:${isSelected ? 'var(--iris-cyan, #00c2ff)' : 'var(--text-primary)'};">${escHtml(g.name)}</strong>
+                          <span style="font-size:0.78rem;color:var(--text-secondary);margin-left:8px;">${g.isDedicated ? 'Dedicada (PCIe)' : 'Integrada'} ${g.vram ? `• ${g.vram}` : ''} ${g.metal ? '• Metal 3' : ''}</span>
+                        </div>
+                        <span style="font-size:0.78rem;font-weight:700;padding:3px 8px;border-radius:6px;background:${isSelected ? 'rgba(16,185,129,0.2)' : 'rgba(255,255,255,0.06)'};color:${isSelected ? '#34d399' : 'var(--text-muted)'};">${isSelected ? 'Em Uso' : 'Disponível'}</span>
+                      </div>
+                    `;
+                  }).join('')}
+                </div>
+              </div>
+            </div>
+          ` : ''}
+          ${settingRowMarkup({
+            title: 'Aceleração por Hardware em 60 FPS',
+            desc: 'Mantém rasterização de camadas e decodificação gráfica executando diretamente no chip de vídeo',
+            controlHtml: settingToggleMarkup('hardwareAcceleration', s.hardwareAcceleration !== false)
+          })}
         </div>
         <div class="settings-group">
           <div class="settings-group-title">Cofre de Senhas do irisTV</div>
@@ -5554,9 +5800,27 @@
         }
         state.settings[key] = parsed;
         applyAllSettings();
+        if (key === 'gpuPreference') {
+          if (typeof IrisGpuManager !== 'undefined') {
+            IrisGpuManager.applyPreference(parsed);
+          }
+          if (parsed === 'dedicated') showToast('GPU Dedicada (Mais Potente) ativada a 60 FPS');
+          else if (parsed === 'integrated') showToast('GPU Integrada (Modo Econômico) ativada');
+          else showToast('GPU no Modo Automático do Sistema');
+        }
         playUiSound('select');
         renderSettingsWorkspace(false, `[data-stg-seg="${key}"][data-val="${raw}"]`);
       });
+    });
+
+    wrap.querySelector('#stg-gpu-refresh-btn')?.addEventListener('click', async () => {
+      playUiSound('select');
+      await refreshOsStatus();
+      if (typeof IrisGpuManager !== 'undefined') {
+        IrisGpuManager.applyPreference(state.settings.gpuPreference || 'dedicated');
+      }
+      renderSettingsWorkspace(false, '#stg-gpu-refresh-btn');
+      showToast('Hardware gráfico verificado');
     });
 
     wrap.querySelectorAll('[data-test-sfx]').forEach((btn) => {

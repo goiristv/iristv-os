@@ -21,7 +21,7 @@ function spawnTvFrontend(url) {
     const browserExe = winBrowsers.find((p) => fs.existsSync(p));
     if (browserExe) {
       console.log(`\n  🌈 irisTV (Windows App Mode) iniciando em ${url}\n`);
-      return spawn(browserExe, [`--app=${url}`, '--start-fullscreen'], { stdio: 'inherit' });
+      return spawn(browserExe, [`--app=${url}`, '--start-fullscreen', '--force_high_performance_gpu', '--enable-gpu-rasterization', '--enable-zero-copy'], { stdio: 'inherit' });
     }
     console.log(`\n  🌈 irisTV rodando no navegador em ${url}\n`);
     return spawn('cmd', ['/c', 'start', '', url], { stdio: 'inherit' });

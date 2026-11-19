@@ -1471,7 +1471,20 @@ function getNetworkInterfaceInfo() {
   return candidates[0] || { iface: 'lo0', ip: '127.0.0.1', mac: '--' };
 }
 
-let hwStatusCache = { ts: 0, bluetooth: { enabled: null, connectedDevices: [] }, irReceiver: { available: false, name: 'Nenhum receptor infravermelho detectado' } };
+let hwStatusCache = {
+  ts: 0,
+  bluetooth: { enabled: null, connectedDevices: [] },
+  irReceiver: { available: false, name: 'Nenhum receptor infravermelho detectado' },
+  gpus: []
+};
+let globalGpuPreference = 'dedicated';
+try {
+  const prefPath = path.join(__dirname, 'gpu-settings.json');
+  if (fs.existsSync(prefPath)) {
+    const raw = JSON.parse(fs.readFileSync(prefPath, 'utf8'));
+    if (raw && raw.preference) globalGpuPreference = raw.preference;
+  }
+} catch (_) {}
 
 async function getRealOsStatus() {
   const platform = process.platform;
@@ -1487,16 +1500,18 @@ async function getRealOsStatus() {
   let darkMode = null;
   let bluetooth = hwStatusCache.bluetooth;
   let irReceiver = hwStatusCache.irReceiver;
+  let gpus = hwStatusCache.gpus || [];
 
   if (platform === 'darwin') {
     const needHwScan = Date.now() - hwStatusCache.ts > 30000;
-    const [volRes, battRes, wifiRes, styleRes, irRes, btRes] = await Promise.all([
+    const [volRes, battRes, wifiRes, styleRes, irRes, btRes, gpuRes] = await Promise.all([
       runCmd('osascript', ['-e', 'get volume settings']),
       runCmd('pmset', ['-g', 'batt']),
       runCmd('networksetup', ['-getairportnetwork', netInfo.iface === 'lo0' ? 'en0' : netInfo.iface]),
       runCmd('defaults', ['read', '-g', 'AppleInterfaceStyle']),
       needHwScan ? runCmd('ioreg', ['-r', '-c', 'AppleIRController', '-w0']) : Promise.resolve(null),
-      needHwScan ? runCmd('system_profiler', ['SPBluetoothDataType', '-json']) : Promise.resolve(null)
+      needHwScan ? runCmd('system_profiler', ['SPBluetoothDataType', '-json']) : Promise.resolve(null),
+      needHwScan ? runCmd('system_profiler', ['SPDisplaysDataType', '-json']) : Promise.resolve(null)
     ]);
 
     if (needHwScan) {
@@ -1525,9 +1540,35 @@ async function getRealOsStatus() {
           };
         } catch (_) {}
       }
+
+      let nextGpus = hwStatusCache.gpus || [];
+      if (gpuRes?.ok && gpuRes.stdout) {
+        try {
+          const dispJson = JSON.parse(gpuRes.stdout)?.SPDisplaysDataType || [];
+          nextGpus = dispJson.map((d) => {
+            const model = d.sppci_model || d._name || 'GPU';
+            const vram = d.spdisplays_vram || d.spdisplays_vram_shared || '';
+            const isDedicated = d.sppci_bus === 'spdisplays_pcie_device' || (Boolean(d.spdisplays_vram) && !d.spdisplays_vram_shared);
+            const vendor = /amd|radeon/i.test(model) || (d.spdisplays_vendor && d.spdisplays_vendor.includes('amd')) ? 'AMD'
+              : (/nvidia|geforce/i.test(model) ? 'NVIDIA'
+              : (/intel/i.test(model) ? 'Intel' : (model.includes('Apple') ? 'Apple' : 'Desconhecido')));
+            return {
+              name: model,
+              model,
+              vendor,
+              vram: (vram || '').trim(),
+              isDedicated: Boolean(isDedicated),
+              metal: d.spdisplays_mtlgpufamilysupport || null,
+              isHighPerformance: Boolean(isDedicated || vendor === 'AMD' || vendor === 'NVIDIA')
+            };
+          });
+        } catch (_) {}
+      }
+
       bluetooth = nextBt;
       irReceiver = nextIr;
-      hwStatusCache = { ts: Date.now(), bluetooth, irReceiver };
+      gpus = nextGpus;
+      hwStatusCache = { ts: Date.now(), bluetooth, irReceiver, gpus };
     }
 
     if (volRes.ok) {
@@ -1648,6 +1689,8 @@ async function getRealOsStatus() {
     irReceiver,
     battery,
     darkMode,
+    gpus: hwStatusCache.gpus || [],
+    gpuPreference: globalGpuPreference,
     network: {
       status: netInfo.ip !== '127.0.0.1' ? 'Conectado' : 'Local',
       iface: netInfo.iface,
@@ -2286,6 +2329,24 @@ function createAppServer() {
     if (pathname === '/api/system' || pathname === '/api/os/status') {
       const status = await getRealOsStatus();
       return sendJson(req, res, 200, status);
+    }
+
+    if (pathname === '/api/os/gpu-preference') {
+      if (req.method === 'POST') {
+        try {
+          const body = await readJsonBody(req);
+          if (body && body.preference) {
+            globalGpuPreference = body.preference;
+            try {
+              fs.writeFileSync(path.join(__dirname, 'gpu-settings.json'), JSON.stringify({ preference: globalGpuPreference }, null, 2));
+            } catch (_) {}
+          }
+          return sendJson(req, res, 200, { ok: true, preference: globalGpuPreference });
+        } catch (err) {
+          return sendJson(req, res, 400, { ok: false, error: err.message });
+        }
+      }
+      return sendJson(req, res, 200, { preference: globalGpuPreference, gpus: hwStatusCache.gpus || [] });
     }
 
     if (pathname === '/api/wifi/status') {

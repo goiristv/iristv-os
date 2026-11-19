@@ -1,6 +1,7 @@
 import Cocoa
 import WebKit
 import GameController
+import Metal
 
 final class IrisAppDelegate: NSObject, NSApplicationDelegate, WKUIDelegate, WKNavigationDelegate, WKScriptMessageHandler {
   var window: NSWindow!
@@ -13,6 +14,30 @@ final class IrisAppDelegate: NSObject, NSApplicationDelegate, WKUIDelegate, WKNa
   var currentAppUrl: URL?
   let targetURL: URL
   private var backendProcess: Process?
+  private var activeMetalDevice: MTLDevice?
+  private var activeCommandQueue: MTLCommandQueue?
+
+  func applyGpuPreference(_ pref: String) {
+    let devices = MTLCopyAllDevices()
+    NSLog("[irisTV GPU] Configurando GPU: \(pref). GPUs: \(devices.map { $0.name }.joined(separator: ", "))")
+    if pref == "integrated" {
+      if let low = devices.first(where: { $0.isLowPower }) {
+        self.activeMetalDevice = low
+        self.activeCommandQueue = low.makeCommandQueue()
+        NSLog("[irisTV GPU] Modo GPU Integrada ativado: \(low.name)")
+        return
+      }
+    }
+    if let high = devices.first(where: { !$0.isLowPower }) {
+      self.activeMetalDevice = high
+      self.activeCommandQueue = high.makeCommandQueue()
+      NSLog("[irisTV GPU] Modo GPU Dedicada de Alto Desempenho ativado: \(high.name)")
+    } else if let fallback = MTLCreateSystemDefaultDevice() {
+      self.activeMetalDevice = fallback
+      self.activeCommandQueue = fallback.makeCommandQueue()
+      NSLog("[irisTV GPU] GPU Padrão do Sistema: \(fallback.name)")
+    }
+  }
 
   init(url: URL) {
     self.targetURL = url
@@ -271,6 +296,7 @@ final class IrisAppDelegate: NSObject, NSApplicationDelegate, WKUIDelegate, WKNa
     config.preferences.setValue(true, forKey: "fullScreenEnabled")
     config.preferences.setValue(true, forKey: "acceleratedDrawingEnabled")
     config.preferences.setValue(true, forKey: "canvasUsesAcceleratedDrawing")
+    config.preferences.setValue(true, forKey: "webGLEnabled")
     if withBridge {
       config.userContentController.add(self, name: "irisWebView")
     }
@@ -334,6 +360,7 @@ final class IrisAppDelegate: NSObject, NSApplicationDelegate, WKUIDelegate, WKNa
     window.makeKeyAndOrderFront(nil)
     NSApp.activate(ignoringOtherApps: true)
     window.makeFirstResponder(webView)
+    applyGpuPreference("dedicated")
     setupHardwareRemoteMonitor()
     ensureServerRunning()
     let cacheTypes: Set<String> = [WKWebsiteDataTypeDiskCache, WKWebsiteDataTypeMemoryCache]
@@ -583,6 +610,8 @@ final class IrisAppDelegate: NSObject, NSApplicationDelegate, WKUIDelegate, WKNa
       } else if action == "saveCredentials", let host = dict["host"] as? String, let password = dict["password"] as? String {
         let username = (dict["username"] as? String) ?? ""
         self.saveCredentialToIrisVault(host: host, username: username, password: password)
+      } else if action == "setGpuPreference", let pref = dict["preference"] as? String {
+        self.applyGpuPreference(pref)
       } else if action == "getCredentials", let host = dict["host"] as? String {
         self.loadCredentialFromIrisVault(host: host) { [weak self] username, password in
           guard let uData = try? JSONSerialization.data(withJSONObject: username),
