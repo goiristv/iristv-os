@@ -282,8 +282,8 @@
       androidPackage: 'com.netflix.ninja',
       drm: 'Widevine L3',
       apkMirrors: [
-        'https://archive.org/download/netflix-ninja-android-tv/netflix-ninja-android-tv.apk',
-        'https://mirror.apk-cloud.com/apks/com.netflix.ninja.apk'
+        'https://archive.org/download/com.netflix.ninja_10.3.0_build_19305-19305_minapi24armeabi-v7anodpi_apkmirror.com/com.netflix.ninja_10.3.0_build_19305-19305_minAPI24%28armeabi-v7a%29%28nodpi%29_apkmirror.com.apk',
+        'https://archive.org/download/com.netflix.ninja_8.1.2_build_3844_mod_20211018/com.netflix.ninja_8.1.2_build_3844_mod.apk'
       ],
       webUrl: 'https://www.netflix.com',
       iconSrc: 'icons/netflix.jpg',
@@ -306,8 +306,7 @@
       androidPackage: 'com.amazon.amazonvideo.livingroom',
       drm: 'Widevine L3',
       apkMirrors: [
-        'https://archive.org/download/prime-video-android-tv/prime-video-android-tv.apk',
-        'https://mirror.apk-cloud.com/apks/com.amazon.amazonvideo.livingroom.apk'
+        'https://archive.org/download/com.amazon.amazonvideo.livingroom_6.10.0_v14.1.0.456-armv7a-506010000_minapi21ar/com.amazon.amazonvideo.livingroom_6.10.0_v14.1.0.456-armv7a-506010000_minAPI21%28armeabi-v7a%29%28nodpi%29_apkmirror.com.apk'
       ],
       webUrl: 'https://www.primevideo.com',
       iconSrc: 'icons/prime.jpg',
@@ -378,8 +377,7 @@
       androidPackage: 'com.teamsmart.videomanager.tv',
       drm: 'Sem Anúncios • 4K 60FPS HDR',
       apkMirrors: [
-        'https://github.com/yuliskov/SmartTube/releases/latest/download/smarttube_stable.apk',
-        'https://github.com/yuliskov/SmartTube/releases/download/21.85/smarttube_stable.apk'
+        'https://github.com/yuliskov/SmartTube/releases/download/32.80s/SmartTube_stable_32.80_universal.apk'
       ],
       webUrl: 'https://www.youtube.com/tv',
       iconSrc: 'icons/youtube.svg',
@@ -426,8 +424,8 @@
       androidPackage: 'com.stremio.one',
       drm: 'Torrents & Add-ons Integrados',
       apkMirrors: [
-        'https://dl.strem.io/android/v1.6.12-arm64-v8a/stremio-1.6.12-arm64.apk',
-        'https://dl.strem.io/android/v1.6.11-arm64-v8a/stremio-1.6.11-arm64.apk'
+        'https://dl.strem.io/android/v2.3.2-android/com.stremio.one-2.3.2-8194306-x86_64.apk',
+        'https://dl.strem.io/android/v2.3.2-android/com.stremio.one-2.3.2-6097154-x86.apk'
       ],
       webUrl: 'https://web.stremio.com',
       iconSrc: 'icons/mediaplayer.svg',

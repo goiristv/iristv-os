@@ -2880,73 +2880,44 @@ function createAppServer() {
 
     const APK_MIRRORS_MAP = {
       smarttube: [
-        'https://github.com/yuliskov/SmartTube/releases/latest/download/smarttube_stable.apk',
-        'https://github.com/yuliskov/SmartTube/releases/download/21.85/smarttube_stable.apk'
+        'https://github.com/yuliskov/SmartTube/releases/download/32.80s/SmartTube_stable_32.80_universal.apk'
       ],
       youtube: [
-        'https://github.com/yuliskov/SmartTube/releases/latest/download/smarttube_stable.apk',
-        'https://archive.org/download/youtube-android-tv-v2/youtube-android-tv.apk'
+        'https://github.com/yuliskov/SmartTube/releases/download/32.80s/SmartTube_stable_32.80_universal.apk'
       ],
       kodi: [
         'https://mirrors.kodi.tv/releases/android/x86_64/kodi-21.1-Omega-x86_64.apk',
         'https://mirrors.kodi.tv/releases/android/arm64-v8a/kodi-21.1-Omega-arm64-v8a.apk'
       ],
       stremio: [
-        'https://dl.strem.io/android/v1.6.12-arm64-v8a/stremio-1.6.12-arm64.apk',
-        'https://dl.strem.io/android/v1.6.11-arm64-v8a/stremio-1.6.11-arm64.apk'
+        'https://dl.strem.io/android/v2.3.2-android/com.stremio.one-2.3.2-8194306-x86_64.apk',
+        'https://dl.strem.io/android/v2.3.2-android/com.stremio.one-2.3.2-6097154-x86.apk'
       ],
       vlc: [
         'https://get.videolan.org/vlc-android/3.5.4/VLC-Android-3.5.4-arm64-v8a.apk',
-        'https://download.videolan.org/pub/videolan/vlc-android/3.5.4/VLC-Android-3.5.4-arm64-v8a.apk'
+        'https://get.videolan.org/vlc-android/3.5.4/VLC-Android-3.5.4-armeabi-v7a.apk'
       ],
       plex: [
-        'https://downloads.plex.tv/kepler/apk/Plex_for_Android_TV.apk',
-        'https://archive.org/download/plex-android-tv/plex-android-tv.apk'
+        'https://downloads.plex.tv/kepler/apk/Plex_for_Android_TV.apk'
       ],
       netflix: [
-        'https://archive.org/download/netflix-ninja-android-tv/netflix-ninja-android-tv.apk',
-        'https://mirror.apk-cloud.com/apks/com.netflix.ninja.apk'
+        'https://archive.org/download/com.netflix.ninja_10.3.0_build_19305-19305_minapi24armeabi-v7anodpi_apkmirror.com/com.netflix.ninja_10.3.0_build_19305-19305_minAPI24%28armeabi-v7a%29%28nodpi%29_apkmirror.com.apk',
+        'https://archive.org/download/com.netflix.ninja_8.1.2_build_3844_mod_20211018/com.netflix.ninja_8.1.2_build_3844_mod.apk'
       ],
       prime: [
-        'https://archive.org/download/prime-video-android-tv/prime-video-android-tv.apk',
-        'https://mirror.apk-cloud.com/apks/com.amazon.amazonvideo.livingroom.apk'
+        'https://archive.org/download/com.amazon.amazonvideo.livingroom_6.10.0_v14.1.0.456-armv7a-506010000_minapi21ar/com.amazon.amazonvideo.livingroom_6.10.0_v14.1.0.456-armv7a-506010000_minAPI21%28armeabi-v7a%29%28nodpi%29_apkmirror.com.apk'
       ],
-      disney: [
-        'https://archive.org/download/disney-plus-android-tv/disney-plus-android-tv.apk',
-        'https://mirror.apk-cloud.com/apks/com.disney.disneyplus.apk'
-      ],
-      max: [
-        'https://archive.org/download/max-android-tv/max-android-tv.apk',
-        'https://mirror.apk-cloud.com/apks/com.wbd.stream.apk'
-      ],
-      globoplay: [
-        'https://archive.org/download/globoplay-android-tv/globoplay-android-tv.apk',
-        'https://mirror.apk-cloud.com/apks/com.globo.globotv.apk'
-      ],
+      disney: [],
+      max: [],
+      globoplay: [],
       spotify: [
-        'https://archive.org/download/spotify-tv-android/spotify-tv-android.apk',
-        'https://mirror.apk-cloud.com/apks/com.spotify.tv.android.apk'
+        'https://archive.org/download/com.spotify.tv.android_v1.9.0-adfree/com.spotify.tv.android_v1.9.0-adfree.apk'
       ],
-      crunchyroll: [
-        'https://archive.org/download/crunchyroll-android-tv/crunchyroll-android-tv.apk',
-        'https://mirror.apk-cloud.com/apks/com.crunchyroll.crunchyroid.apk'
-      ],
-      plutotv: [
-        'https://archive.org/download/pluto-tv-android/pluto-tv-android.apk',
-        'https://mirror.apk-cloud.com/apks/tv.pluto.android.apk'
-      ],
-      twitch: [
-        'https://archive.org/download/twitch-tv-android/twitch-tv-android.apk',
-        'https://mirror.apk-cloud.com/apks/tv.twitch.android.app.apk'
-      ],
-      appletv: [
-        'https://archive.org/download/apple-tv-android-tv/apple-tv-android-tv.apk',
-        'https://mirror.apk-cloud.com/apks/com.apple.atve.androidtv.appletv.apk'
-      ],
-      paramount: [
-        'https://archive.org/download/paramount-plus-android-tv/paramount-plus-android-tv.apk',
-        'https://mirror.apk-cloud.com/apks/com.cbs.app.apk'
-      ]
+      crunchyroll: [],
+      plutotv: [],
+      twitch: [],
+      appletv: [],
+      paramount: []
     };
 
     global.__irisApkState = global.__irisApkState || {};
@@ -2961,58 +2932,132 @@ function createAppServer() {
       return null;
     };
 
-    // Helper: Download a remote file from mirrors with progress tracking
-    async function downloadApkFromMirrors(appId, mirrors, targetFilePath) {
-      fs.mkdirSync(path.dirname(targetFilePath), { recursive: true });
-      let downloaded = false;
-
-      for (let i = 0; i < mirrors.length; i++) {
-        const mirrorUrl = mirrors[i];
-        global.__irisApkState[appId] = {
-          status: 'downloading',
-          progress: 5 + Math.round((i / mirrors.length) * 10),
-          mirrorIndex: i,
-          mirrorUrl
-        };
-
+    // Resolve dynamic mirrors via Archive.org Search + Metadata API when needed
+    async function resolveDynamicApkMirrors(appId, androidPkg) {
+      const found = [];
+      if (appId === 'smarttube' || appId === 'youtube') {
         try {
-          console.log(`[irisStore APK] Baixando ${appId} do mirror #${i + 1}: ${mirrorUrl}`);
-          const res = await fetch(mirrorUrl, {
-            headers: { 'User-Agent': 'Mozilla/5.0 (Linux; Android 11; Smart TV) AppleWebKit/537.36' },
-            redirect: 'follow',
-            signal: AbortSignal.timeout(60000)
+          const r = await fetch('https://api.github.com/repos/yuliskov/SmartTube/releases/latest', {
+            headers: { 'User-Agent': 'irisOS/1.0' },
+            signal: AbortSignal.timeout(8000)
           });
-
-          if (!res.ok) {
-            console.warn(`[irisStore APK] Mirror #${i + 1} falhou com status ${res.status}`);
-            continue;
+          if (r.ok) {
+            const rel = await r.json();
+            const asset = (rel.assets || []).find((a) => /universal.*\.apk$/i.test(a.name))
+              || (rel.assets || []).find((a) => /\.apk$/i.test(a.name));
+            if (asset?.browser_download_url) found.push(asset.browser_download_url);
           }
-
-          const contentLength = parseInt(res.headers.get('content-length') || '0', 10);
-          const fileStream = fs.createWriteStream(targetFilePath);
-          let received = 0;
-
-          const reader = res.body.getReader();
-          while (true) {
-            const { done, value } = await reader.read();
-            if (done) break;
-            fileStream.write(Buffer.from(value));
-            received += value.length;
-            if (contentLength > 0) {
-              const pct = Math.min(95, Math.round((received / contentLength) * 100));
-              global.__irisApkState[appId].progress = pct;
+        } catch (_) {}
+      }
+      const queryTerm = androidPkg || appId;
+      if (queryTerm) {
+        try {
+          const sr = await fetch(`https://archive.org/advancedsearch.php?q=${encodeURIComponent(queryTerm)}&fl[]=identifier&rows=5&output=json`, {
+            headers: { 'User-Agent': 'irisOS/1.0' },
+            signal: AbortSignal.timeout(10000)
+          });
+          if (sr.ok) {
+            const sJson = await sr.json();
+            const docs = sJson?.response?.docs || [];
+            for (const doc of docs.slice(0, 3)) {
+              if (!doc?.identifier) continue;
+              const mr = await fetch(`https://archive.org/metadata/${encodeURIComponent(doc.identifier)}`, {
+                headers: { 'User-Agent': 'irisOS/1.0' },
+                signal: AbortSignal.timeout(8000)
+              });
+              if (mr.ok) {
+                const mJson = await mr.json();
+                const apkFile = (mJson?.files || []).find((f) => f?.name && f.name.toLowerCase().endsWith('.apk'));
+                if (apkFile?.name) {
+                  found.push(`https://archive.org/download/${encodeURIComponent(doc.identifier)}/${encodeURIComponent(apkFile.name)}`);
+                }
+              }
             }
           }
-          await new Promise((resolve, reject) => {
-            fileStream.end((err) => (err ? reject(err) : resolve()));
-          });
+        } catch (_) {}
+      }
+      return found;
+    }
 
-          if (fs.existsSync(targetFilePath) && fs.statSync(targetFilePath).size > 1024 * 100) {
-            downloaded = true;
-            break;
+    // Helper: Download a remote file from mirrors with progress tracking + ZIP/APK header verification
+    async function downloadApkFromMirrors(appId, initialMirrors, targetFilePath, androidPkg = '') {
+      fs.mkdirSync(path.dirname(targetFilePath), { recursive: true });
+      let mirrors = [...(initialMirrors || [])];
+      let downloaded = false;
+
+      const tryDownloadList = async (urlList) => {
+        for (let i = 0; i < urlList.length; i++) {
+          const mirrorUrl = urlList[i];
+          global.__irisApkState[appId] = {
+            status: 'downloading',
+            progress: 5 + Math.round((i / Math.max(1, urlList.length)) * 10),
+            mirrorIndex: i,
+            mirrorUrl
+          };
+
+          try {
+            console.log(`[irisStore APK] Baixando ${appId} do mirror #${i + 1}: ${mirrorUrl}`);
+            const res = await fetch(mirrorUrl, {
+              headers: { 'User-Agent': 'Mozilla/5.0 (Linux; Android 11; Smart TV) AppleWebKit/537.36' },
+              redirect: 'follow',
+              signal: AbortSignal.timeout(90000)
+            });
+
+            if (!res.ok) {
+              console.warn(`[irisStore APK] Mirror #${i + 1} falhou com status ${res.status}`);
+              continue;
+            }
+            const ctype = (res.headers.get('content-type') || '').toLowerCase();
+            if (ctype.includes('text/html')) {
+              console.warn(`[irisStore APK] Mirror #${i + 1} retornou HTML em vez de APK`);
+              continue;
+            }
+
+            const contentLength = parseInt(res.headers.get('content-length') || '0', 10);
+            const fileStream = fs.createWriteStream(targetFilePath);
+            let received = 0;
+
+            const reader = res.body.getReader();
+            while (true) {
+              const { done, value } = await reader.read();
+              if (done) break;
+              fileStream.write(Buffer.from(value));
+              received += value.length;
+              if (contentLength > 0) {
+                const pct = Math.min(95, Math.round((received / contentLength) * 100));
+                global.__irisApkState[appId].progress = pct;
+              }
+            }
+            await new Promise((resolve, reject) => {
+              fileStream.end((err) => (err ? reject(err) : resolve()));
+            });
+
+            if (fs.existsSync(targetFilePath) && fs.statSync(targetFilePath).size > 1024 * 100) {
+              const fd = fs.openSync(targetFilePath, 'r');
+              const magic = Buffer.alloc(2);
+              fs.readSync(fd, magic, 0, 2, 0);
+              fs.closeSync(fd);
+              if (magic[0] === 0x50 && magic[1] === 0x4b) {
+                return true;
+              }
+              console.warn(`[irisStore APK] Arquivo baixado do mirror #${i + 1} não é um APK válido (PK magic ausente)`);
+              try { fs.unlinkSync(targetFilePath); } catch (_) {}
+            }
+          } catch (mErr) {
+            console.warn(`[irisStore APK] Erro no mirror #${i + 1}: ${mErr.message}`);
           }
-        } catch (mErr) {
-          console.warn(`[irisStore APK] Erro no mirror #${i + 1}: ${mErr.message}`);
+        }
+        return false;
+      };
+
+      if (mirrors.length > 0) {
+        downloaded = await tryDownloadList(mirrors);
+      }
+      if (!downloaded) {
+        console.log(`[irisStore APK] Buscando mirrors dinâmicos para ${appId} (${androidPkg})...`);
+        const dynamicMirrors = await resolveDynamicApkMirrors(appId, androidPkg);
+        if (dynamicMirrors.length > 0) {
+          downloaded = await tryDownloadList(dynamicMirrors);
         }
       }
 
@@ -3031,13 +3076,9 @@ function createAppServer() {
         const appId = String(body.id || '').toLowerCase().trim();
         const appName = String(body.name || appId || 'App').trim();
         const androidPkg = String(body.androidPackage || TV_ANDROID_PACKAGES[appId] || '').trim();
-        const mirrors = Array.isArray(body.apkMirrors) && body.apkMirrors.length > 0
-          ? body.apkMirrors
-          : (APK_MIRRORS_MAP[appId] || (body.apkUrl ? [body.apkUrl] : []));
-
-        if (!mirrors || mirrors.length === 0) {
-          return sendJson(req, res, 400, { ok: false, error: 'Nenhum mirror de download configurado para este APK' });
-        }
+        const serverMirrors = APK_MIRRORS_MAP[appId] || [];
+        const clientMirrors = Array.isArray(body.apkMirrors) ? body.apkMirrors : (body.apkUrl ? [body.apkUrl] : []);
+        const mirrors = Array.from(new Set([...serverMirrors, ...clientMirrors]));
 
         const apkDir = process.platform === 'linux' ? '/opt/iristv/apks' : path.join(ROOT_DIR, 'apks');
         const targetPath = path.join(apkDir, `${appId}.apk`);
@@ -3047,7 +3088,7 @@ function createAppServer() {
 
         (async () => {
           try {
-            const success = await downloadApkFromMirrors(appId, mirrors, targetPath);
+            const success = await downloadApkFromMirrors(appId, mirrors, targetPath, androidPkg);
             if (!success) {
               global.__irisApkState[appId] = { status: 'error', error: 'Todos os mirrors falharam', progress: 0 };
               return;

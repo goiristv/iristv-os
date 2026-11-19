@@ -270,8 +270,20 @@ if [ -x /usr/bin/waydroid ] && [ -f /var/lib/waydroid/waydroid.cfg ]; then
     # Aguarda contêiner inicializar e aplica suporte a Widevine DRM L3 e otimizações de TV de alta velocidade
     for _i in $(seq 1 15); do
       if waydroid status 2>/dev/null | grep -q "RUNNING"; then
+        # Detecta a resolução nativa real da TV/Monitor via DRM para ajuste perfeito em tela cheia
+        SCREEN_RES=$(cat /sys/class/drm/card*-*/modes 2>/dev/null | grep -E '^[0-9]+x[0-9]+' | head -n 1)
+        SCREEN_W=${SCREEN_RES%x*}
+        SCREEN_H=${SCREEN_RES#*x}
+
         waydroid prop set persist.waydroid.widevine true 2>/dev/null || true
-        waydroid prop set persist.waydroid.multi_windows true 2>/dev/null || true
+        # multi_windows=false força o Waydroid a rodar em tela cheia unificada ajustada ao Cage
+        waydroid prop set persist.waydroid.multi_windows false 2>/dev/null || true
+        waydroid prop set persist.waydroid.width_padding 0 2>/dev/null || true
+        waydroid prop set persist.waydroid.height_padding 0 2>/dev/null || true
+        if [ -n "$SCREEN_W" ] && [ -n "$SCREEN_H" ]; then
+          waydroid prop set persist.waydroid.width "$SCREEN_W" 2>/dev/null || true
+          waydroid prop set persist.waydroid.height "$SCREEN_H" 2>/dev/null || true
+        fi
         waydroid prop set persist.waydroid.suspend false 2>/dev/null || true
         waydroid prop set persist.waydroid.fake_touch false 2>/dev/null || true
         waydroid prop set persist.waydroid.uevent 1 2>/dev/null || true
@@ -285,10 +297,24 @@ if [ -x /usr/bin/waydroid ] && [ -f /var/lib/waydroid/waydroid.cfg ]; then
         # Pré-aquece a sessão Android (Zygote & Dalvik VM) para abertura instantânea dos apps
         waydroid session start >> /var/log/waydroid-session.log 2>&1 &
 
-        # Compilação AOT (Ahead-of-Time) em background para execução nativa ultra-rápida (sem iniciar apps)
+        # Ajuste automático de resolução/densidade de TV, imersão 100% e compilação AOT
         (
           for _j in $(seq 1 12); do
             if waydroid shell getprop sys.boot_completed 2>/dev/null | grep -q "1"; then
+              # Ajusta a resolução e densidade exata da tela da TV (sem barras nem cortes)
+              if [ -n "$SCREEN_W" ] && [ -n "$SCREEN_H" ]; then
+                waydroid shell wm size "${SCREEN_W}x${SCREEN_H}" >/dev/null 2>&1 || true
+                if [ "$SCREEN_W" -ge 3000 ]; then
+                  waydroid shell wm density 320 >/dev/null 2>&1 || true
+                elif [ "$SCREEN_W" -ge 1600 ]; then
+                  waydroid shell wm density 213 >/dev/null 2>&1 || true
+                else
+                  waydroid shell wm density 160 >/dev/null 2>&1 || true
+                fi
+              fi
+              waydroid shell wm overscan 0,0,0,0 >/dev/null 2>&1 || true
+              waydroid shell settings put global policy_control immersive.full=* >/dev/null 2>&1 || true
+
               # Desativa animações artificiais de transição do Android (-400ms no cold launch)
               waydroid shell settings put global window_animation_scale 0 >/dev/null 2>&1 || true
               waydroid shell settings put global transition_animation_scale 0 >/dev/null 2>&1 || true
