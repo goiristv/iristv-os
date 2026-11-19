@@ -1942,9 +1942,15 @@
   /* =========================================================
      Live Dynamic Spotlight Hero (NavaTV Open-Canvas Behavior)
      ========================================================= */
+  let spotlightMediaTimer = null;
   function setSpotlightItem(target) {
     if (!target) return;
     state.spotlightTarget = target;
+
+    const scheduleHeavySpotlight = (fn) => {
+      clearTimeout(spotlightMediaTimer);
+      spotlightMediaTimer = setTimeout(fn, 85);
+    };
 
     if (target.type === 'app') {
       const app = target.data;
@@ -1956,14 +1962,12 @@
       spotlightVisual.classList.remove('is-wide');
       spotlightVisual.style.setProperty('--spot-glow', app.glow || 'rgba(0, 194, 255, 0.35)');
       ambientBackdropImg.classList.remove('is-visible');
-      if (app.iconSrc) {
-        spotlightImg.src = app.iconSrc;
+      scheduleHeavySpotlight(() => {
+        if (state.spotlightTarget !== target) return;
+        spotlightImg.src = app.iconSrc || 'logo.svg';
         spotlightImg.alt = app.name;
-      } else {
-        spotlightImg.src = 'logo.svg';
-        spotlightImg.alt = app.name;
-      }
-      if (state.theme === 'prism' && state.smartHome.ambilightSync) setAmbientOrbs(app.orbs);
+        if (state.theme === 'prism' && state.smartHome.ambilightSync) setAmbientOrbs(app.orbs);
+      });
     } else if (target.type === 'show') {
       const show = target.data;
       if (heroKicker) heroKicker.textContent = show.appName ? show.appName.toUpperCase() : '';
@@ -1973,14 +1977,17 @@
       heroPlayLabel.textContent = 'Assistir';
       spotlightVisual.classList.add('is-wide');
       spotlightVisual.style.setProperty('--spot-glow', show.glow || 'rgba(0, 194, 255, 0.45)');
-      spotlightImg.src = show.bgImg;
-      spotlightImg.alt = show.title;
       if (ambientBackdropImg) ambientBackdropImg.classList.remove('is-visible');
-      if (state.theme === 'prism' && state.smartHome.ambilightSync) setAmbientOrbs(show.orbs);
-      if (state.settings.showBannersAsWallpaper && show.bgImg && show.id !== 'severance' && !/severance|ruptura/i.test(show.title || '')) {
-        activeShowBannerUrl = show.bgImg;
-        updateMainScreenWallpaper(true);
-      }
+      scheduleHeavySpotlight(() => {
+        if (state.spotlightTarget !== target) return;
+        spotlightImg.src = show.bgImg;
+        spotlightImg.alt = show.title;
+        if (state.theme === 'prism' && state.smartHome.ambilightSync) setAmbientOrbs(show.orbs);
+        if (state.settings.showBannersAsWallpaper && show.bgImg && show.id !== 'severance' && !/severance|ruptura/i.test(show.title || '')) {
+          activeShowBannerUrl = show.bgImg;
+          updateMainScreenWallpaper(true);
+        }
+      });
     } else if (target.type === 'continue') {
       const item = target.data;
       heroKicker.textContent = `CONTINUAR • ${item.appName.toUpperCase()}`;
@@ -1990,14 +1997,17 @@
       heroPlayLabel.textContent = 'Continuar';
       spotlightVisual.classList.add('is-wide');
       spotlightVisual.style.setProperty('--spot-glow', item.glow || 'rgba(155, 77, 255, 0.45)');
-      spotlightImg.src = item.thumb;
-      spotlightImg.alt = item.title;
       if (ambientBackdropImg) ambientBackdropImg.classList.remove('is-visible');
-      if (state.theme === 'prism' && state.smartHome.ambilightSync) setAmbientOrbs(item.orbs);
-      if (state.settings.showBannersAsWallpaper && item.thumb) {
-        activeShowBannerUrl = item.thumb;
-        updateMainScreenWallpaper(true);
-      }
+      scheduleHeavySpotlight(() => {
+        if (state.spotlightTarget !== target) return;
+        spotlightImg.src = item.thumb;
+        spotlightImg.alt = item.title;
+        if (state.theme === 'prism' && state.smartHome.ambilightSync) setAmbientOrbs(item.orbs);
+        if (state.settings.showBannersAsWallpaper && item.thumb) {
+          activeShowBannerUrl = item.thumb;
+          updateMainScreenWallpaper(true);
+        }
+      });
     } else if (target.type === 'live') {
       const ch = target.data;
       heroKicker.textContent = `AO VIVO • CANAL ${ch.num}`;
@@ -2008,9 +2018,12 @@
       spotlightVisual.classList.remove('is-wide');
       spotlightVisual.style.setProperty('--spot-glow', 'rgba(255, 45, 111, 0.4)');
       ambientBackdropImg.classList.remove('is-visible');
-      spotlightImg.src = ch.iconSrc || 'logo.svg';
-      spotlightImg.alt = ch.name;
-      if (state.theme === 'prism' && state.smartHome.ambilightSync) setAmbientOrbs(ch.orbs);
+      scheduleHeavySpotlight(() => {
+        if (state.spotlightTarget !== target) return;
+        spotlightImg.src = ch.iconSrc || 'logo.svg';
+        spotlightImg.alt = ch.name;
+        if (state.theme === 'prism' && state.smartHome.ambilightSync) setAmbientOrbs(ch.orbs);
+      });
     }
 
     const isFav = state.favorites.has(target.data.id || target.data.num);
@@ -2090,7 +2103,6 @@
 
     btn.addEventListener('mouseenter', () => {
       setFocus(btn, false);
-      setSpotlightItem({ type: 'app', data: app });
     });
     btn.addEventListener('click', () => launchApp(app));
 
@@ -2119,7 +2131,6 @@
     `;
     btn.addEventListener('mouseenter', () => {
       setFocus(btn, false);
-      setSpotlightItem({ type: 'live', data: ch });
     });
     btn.addEventListener('click', () => {
       openCinemaPlayer({
@@ -5934,7 +5945,7 @@
     playUiSound('select');
     searchRenderToken++;
     searchInput.value = '';
-    searchResults.innerHTML = `<div style="text-align:center;padding:28px 20px;color:rgba(255,255,255,0.55);font-size:0.9rem;font-weight:500;">Carregando sugestões...</div>`;
+    searchResults.innerHTML = `<div style="text-align:center;padding:28px 20px;color:rgba(255,255,255,0.55);font-size:0.9rem;font-weight:500;">Carregando aplicativos e títulos...</div>`;
     searchOverlay.classList.remove('hidden');
     searchInput.focus({ preventScroll: true });
     requestAnimationFrame(() => {
@@ -5942,7 +5953,7 @@
         if (!searchOverlay.classList.contains('hidden')) {
           renderSearchResults();
         }
-      }, 45);
+      }, 24);
     });
   }
 

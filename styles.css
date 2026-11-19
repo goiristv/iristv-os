@@ -1611,6 +1611,7 @@ body.theme-light .ambient-vignette {
         display: flex;
         flex-direction: column;
         gap: 12px;
+        contain: layout style;
         contain-intrinsic-size: 0 210px;
       }
 
@@ -1675,6 +1676,7 @@ body.theme-light .ambient-vignette {
         padding: 24px 16px 28px;
         margin: -20px -16px -28px;
         scroll-behavior: smooth;
+        will-change: scroll-position;
         scrollbar-width: none;
       }
 
@@ -2294,6 +2296,12 @@ body.theme-light .ambient-vignette {
         padding: 28px;
       }
 
+      #search-overlay {
+        background: rgba(4, 6, 12, 0.45);
+        backdrop-filter: blur(20px) saturate(150%);
+        -webkit-backdrop-filter: blur(20px) saturate(150%);
+      }
+
       .spotlight-panel {
         width: min(920px, 100%);
         max-height: 82vh;
@@ -2302,11 +2310,11 @@ body.theme-light .ambient-vignette {
         gap: 14px;
         padding: 20px 22px 22px;
         border-radius: 24px;
-        background: rgba(13, 17, 29, 0.94);
-        border: 1px solid rgba(255, 255, 255, 0.14);
-        box-shadow: 0 32px 80px rgba(0, 0, 0, 0.72), inset 0 1px 0 rgba(255, 255, 255, 0.12);
-        animation: modalPop 0.2s cubic-bezier(0.22, 1, 0.36, 1) both;
-        will-change: transform, opacity;
+        background: rgba(14, 18, 30, 0.72);
+        backdrop-filter: blur(22px) saturate(150%);
+        -webkit-backdrop-filter: blur(22px) saturate(150%);
+        border: 1px solid rgba(255, 255, 255, 0.16);
+        box-shadow: 0 32px 80px rgba(0, 0, 0, 0.68), inset 0 1px 0 rgba(255, 255, 255, 0.14);
       }
 
       @keyframes modalPop {
