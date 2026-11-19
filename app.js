@@ -3913,9 +3913,35 @@
 
   const mediaClientCache = new Map();
   let activeDetailsAbortCtrl = null;
+  let currentDetailsShow = null;
+
+  function syncSingleShowCardStatus(show) {
+    if (!show) return;
+    const card = document.querySelector(`.poster-card[data-show-id="${show.id}"]`);
+    if (!card) return;
+    const tr = getTrackEntry(show);
+    const statusBadges = [
+      tr?.watched ? '<span class="poster-mini-pill watched">Visto</span>' : '',
+      !tr?.watched && tr?.watchlist ? '<span class="poster-mini-pill watchlist">Quero Ver</span>' : '',
+      !tr?.watched && tr?.watchedEpisodes?.length ? `<span class="poster-mini-pill">${tr.watchedEpisodes.length} eps</span>` : '',
+      tr?.userRating ? `<span class="poster-mini-pill rate">Nota ${tr.userRating}</span>` : ''
+    ].filter(Boolean).join('');
+    let st = card.querySelector('.poster-card-status');
+    if (statusBadges) {
+      if (!st) {
+        st = document.createElement('div');
+        st.className = 'poster-card-status';
+        card.appendChild(st);
+      }
+      st.innerHTML = statusBadges;
+    } else if (st) {
+      st.remove();
+    }
+  }
 
   async function openMediaDetails(show) {
     if (!show) return;
+    currentDetailsShow = show;
     if (activeDetailsAbortCtrl) {
       try { activeDetailsAbortCtrl.abort(); } catch (_) { }
       activeDetailsAbortCtrl = null;
@@ -5876,6 +5902,8 @@
     }
     // Cancel in-flight image decodes & embeds immediately to reclaim network sockets & compositor thread
     if (appStageBody) {
+      const hero = appStageBody.querySelector('.details-hero');
+      if (hero) hero.style.backgroundImage = 'none';
       appStageBody.querySelectorAll('img').forEach((img) => {
         img.src = '';
         img.removeAttribute('src');
@@ -5884,21 +5912,25 @@
         ifr.src = 'about:blank';
         ifr.remove();
       });
+      appStageBody.replaceChildren();
     }
+    if (appStageBrand) appStageBrand.innerHTML = '';
+    appStageWindow.style.removeProperty('--stage-glow');
     playUiSound('back');
     appStageWindow.classList.add('is-closing');
     setTimeout(() => {
       if (window.IrisNativeApps) window.IrisNativeApps.cleanupActiveNative();
       if (window.IrisNativeGames) window.IrisNativeGames.cleanup();
       if (window.IrisMediaPlayer) window.IrisMediaPlayer.cleanup();
-      if (appStageBody) appStageBody.innerHTML = '';
-      if (appStageBrand) appStageBrand.innerHTML = '';
       appStageWindow.classList.remove('is-details-mode', 'is-store-mode', 'is-fullscreen-app', 'is-mediaplayer-app', 'is-closing');
-      appStageWindow.style.removeProperty('--stage-glow');
       appStageOverlay.classList.add('hidden');
       if (state.showsGridDirty && state.activeTab === 'shows') {
         state.showsGridDirty = false;
-        renderShowsGridOnly();
+        if (state.activeShowView === 'watched' || state.activeShowView === 'watchlist') {
+          renderShowsGridOnly();
+        } else {
+          syncSingleShowCardStatus(currentDetailsShow);
+        }
       }
       if (state.appsGridDirty && (state.activeTab === 'home' || state.activeTab === 'apps')) {
         state.appsGridDirty = false;
@@ -5906,7 +5938,8 @@
       }
       ensureScopeFocus(lastOpenedMediaCard);
       lastOpenedMediaCard = null;
-    }, 200);
+      currentDetailsShow = null;
+    }, 140);
   }
 
   document.getElementById('close-app-stage').addEventListener('click', closeAppStage);
@@ -6412,12 +6445,15 @@
       '.store-app-card',
       '.details-provider-card'
     ].join(', ');
-    return Array.from(scopeRoot.querySelectorAll(selector)).filter((el) => {
-      if (el.closest('.hidden')) return false;
-      if (el.offsetParent === null && getComputedStyle(el).position !== 'fixed') return false;
-      const r = el.getBoundingClientRect();
-      return r.width > 2 && r.height > 2;
-    });
+    const all = scopeRoot.querySelectorAll(selector);
+    const visible = [];
+    for (let i = 0; i < all.length; i++) {
+      const el = all[i];
+      if (el.closest('.hidden')) continue;
+      if (el.offsetParent === null) continue;
+      visible.push(el);
+    }
+    return visible;
   }
 
   function setFocus(el, shouldScroll = true) {

@@ -2174,19 +2174,13 @@ body.theme-light .ambient-vignette {
         object-fit: cover;
         display: block;
         opacity: 0;
-        transform: scale(1.04);
-        filter: blur(4px);
-        transition: opacity 0.38s cubic-bezier(0.16, 1, 0.3, 1),
-                    transform 0.45s cubic-bezier(0.16, 1, 0.3, 1),
-                    filter 0.38s cubic-bezier(0.16, 1, 0.3, 1);
-        will-change: opacity, transform, filter;
+        transform: scale(0.96);
+        transition: opacity 0.3s ease-out, transform 0.32s cubic-bezier(0.16, 1, 0.3, 1);
       }
 
       .poster-card img.is-loaded {
         opacity: 1;
         transform: scale(1);
-        filter: blur(0);
-        will-change: auto;
       }
 
       .poster-card::after {
@@ -2586,44 +2580,47 @@ body.theme-light .ambient-vignette {
         width: min(1040px, 95vw);
         height: min(650px, 86vh);
         border-radius: var(--card-radius, 18px);
-        background: rgba(10, 15, 28, 0.9);
+        background: rgba(10, 15, 28, 0.95);
         border: 1px solid rgba(255, 255, 255, 0.16);
         box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.22), inset 0 0 40px rgba(255, 255, 255, 0.02), 0 32px 80px rgba(0, 0, 0, 0.6);
         display: flex;
         flex-direction: column;
         overflow: hidden;
-        animation: stageExpandIn 0.36s cubic-bezier(0.16, 1, 0.3, 1) both;
+      }
+
+      .app-stage-overlay:not(.hidden) .app-stage-window {
+        animation: stageExpandIn 0.26s cubic-bezier(0.16, 1, 0.3, 1) both;
+      }
+
+      .app-stage-overlay.hidden .app-stage-window {
+        animation: none !important;
       }
 
       .app-stage-window.is-closing {
-        animation: stageShrinkOut 0.22s cubic-bezier(0.16, 1, 0.3, 1) forwards !important;
+        animation: stageShrinkOut 0.14s cubic-bezier(0.16, 1, 0.3, 1) forwards !important;
       }
 
       @keyframes stageExpandIn {
         0% {
           opacity: 0;
-          transform: scale(0.86) translateY(28px);
-          filter: blur(16px);
+          transform: scale(0.92) translate3d(0, 16px, 0);
         }
 
         100% {
           opacity: 1;
-          transform: scale(1) translateY(0);
-          filter: blur(0);
+          transform: scale(1) translate3d(0, 0, 0);
         }
       }
 
       @keyframes stageShrinkOut {
         0% {
           opacity: 1;
-          transform: scale(1) translateY(0);
-          filter: blur(0);
+          transform: scale(1) translate3d(0, 0, 0);
         }
 
         100% {
           opacity: 0;
-          transform: scale(0.88) translateY(20px);
-          filter: blur(12px);
+          transform: scale(0.94) translate3d(0, 12px, 0);
         }
       }
 
