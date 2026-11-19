@@ -168,6 +168,10 @@
       };
     }
 
+    showItem(data) {
+      this.show = data;
+    }
+
     set show(data) {
       this._data = data;
       this.tag('Backdrop').src = data.bg || data.poster;
@@ -278,6 +282,11 @@
         return true;
       }
       return false;
+    }
+
+    _handleBack() {
+      this.fireAncestors('$goHome');
+      return true;
     }
   }
 

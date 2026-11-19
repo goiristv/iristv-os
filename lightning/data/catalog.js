@@ -159,7 +159,7 @@
       {
         num: '1',
         name: 'Rede Globo',
-        logo: 'icons/globo.jpg',
+        logo: 'icons/globoplay.jpg',
         stream: 'http://hls1.sua.tv/live/globotvbahiafhdbr2/s.m3u8',
         now: 'Jornal Nacional',
         next: 'Novela das Nove: Mania de Você',
@@ -242,12 +242,12 @@
       { id: 'max', name: 'Max', icon: 'icons/max.jpg' },
       { id: 'disney', name: 'Disney+', icon: 'icons/disney.jpg' },
       { id: 'spotify', name: 'Spotify', icon: 'icons/spotify.jpg' },
-      { id: 'media', name: 'Mídia', icon: 'icons/musica.jpg', isInternal: true },
-      { id: 'livetv', name: 'TV Aberta', icon: 'icons/tvbrasil.png', isInternal: true },
+      { id: 'media', name: 'Mídia', icon: 'icons/youtubemusic.jpg', isInternal: true },
+      { id: 'livetv', name: 'TV Aberta', icon: 'icons/redetv.png', isInternal: true },
       { id: 'news', name: 'Notícias', icon: 'icons/globonews.svg', isInternal: true },
       { id: 'dvr', name: 'Gravador DVR', icon: 'icons/canaluol.png', isInternal: true },
-      { id: 'vault', name: 'Cofre de Senhas', icon: 'icons/settings.svg', isInternal: true },
-      { id: 'settings', name: 'Ajustes', icon: 'icons/settings.svg', isInternal: true }
+      { id: 'vault', name: 'Cofre de Senhas', icon: 'icons/mediaplayer.svg', isInternal: true },
+      { id: 'settings', name: 'Ajustes', icon: 'icons/appstore.svg', isInternal: true }
     ],
 
     // News Feed (G1, UOL, Tech)

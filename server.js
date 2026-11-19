@@ -3468,6 +3468,10 @@ function createAppServer() {
     }
 
     if (pathname === '/') pathname = '/index.html';
+    if (pathname.startsWith('/lightning/media/')) pathname = pathname.slice('/lightning'.length);
+    if (pathname.startsWith('/lightning/icons/')) pathname = pathname.slice('/lightning'.length);
+    if (pathname.startsWith('/lightning/sounds/')) pathname = pathname.slice('/lightning'.length);
+    if (pathname.startsWith('/lightning/public/')) pathname = pathname.slice('/lightning'.length);
 
     const resolvedPath = path.resolve(ROOT_DIR, `.${pathname}`);
     if (!resolvedPath.startsWith(ROOT_DIR)) {

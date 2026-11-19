@@ -24,14 +24,34 @@
         Wallpaper: {
           w: 1920,
           h: 1080,
-          src: 'media/wallpapers/patagonia-fitzroy-sunset.jpg'
-        },
-        // Global Dark Tint Overlay to ensure text readability
-        DarkVignette: {
-          w: 1920,
-          h: 1080,
-          rect: true,
-          color: 0x88060911
+          src: '/media/wallpapers/patagonia-fitzroy-sunset.jpg',
+          // Ambient Cyan Glow Orb
+          OrbCyan: {
+            x: 180,
+            y: 80,
+            w: 950,
+            h: 550,
+            rect: true,
+            color: 0x2600c2ff,
+            shader: { type: window.lng.shaders.RoundedRectangle, radius: 260 }
+          },
+          // Ambient Violet Glow Orb
+          OrbPurple: {
+            x: 1100,
+            y: 260,
+            w: 950,
+            h: 600,
+            rect: true,
+            color: 0x208b5cf6,
+            shader: { type: window.lng.shaders.RoundedRectangle, radius: 280 }
+          },
+          // Soft Vignette Overlay
+          DarkVignette: {
+            w: 1920,
+            h: 1080,
+            rect: true,
+            color: 0x80050811
+          }
         },
         // Views Stack
         Views: {
@@ -122,11 +142,12 @@
       console.log('[irisTV] Inicializando interface LightningJS 100% Canvas WebGL...');
       this._history = [];
       this._keyboardCallback = null;
+      this._audioCache = {};
 
-      // Check onboarding
       let completed = false;
       try {
-        completed = localStorage.getItem('iristv_onboarding_completed') === 'true';
+        completed = localStorage.getItem('iristv-onboarded') === '1'
+          || localStorage.getItem('iristv_onboarding_completed') === 'true';
       } catch (e) {}
 
       if (!completed) {
@@ -134,6 +155,17 @@
       } else {
         this._setState('Home');
       }
+    }
+
+    $playSound(name) {
+      try {
+        if (!this._audioCache) this._audioCache = {};
+        if (!this._audioCache[name]) {
+          this._audioCache[name] = new Audio(`/sounds/${name}.mp3`);
+        }
+        this._audioCache[name].currentTime = 0;
+        this._audioCache[name].play().catch(() => {});
+      } catch (_) {}
     }
 
     _switchState(targetState) {
