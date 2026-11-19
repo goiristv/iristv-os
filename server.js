@@ -3522,13 +3522,18 @@ function createAppServer() {
             : 'no-store';
 
           if (req.headers['if-none-match'] === entry.etag) {
-            res.writeHead(304, { ETag: entry.etag, 'Cache-Control': cacheHeader });
+            res.writeHead(304, {
+              ETag: entry.etag,
+              'Cache-Control': cacheHeader,
+              'Access-Control-Allow-Origin': '*'
+            });
             return res.end();
           }
 
           const headers = {
             'Content-Type': MIME_TYPES[ext] || 'application/octet-stream',
             'Cache-Control': cacheHeader,
+            'Access-Control-Allow-Origin': '*',
             ETag: entry.etag
           };
 

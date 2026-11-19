@@ -185,11 +185,12 @@
           shader: { type: shaders.RoundedRectangle, radius: 18 }
         },
         BottomShade: {
-          y: 190,
+          y: 180,
           w: 220,
-          h: 140,
+          h: 150,
           rect: true,
-          color: 0xd9050811,
+          colorTop: 0x00050811,
+          colorBottom: 0xf0050811,
           shader: { type: shaders.RoundedRectangle, radius: 18 }
         },
         QualityPill: {
@@ -470,21 +471,32 @@
             shader: { type: shaders.RoundedRectangle, radius: 24, stroke: 1, strokeColor: 0x22ffffff },
             // Right-side Backdrop Artwork
             BackdropArt: {
-              x: 800,
+              x: 820,
               y: 0,
-              w: 960,
+              w: 940,
               h: 420,
-              src: '/media/bg-severance.jpg',
+              src: 'media/bg-severance.jpg',
               shader: { type: shaders.RoundedRectangle, radius: 24 }
             },
-            // Horizontal Fade Mask (Blends artwork into glass left)
-            BackdropMask: {
-              x: 750,
+            // Left-to-right fade gradient overlay to seamlessly blend artwork into dark glass card
+            BackdropFade: {
+              x: 820,
               y: 0,
-              w: 300,
+              w: 480,
               h: 420,
               rect: true,
-              color: 0xff0f172a,
+              colorLeft: 0xff070b13,
+              colorRight: 0x00070b13
+            },
+            // Bottom fade overlay
+            BackdropBottomFade: {
+              x: 820,
+              y: 280,
+              w: 940,
+              h: 140,
+              rect: true,
+              colorTop: 0x00070b13,
+              colorBottom: 0xff070b13,
               shader: { type: shaders.RoundedRectangle, radius: 24 }
             },
             // Left Content Stack

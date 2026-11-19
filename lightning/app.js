@@ -24,7 +24,7 @@
         Wallpaper: {
           w: 1920,
           h: 1080,
-          src: '/media/wallpapers/patagonia-fitzroy-sunset.jpg',
+          src: 'media/wallpapers/patagonia-fitzroy-sunset.jpg',
           // Ambient Cyan Glow Orb
           OrbCyan: {
             x: 180,
