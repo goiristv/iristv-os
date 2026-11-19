@@ -1574,9 +1574,11 @@
   }
 
   /* =========================================================
-     Boot Sequence (Ultra-fast + Session Instant)
+     Boot Sequence (Cinematic 3s Hardware-Accelerated Startup)
      ========================================================= */
+  let bootFinished = false;
   function finishBoot(instant = false) {
+    if (bootFinished) return;
     if (typeof mountHomeNow === 'function') mountHomeNow();
     sessionStorage.setItem('irisos-booted', '1');
     const maybeOnboard = () => {
@@ -1585,6 +1587,7 @@
       }
     };
     if (instant) {
+      bootFinished = true;
       bootScreen.classList.add('hidden', 'fade-out');
       tvShell.classList.remove('is-hidden');
       maybeOnboard();
@@ -1592,21 +1595,23 @@
       return;
     }
     if (bootScreen.classList.contains('fade-out')) return;
+    bootFinished = true;
     bootScreen.classList.add('fade-out');
     tvShell.classList.remove('is-hidden');
     setTimeout(() => {
       bootScreen.classList.add('hidden');
       maybeOnboard();
       setTimeout(() => ensureScopeFocus(), 30);
-    }, 520);
+    }, 550);
   }
 
   function replayBoot() {
     closeAppStage();
+    bootFinished = false;
     bootScreen.classList.remove('hidden', 'fade-out');
     const wrap = bootScreen.querySelector('.boot-logo-wrap');
     wrap.replaceWith(wrap.cloneNode(true));
-    setTimeout(() => finishBoot(false), 1200);
+    setTimeout(() => finishBoot(false), 3000);
   }
 
   skipBootBtn?.addEventListener('click', () => finishBoot(false));
@@ -9542,18 +9547,20 @@
     });
   }
 
-  if (sessionStorage.getItem('irisos-booted') === '1') {
+  // Cinematic 3.0-second hardware-accelerated boot sequence:
+  // Runs at solid 60 FPS without layout or decode contention.
+  // Mount the Home DOM at 2.7s right under the boot screen,
+  // then smoothly dissolve the boot screen at 3.0s.
+  const BOOT_DURATION_MS = 3000;
+  setTimeout(() => {
     mountHomeNow();
-    finishBoot(true);
-  } else {
-    // Let the boot screen animate at 60 FPS with zero main-thread / image-decode contention,
-    // then mount the Home UI right as the boot screen finishes.
-    setTimeout(() => {
-      mountHomeNow();
-      requestAnimationFrame(() => finishBoot(false));
-    }, 900);
-  }
-  const bgStartupDelay = sessionStorage.getItem('irisos-booted') === '1' ? 250 : 1550;
+  }, BOOT_DURATION_MS - 300);
+
+  setTimeout(() => {
+    requestAnimationFrame(() => finishBoot(false));
+  }, BOOT_DURATION_MS);
+
+  const bgStartupDelay = BOOT_DURATION_MS + 200;
   setTimeout(() => {
     prefetchDefaultShowsCatalog();
     const isTvProfile = Boolean(window.IrisWebOS?.isWebOS || /Web0S|webOS/i.test(navigator.userAgent || ''));

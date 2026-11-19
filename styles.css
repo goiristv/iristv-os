@@ -351,6 +351,9 @@ body.theme-light .ambient-vignette {
 /* =========================================
    Boot Screen (Multicolor Optical Iris)
    ========================================= */
+/* =========================================
+   Boot Screen (3-Second Cinematic Hardware-Accelerated Startup)
+   ========================================= */
 .boot-screen {
   position: fixed;
   top: 0;
@@ -358,29 +361,43 @@ body.theme-light .ambient-vignette {
   bottom: 0;
   left: 0;
   inset: 0;
-  z-index: 900;
+  z-index: 9999;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  background: radial-gradient(circle at 50% 45%, #11162b 0%, #060810 72%);
-  transition: opacity 0.35s ease-out;
-  will-change: opacity;
+  background: radial-gradient(circle at 50% 45%, #0f152a 0%, #05070f 75%);
+  transition: opacity 0.55s cubic-bezier(0.16, 1, 0.3, 1), transform 0.55s cubic-bezier(0.16, 1, 0.3, 1);
+  will-change: opacity, transform;
   contain: strict;
+  user-select: none;
 }
 
 .boot-screen.fade-out {
   opacity: 0;
+  transform: scale(1.05);
   pointer-events: none;
+}
+
+.boot-screen.hidden {
+  display: none !important;
 }
 
 .boot-glow {
   position: absolute;
-  width: 420px;
-  height: 420px;
+  width: 520px;
+  height: 520px;
   border-radius: 50%;
-  background: radial-gradient(circle, rgba(56, 189, 248, 0.22) 0%, rgba(168, 85, 247, 0.14) 38%, rgba(255, 45, 111, 0.06) 62%, transparent 74%);
+  background: radial-gradient(circle, rgba(0, 229, 255, 0.28) 0%, rgba(124, 77, 255, 0.18) 42%, rgba(255, 45, 111, 0.08) 65%, transparent 75%);
   pointer-events: none;
+  animation: bootGlowPulse 3s cubic-bezier(0.16, 1, 0.3, 1) infinite alternate;
+  will-change: transform, opacity;
+}
+
+@keyframes bootGlowPulse {
+  0% { transform: scale(0.85); opacity: 0.5; }
+  50% { transform: scale(1.15); opacity: 0.9; }
+  100% { transform: scale(1.0); opacity: 0.75; }
 }
 
 .boot-logo-wrap {
@@ -390,13 +407,13 @@ body.theme-light .ambient-vignette {
   align-items: center;
   z-index: 2;
   will-change: transform, opacity;
-  animation: bootWrapIn 0.42s cubic-bezier(0.22, 1, 0.36, 1) both;
+  animation: bootLogoEnter 1.1s cubic-bezier(0.16, 1, 0.3, 1) both;
 }
 
-@keyframes bootWrapIn {
+@keyframes bootLogoEnter {
   0% {
     opacity: 0;
-    transform: translate3d(0, 10px, 0) scale(0.92);
+    transform: translate3d(0, 24px, 0) scale(0.86);
   }
   100% {
     opacity: 1;
@@ -405,26 +422,100 @@ body.theme-light .ambient-vignette {
 }
 
 .boot-svg {
-  width: 150px;
-  height: 150px;
+  width: 160px;
+  height: 160px;
   overflow: visible;
+  filter: drop-shadow(0 0 26px rgba(0, 229, 255, 0.35));
 }
 
-.iris-prism-ring,
+.iris-prism-ring {
+  transform-origin: 100px 100px;
+  animation: irisRingSpin 3s cubic-bezier(0.16, 1, 0.3, 1) both;
+  will-change: transform;
+}
+
+@keyframes irisRingSpin {
+  0% {
+    transform: rotate(-120deg) scale(0.65);
+    opacity: 0;
+  }
+  20% {
+    opacity: 1;
+  }
+  70% {
+    transform: rotate(18deg) scale(1.04);
+  }
+  100% {
+    transform: rotate(0deg) scale(1);
+    opacity: 1;
+  }
+}
+
 .iris-petal {
-  opacity: 1;
+  transform-origin: 100px 100px;
+  animation: irisPetalBloom 1.3s cubic-bezier(0.16, 1, 0.3, 1) both;
+  will-change: transform, opacity;
+}
+
+@keyframes irisPetalBloom {
+  0% {
+    opacity: 0;
+    transform: scale(0.2);
+  }
+  60% {
+    opacity: 1;
+    transform: scale(1.1);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.iris-petal.ip-1  { animation-delay: 0.04s; }
+.iris-petal.ip-2  { animation-delay: 0.08s; }
+.iris-petal.ip-3  { animation-delay: 0.12s; }
+.iris-petal.ip-4  { animation-delay: 0.16s; }
+.iris-petal.ip-5  { animation-delay: 0.20s; }
+.iris-petal.ip-6  { animation-delay: 0.24s; }
+.iris-petal.ip-7  { animation-delay: 0.28s; }
+.iris-petal.ip-8  { animation-delay: 0.32s; }
+.iris-petal.ip-9  { animation-delay: 0.36s; }
+.iris-petal.ip-10 { animation-delay: 0.40s; }
+.iris-petal.ip-11 { animation-delay: 0.44s; }
+.iris-petal.ip-12 { animation-delay: 0.48s; }
+
+.iris-ring-outer {
+  animation: irisRingPulse 3s ease-in-out infinite alternate;
+}
+@keyframes irisRingPulse {
+  0% { stroke: rgba(255, 255, 255, 0.25); }
+  50% { stroke: rgba(0, 229, 255, 0.65); }
+  100% { stroke: rgba(255, 255, 255, 0.35); }
 }
 
 .boot-wordmark {
-  margin-top: 10px;
-  font-family: "Outfit", sans-serif;
+  margin-top: 16px;
+  font-family: 'Plus Jakarta Sans', "Outfit", sans-serif;
   font-size: 2.9rem;
-  font-weight: 700;
+  font-weight: 800;
   letter-spacing: -0.03em;
+  animation: bootTextIn 1.1s 0.2s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+@keyframes bootTextIn {
+  0% {
+    opacity: 0;
+    transform: translate3d(0, 12px, 0);
+  }
+  100% {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
 }
 
 .brand-iris {
-  color: var(--text-primary);
+  color: #ffffff;
   font-weight: 700;
 }
 
@@ -433,7 +524,7 @@ body.theme-light .ambient-vignette {
 }
 
 .brand-os {
-  background: var(--prism-gradient);
+  background: linear-gradient(135deg, #00e5ff 0%, #7c4dff 50%, #ff2d6f 100%);
   background-size: 200% 200%;
   -webkit-background-clip: text;
   background-clip: text;
@@ -441,18 +532,60 @@ body.theme-light .ambient-vignette {
   font-weight: 800;
 }
 
-      .skip-boot-btn {
-        position: absolute;
-        bottom: 30px;
-        right: 38px;
-        background: rgba(255, 255, 255, 0.08);
-        border: 1px solid rgba(255, 255, 255, 0.16);
-        color: rgba(255, 255, 255, 0.72);
-        padding: 7px 15px;
-        border-radius: 999px;
-        font-size: 0.8rem;
-        cursor: pointer;
-      }
+.boot-progress-track {
+  width: 240px;
+  height: 4px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.12);
+  margin-top: 26px;
+  overflow: hidden;
+  box-shadow: 0 0 14px rgba(0, 0, 0, 0.4);
+}
+
+.boot-progress-fill {
+  height: 100%;
+  width: 100%;
+  border-radius: 999px;
+  background: linear-gradient(90deg, #00e5ff 0%, #7c4dff 50%, #ff2d6f 100%);
+  transform-origin: left center;
+  transform: scaleX(0);
+  animation: bootBarFill 3.0s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+  will-change: transform;
+}
+
+@keyframes bootBarFill {
+  0% { transform: scaleX(0.04); }
+  25% { transform: scaleX(0.28); }
+  65% { transform: scaleX(0.72); }
+  90% { transform: scaleX(0.96); }
+  100% { transform: scaleX(1); }
+}
+
+.skip-boot-btn {
+  position: absolute;
+  bottom: 32px;
+  right: 40px;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  color: rgba(255, 255, 255, 0.65);
+  padding: 8px 18px;
+  border-radius: 999px;
+  font-size: 0.85rem;
+  font-family: inherit;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
+
+.skip-boot-btn:hover,
+.skip-boot-btn:focus-visible {
+  background: rgba(255, 255, 255, 0.2);
+  color: #ffffff;
+  border-color: rgba(255, 255, 255, 0.45);
+  transform: scale(1.05);
+}
 
       /* =========================================
    Minimalist TV Shell & 3-Zone Top Bar
@@ -10349,38 +10482,7 @@ body.theme-light .ambient-vignette {
         -webkit-text-security: none;
       }
 
-      .boot-progress-track {
-        width: 220px;
-        height: 5px;
-        border-radius: 999px;
-        background: rgba(255, 255, 255, 0.12);
-        margin-top: 26px;
-        overflow: hidden;
-      }
-
-      .boot-progress-fill {
-        height: 100%;
-        width: 0%;
-        width: 100%;
-        border-radius: 999px;
-        background: linear-gradient(90deg, #00e5ff, #7c4dff, #ff2d6f);
-        animation: bootBarFill 1.1s cubic-bezier(0.22, 1, 0.36, 1) forwards;
-        transform-origin: left center;
-        will-change: transform;
-        animation: bootBarFill 0.85s cubic-bezier(0.22, 1, 0.36, 1) forwards;
-      }
-
-      @keyframes bootBarFill {
-        0% {
-          width: 15%;
-          transform: scaleX(0.12);
-        }
-
-        100% {
-          width: 100%;
-          transform: scaleX(1);
-        }
-      }
+      /* Boot progress styles are consolidated in the primary Boot Screen section */
 
       /* =========================================================
    Offline Internet Gate Overlay (Blocks irisTV when offline)
