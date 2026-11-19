@@ -2156,10 +2156,69 @@
     playUiSound('open');
   }
 
+  let appSplashTimer = null;
+  function hideAppLaunchSplash() {
+    if (appSplashTimer) {
+      clearTimeout(appSplashTimer);
+      appSplashTimer = null;
+    }
+    const el = document.getElementById('iris-app-splash');
+    if (el) {
+      el.classList.add('is-fading');
+      setTimeout(() => { el.classList.add('hidden'); el.classList.remove('is-fading'); }, 220);
+    }
+  }
+
+  function showAppLaunchSplash(appMeta = {}, autoHideMs = 0) {
+    let el = document.getElementById('iris-app-splash');
+    if (!el) {
+      el = document.createElement('div');
+      el.id = 'iris-app-splash';
+      el.className = 'iris-app-splash hidden';
+      el.innerHTML = `
+        <div class="iris-app-splash-glow"></div>
+        <div class="iris-app-splash-content">
+          <div class="iris-app-splash-icon-wrap">
+            <img id="iris-app-splash-img" alt="" />
+          </div>
+          <h2 id="iris-app-splash-name" class="iris-app-splash-name"></h2>
+          <div class="iris-app-splash-spinner"></div>
+        </div>
+      `;
+      document.body.appendChild(el);
+    }
+    const img = el.querySelector('#iris-app-splash-img');
+    const title = el.querySelector('#iris-app-splash-name');
+    const iconWrap = el.querySelector('.iris-app-splash-icon-wrap');
+    el.style.setProperty('--splash-bg', appMeta.bg || '#080c16');
+    el.style.setProperty('--splash-glow', appMeta.glow || 'rgba(0, 194, 255, 0.45)');
+    if (img) {
+      if (appMeta.iconSrc) {
+        img.src = appMeta.iconSrc;
+        img.style.display = 'block';
+        if (iconWrap) iconWrap.style.background = appMeta.bg || '#141414';
+      } else {
+        img.style.display = 'none';
+      }
+    }
+    if (title) title.textContent = appMeta.name || 'Abrindo...';
+    el.classList.remove('hidden', 'is-fading');
+    if (appSplashTimer) clearTimeout(appSplashTimer);
+    if (autoHideMs > 0) {
+      appSplashTimer = setTimeout(() => hideAppLaunchSplash(), autoHideMs);
+    }
+  }
+
   async function openExternalAppUrl(url, name, appMeta = {}) {
     if (!url && !appMeta?.id) return;
     if (window.IrisWebOS?.isWebOS && window.IrisWebOS.launchApp(appMeta.id, url)) return;
-    if (postWebViewAction('openAppUrl', { url, name: name || 'App', id: appMeta?.id })) return;
+    if (postWebViewAction('openAppUrl', { url, name: name || 'App', id: appMeta?.id, iconSrc: appMeta?.iconSrc || '', bg: appMeta?.bg || '' })) return;
+
+    const isLinux = /linux/i.test(state.systemInfo?.hostPlatform || '');
+    if (isLinux || appMeta.isApk || appMeta.androidPackage) {
+      showAppLaunchSplash({ name: name || appMeta.name || 'App', iconSrc: appMeta.iconSrc, bg: appMeta.bg, glow: appMeta.glow }, 2600);
+    }
+
     try {
       const r = await fetch('/api/os/launch-tv-app', {
         method: 'POST',
@@ -2174,11 +2233,16 @@
       if (r.ok) {
         const res = await r.json();
         if (res?.launched) {
-          showToast(`Abrindo ${name || 'App'} (${res.mode})...`);
+          const onReturn = () => {
+            hideAppLaunchSplash();
+            window.removeEventListener('focus', onReturn);
+          };
+          window.addEventListener('focus', onReturn);
           return;
         }
       }
     } catch (_) { }
+    hideAppLaunchSplash();
     if (url) {
       openFastAppWebStage(url, name, appMeta);
     }
@@ -4122,7 +4186,14 @@
       if (isNativeWebView) {
         playUiSound('open');
         closeAppStage();
-        postWebViewAction('openAppUrl', { url: app.webUrl, name: app.name, androidPackage: app.androidPackage, id: app.id });
+        postWebViewAction('openAppUrl', {
+          url: app.webUrl,
+          name: app.name,
+          androidPackage: app.androidPackage,
+          id: app.id,
+          iconSrc: app.iconSrc || '',
+          bg: app.bg || ''
+        });
         return;
       }
       playUiSound('open');

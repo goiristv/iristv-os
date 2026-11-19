@@ -22,6 +22,10 @@ final class IrisAppDelegate: NSObject, NSApplicationDelegate, WKUIDelegate, WKNa
   private var warmAppLru: [String] = []
   private var currentAppKey: String? = nil
   private var snapshotImageView: NSImageView!
+  private var appSplashOverlay: NSView!
+  private var appSplashIconView: NSImageView!
+  private var appSplashLabel: NSTextField!
+  private var appSplashSpinner: NSProgressIndicator!
   private let maxWarmApps = 3
   private var cachedTvNavScript: String?
   private var cachedPwScript: String?
@@ -575,6 +579,36 @@ final class IrisAppDelegate: NSObject, NSApplicationDelegate, WKUIDelegate, WKNa
     snapshotImageView.isHidden = true
     appWebViewSlot.addSubview(snapshotImageView)
 
+    appSplashOverlay = NSView()
+    appSplashOverlay.wantsLayer = true
+    appSplashOverlay.layer?.backgroundColor = NSColor(calibratedRed: 0.04, green: 0.05, blue: 0.09, alpha: 1.0).cgColor
+    appSplashOverlay.translatesAutoresizingMaskIntoConstraints = false
+    appSplashOverlay.isHidden = true
+
+    appSplashIconView = NSImageView()
+    appSplashIconView.imageScaling = .scaleProportionallyUpOrDown
+    appSplashIconView.wantsLayer = true
+    appSplashIconView.layer?.cornerRadius = 26
+    appSplashIconView.layer?.masksToBounds = true
+    appSplashIconView.translatesAutoresizingMaskIntoConstraints = false
+
+    appSplashLabel = NSTextField(labelWithString: "")
+    appSplashLabel.font = NSFont.systemFont(ofSize: 22, weight: .bold)
+    appSplashLabel.textColor = NSColor.white
+    appSplashLabel.alignment = .center
+    appSplashLabel.translatesAutoresizingMaskIntoConstraints = false
+
+    appSplashSpinner = NSProgressIndicator()
+    appSplashSpinner.style = .spinning
+    appSplashSpinner.controlSize = .small
+    appSplashSpinner.appearance = NSAppearance(named: .darkAqua)
+    appSplashSpinner.translatesAutoresizingMaskIntoConstraints = false
+
+    appSplashOverlay.addSubview(appSplashIconView)
+    appSplashOverlay.addSubview(appSplashLabel)
+    appSplashOverlay.addSubview(appSplashSpinner)
+    appWebViewSlot.addSubview(appSplashOverlay)
+
     appContainer.addSubview(appHeaderBar)
     appContainer.addSubview(appWebViewSlot)
 
@@ -606,13 +640,58 @@ final class IrisAppDelegate: NSObject, NSApplicationDelegate, WKUIDelegate, WKNa
       snapshotImageView.topAnchor.constraint(equalTo: appWebViewSlot.topAnchor),
       snapshotImageView.leadingAnchor.constraint(equalTo: appWebViewSlot.leadingAnchor),
       snapshotImageView.trailingAnchor.constraint(equalTo: appWebViewSlot.trailingAnchor),
-      snapshotImageView.bottomAnchor.constraint(equalTo: appWebViewSlot.bottomAnchor)
+      snapshotImageView.bottomAnchor.constraint(equalTo: appWebViewSlot.bottomAnchor),
+
+      appSplashOverlay.topAnchor.constraint(equalTo: appWebViewSlot.topAnchor),
+      appSplashOverlay.leadingAnchor.constraint(equalTo: appWebViewSlot.leadingAnchor),
+      appSplashOverlay.trailingAnchor.constraint(equalTo: appWebViewSlot.trailingAnchor),
+      appSplashOverlay.bottomAnchor.constraint(equalTo: appWebViewSlot.bottomAnchor),
+
+      appSplashIconView.centerXAnchor.constraint(equalTo: appSplashOverlay.centerXAnchor),
+      appSplashIconView.centerYAnchor.constraint(equalTo: appSplashOverlay.centerYAnchor, constant: -28),
+      appSplashIconView.widthAnchor.constraint(equalToConstant: 112),
+      appSplashIconView.heightAnchor.constraint(equalToConstant: 112),
+
+      appSplashLabel.centerXAnchor.constraint(equalTo: appSplashOverlay.centerXAnchor),
+      appSplashLabel.topAnchor.constraint(equalTo: appSplashIconView.bottomAnchor, constant: 18),
+
+      appSplashSpinner.centerXAnchor.constraint(equalTo: appSplashOverlay.centerXAnchor),
+      appSplashSpinner.topAnchor.constraint(equalTo: appSplashLabel.bottomAnchor, constant: 16)
     ])
 
     rootView.addSubview(appContainer)
   }
 
-  private func openEmbeddedApp(url: URL, name: String, appId: String? = nil) {
+  private func loadAppIconImage(_ iconSrc: String?) -> NSImage? {
+    guard let src = iconSrc, !src.isEmpty else { return nil }
+    let clean = src.hasPrefix("/") ? String(src.dropFirst()) : src
+    let candidates = [
+      Bundle.main.bundlePath + "/../../" + clean,
+      FileManager.default.currentDirectoryPath + "/" + clean,
+      "/Users/macosx/Downloads/irisoS/" + clean
+    ]
+    for path in candidates {
+      if FileManager.default.fileExists(atPath: path), let img = NSImage(contentsOfFile: path) {
+        return img
+      }
+    }
+    return nil
+  }
+
+  private func colorFromHex(_ hex: String?) -> NSColor {
+    guard let raw = hex?.trimmingCharacters(in: CharacterSet.alphanumerics.inverted), raw.count == 6,
+          let rgb = UInt64(raw, radix: 16) else {
+      return NSColor(calibratedRed: 0.04, green: 0.05, blue: 0.09, alpha: 1.0)
+    }
+    return NSColor(
+      calibratedRed: CGFloat((rgb >> 16) & 0xFF) / 255.0,
+      green: CGFloat((rgb >> 8) & 0xFF) / 255.0,
+      blue: CGFloat(rgb & 0xFF) / 255.0,
+      alpha: 1.0
+    )
+  }
+
+  private func openEmbeddedApp(url: URL, name: String, appId: String? = nil, iconSrc: String? = nil, bgHex: String? = nil) {
     appContainer.layoutSubtreeIfNeeded()
 
     let appKey = (appId ?? url.host?.lowercased() ?? "app")
@@ -626,9 +705,11 @@ final class IrisAppDelegate: NSObject, NSApplicationDelegate, WKUIDelegate, WKNa
     if let warmView = warmAppViews[appKey] {
       NSLog("[irisTV FastSwitch] Resumindo instantaneamente '%@' em 0ms (Apple TV Fast Switch)", appKey)
       appWebViewSlot.subviews.forEach { sub in
-        if sub != warmView && sub != snapshotImageView { sub.isHidden = true }
+        if sub != warmView && sub != snapshotImageView && sub != appSplashOverlay { sub.isHidden = true }
       }
       snapshotImageView.isHidden = true
+      appSplashOverlay.isHidden = true
+      appSplashSpinner.stopAnimation(nil)
       warmView.frame = appWebViewSlot.bounds
       warmView.isHidden = false
       appWebView = warmView
@@ -646,7 +727,7 @@ final class IrisAppDelegate: NSObject, NSApplicationDelegate, WKUIDelegate, WKNa
       return
     }
 
-    // Cenário 2: Cold Start com Restauração de Sessão e Snapshot Instantâneo
+    // Cenário 2: Cold Start com Splash Screen do Ícone + Restauração de Sessão
     let isNetflix = (url.host?.lowercased().contains("netflix.com") == true)
     var finalUrl: URL = {
       if isYouTube && (url.path.isEmpty || url.path == "/") {
@@ -666,13 +747,13 @@ final class IrisAppDelegate: NSObject, NSApplicationDelegate, WKUIDelegate, WKNa
       finalUrl = savedUrl
     }
 
-    if let snap = loadSnapshot(key: appKey) {
-      snapshotImageView.image = snap
-      snapshotImageView.alphaValue = 1.0
-      snapshotImageView.isHidden = false
-    } else {
-      snapshotImageView.isHidden = true
-    }
+    snapshotImageView.isHidden = true
+    appSplashOverlay.layer?.backgroundColor = colorFromHex(bgHex).cgColor
+    appSplashIconView.image = loadAppIconImage(iconSrc ?? "icons/\(appKey).jpg")
+    appSplashLabel.stringValue = name
+    appSplashOverlay.alphaValue = 1.0
+    appSplashOverlay.isHidden = false
+    appSplashSpinner.startAnimation(nil)
 
     let dynamicView = WKWebView(frame: appWebViewSlot.bounds, configuration: buildWebConfig(withBridge: true, injectTvNav: !isYouTube, injectPasswordManager: true))
     dynamicView.autoresizingMask = [.width, .height]
@@ -688,9 +769,9 @@ final class IrisAppDelegate: NSObject, NSApplicationDelegate, WKUIDelegate, WKNa
     dynamicView.allowsBackForwardNavigationGestures = true
 
     appWebViewSlot.subviews.forEach { sub in
-      if sub != snapshotImageView { sub.isHidden = true }
+      if sub != snapshotImageView && sub != appSplashOverlay { sub.isHidden = true }
     }
-    appWebViewSlot.addSubview(dynamicView)
+    appWebViewSlot.addSubview(dynamicView, positioned: .below, relativeTo: appSplashOverlay)
     warmAppViews[appKey] = dynamicView
     warmAppLru.append(appKey)
 
@@ -792,11 +873,15 @@ final class IrisAppDelegate: NSObject, NSApplicationDelegate, WKUIDelegate, WKNa
       } else if action == "openAppUrl", let urlStr = dict["url"] as? String, let u = URL(string: urlStr) {
         let name = (dict["name"] as? String) ?? "App"
         let appId = dict["id"] as? String
-        self.openEmbeddedApp(url: u, name: name, appId: appId)
+        let iconSrc = dict["iconSrc"] as? String
+        let bg = dict["bg"] as? String
+        self.openEmbeddedApp(url: u, name: name, appId: appId, iconSrc: iconSrc, bgHex: bg)
       } else if action == "openExternal", let urlStr = dict["url"] as? String, let u = URL(string: urlStr) {
         let name = (dict["name"] as? String) ?? (u.host ?? "App")
         let appId = dict["id"] as? String
-        self.openEmbeddedApp(url: u, name: name, appId: appId)
+        let iconSrc = dict["iconSrc"] as? String
+        let bg = dict["bg"] as? String
+        self.openEmbeddedApp(url: u, name: name, appId: appId, iconSrc: iconSrc, bgHex: bg)
       } else if action == "saveCredentials", let host = dict["host"] as? String, let password = dict["password"] as? String {
         let username = (dict["username"] as? String) ?? ""
         self.saveCredentialToIrisVault(host: host, username: username, password: password)
@@ -816,6 +901,16 @@ final class IrisAppDelegate: NSObject, NSApplicationDelegate, WKUIDelegate, WKNa
 
   func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
     if webView == self.appWebView {
+      if let splash = self.appSplashOverlay, !splash.isHidden {
+        NSAnimationContext.runAnimationGroup({ ctx in
+          ctx.duration = 0.18
+          splash.animator().alphaValue = 0.0
+        }, completionHandler: {
+          splash.isHidden = true
+          splash.alphaValue = 1.0
+          self.appSplashSpinner.stopAnimation(nil)
+        })
+      }
       if let snapView = self.snapshotImageView, !snapView.isHidden {
         NSAnimationContext.runAnimationGroup({ ctx in
           ctx.duration = 0.12

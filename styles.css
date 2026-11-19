@@ -12342,3 +12342,80 @@ body.theme-light .ambient-vignette {
         border: none;
         background: #000000;
       }
+
+      /* App Launch Splash Screen (Apple TV Style) */
+      .iris-app-splash {
+        position: fixed;
+        inset: 0;
+        z-index: 100000;
+        background: var(--splash-bg, #080c16);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        opacity: 1;
+        transition: opacity 0.22s ease;
+      }
+      .iris-app-splash.hidden {
+        display: none !important;
+      }
+      .iris-app-splash.is-fading {
+        opacity: 0;
+        pointer-events: none;
+      }
+      .iris-app-splash-glow {
+        position: absolute;
+        width: 480px;
+        height: 480px;
+        border-radius: 50%;
+        background: radial-gradient(circle, var(--splash-glow, rgba(0, 194, 255, 0.4)) 0%, transparent 70%);
+        filter: blur(48px);
+        opacity: 0.75;
+        pointer-events: none;
+      }
+      .iris-app-splash-content {
+        position: relative;
+        z-index: 2;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 18px;
+        animation: splashIconPop 0.28s cubic-bezier(0.16, 1, 0.3, 1) both;
+      }
+      .iris-app-splash-icon-wrap {
+        width: 118px;
+        height: 118px;
+        border-radius: 28px;
+        overflow: hidden;
+        box-shadow: 0 24px 56px rgba(0, 0, 0, 0.55), 0 0 0 1px rgba(255, 255, 255, 0.14);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+      .iris-app-splash-icon-wrap img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+      }
+      .iris-app-splash-name {
+        margin: 0;
+        font-family: 'Outfit', -apple-system, BlinkMacSystemFont, sans-serif;
+        font-size: 1.55rem;
+        font-weight: 700;
+        color: #ffffff;
+        letter-spacing: -0.02em;
+      }
+      .iris-app-splash-spinner {
+        width: 22px;
+        height: 22px;
+        border-radius: 50%;
+        border: 2.5px solid rgba(255, 255, 255, 0.18);
+        border-top-color: #ffffff;
+        animation: splashSpin 0.75s linear infinite;
+      }
+      @keyframes splashIconPop {
+        0% { opacity: 0; transform: scale(0.86); }
+        100% { opacity: 1; transform: scale(1); }
+      }
+      @keyframes splashSpin {
+        to { transform: rotate(360deg); }
+      }
