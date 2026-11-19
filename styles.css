@@ -2142,13 +2142,23 @@ body.theme-light .ambient-vignette {
         border-radius: var(--card-radius, 18px);
         overflow: hidden;
         border: 1px solid rgba(255, 255, 255, 0.14);
-        background: #101322;
+        background: #0d101e;
         cursor: pointer;
         padding: 0;
         box-shadow: 0 8px 18px rgba(0, 0, 0, 0.26);
         opacity: 0;
         animation: tilePopIn 0.5s var(--spring-ease) calc(var(--stagger, 0) * 35ms) forwards;
         transition: transform 0.16s cubic-bezier(0.22, 1, 0.36, 1), border-color 0.14s ease;
+      }
+
+      .poster-card.is-img-loading {
+        background: linear-gradient(110deg,
+            rgba(255, 255, 255, 0.04) 25%,
+            rgba(255, 255, 255, 0.12) 50%,
+            rgba(255, 255, 255, 0.04) 75%);
+        background-size: 200% 100%;
+        animation: tilePopIn 0.5s var(--spring-ease) calc(var(--stagger, 0) * 35ms) forwards,
+                   irisImgShimmer 1.4s ease-in-out infinite;
       }
 
       .poster-grid-layout .poster-card {
@@ -2163,6 +2173,20 @@ body.theme-light .ambient-vignette {
         height: 100%;
         object-fit: cover;
         display: block;
+        opacity: 0;
+        transform: scale(1.04);
+        filter: blur(4px);
+        transition: opacity 0.38s cubic-bezier(0.16, 1, 0.3, 1),
+                    transform 0.45s cubic-bezier(0.16, 1, 0.3, 1),
+                    filter 0.38s cubic-bezier(0.16, 1, 0.3, 1);
+        will-change: opacity, transform, filter;
+      }
+
+      .poster-card img.is-loaded {
+        opacity: 1;
+        transform: scale(1);
+        filter: blur(0);
+        will-change: auto;
       }
 
       .poster-card::after {

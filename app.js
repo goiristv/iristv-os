@@ -2232,11 +2232,13 @@
     return next;
   }
 
+  let lastOpenedMediaCard = null;
+
   function createPosterCard(show, rowId, idx = 0) {
     const tr = getTrackEntry(show);
     const typeTag = show.type === 'MOVIE' ? 'Filme' : (show.appName || 'Série');
     const btn = document.createElement('button');
-    btn.className = 'poster-card focusable';
+    btn.className = 'poster-card focusable is-img-loading';
     btn.dataset.nav = rowId;
     btn.dataset.showId = show.id;
     btn.style.setProperty('--stagger', String(idx));
@@ -2250,17 +2252,50 @@
       tr?.userRating ? `<span class="poster-mini-pill rate">Nota ${tr.userRating}</span>` : ''
     ].filter(Boolean).join('');
 
-    btn.innerHTML = `
-      <img src="${escHtml(show.poster)}" alt="${escHtml(show.title)}" loading="lazy" decoding="async" />
-      ${statusBadges ? `<div class="poster-card-status">${statusBadges}</div>` : ''}
-      <span class="poster-app-badge">${escHtml(typeTag)}</span>
-      <span class="poster-bottom-title">${escHtml(show.title)}</span>
-    `;
+    const img = document.createElement('img');
+    img.src = show.poster;
+    img.alt = show.title;
+    img.loading = 'lazy';
+    img.decoding = 'async';
+
+    const onLoaded = () => {
+      img.classList.add('is-loaded');
+      btn.classList.remove('is-img-loading');
+    };
+    if (img.complete && img.naturalWidth > 0) {
+      onLoaded();
+    } else {
+      img.addEventListener('load', onLoaded, { once: true });
+      img.addEventListener('error', () => {
+        btn.classList.remove('is-img-loading');
+      }, { once: true });
+    }
+
+    btn.appendChild(img);
+    if (statusBadges) {
+      const st = document.createElement('div');
+      st.className = 'poster-card-status';
+      st.innerHTML = statusBadges;
+      btn.appendChild(st);
+    }
+    const appBadge = document.createElement('span');
+    appBadge.className = 'poster-app-badge';
+    appBadge.textContent = typeTag;
+    btn.appendChild(appBadge);
+
+    const titleSpan = document.createElement('span');
+    titleSpan.className = 'poster-bottom-title';
+    titleSpan.textContent = show.title;
+    btn.appendChild(titleSpan);
+
     btn.addEventListener('mouseenter', () => {
       setFocus(btn, false);
       setSpotlightItem({ type: 'show', data: show });
     });
-    btn.addEventListener('click', () => openMediaDetails(show));
+    btn.addEventListener('click', () => {
+      lastOpenedMediaCard = btn;
+      openMediaDetails(show);
+    });
     return btn;
   }
 
@@ -3877,9 +3912,16 @@
   }
 
   const mediaClientCache = new Map();
+  let activeDetailsAbortCtrl = null;
 
   async function openMediaDetails(show) {
     if (!show) return;
+    if (activeDetailsAbortCtrl) {
+      try { activeDetailsAbortCtrl.abort(); } catch (_) { }
+      activeDetailsAbortCtrl = null;
+    }
+    const abortCtrl = new AbortController();
+    activeDetailsAbortCtrl = abortCtrl;
     playUiSound('open');
     const { lang, country } = getCurrentUiLocale();
     const L = getDetailsLabels(lang);
@@ -3940,7 +3982,7 @@
           const epDone = curSet.has(epKey);
           return `
             <div class="episode-card">
-              ${ep.image ? `<img class="episode-thumb" src="${escHtml(ep.image)}" alt="" loading="lazy" />` : ''}
+              ${ep.image ? `<img class="episode-thumb" src="${escHtml(ep.image)}" alt="" loading="lazy" decoding="async" />` : ''}
               <div class="episode-meta">
                 <div class="episode-head">
                   <span class="episode-title">${L.epWord} ${ep.number} • ${escHtml(ep.name)}</span>
@@ -4216,10 +4258,10 @@
           <div class="details-section">
             <div class="details-section-title"><span>${L.cast}</span></div>
             <div class="cast-strip">
-              ${d.cast.map((actor) => `
+              ${d.cast.slice(0, 14).map((actor) => `
                 <div class="cast-card">
                   ${actor.photo
-            ? `<img class="cast-photo" src="${escHtml(actor.photo)}" alt="${escHtml(actor.name)}" loading="lazy" />`
+            ? `<img class="cast-photo" src="${escHtml(actor.photo)}" alt="${escHtml(actor.name)}" loading="lazy" decoding="async" />`
             : `<div class="cast-photo" style="display:grid;place-items:center;font-weight:800;font-size:1.3rem;">${escHtml((actor.name || '?')[0])}</div>`
           }
                   <div class="cast-name">${escHtml(actor.name)}</div>
@@ -4446,19 +4488,21 @@
 
     try {
       const resp = await fetch(`/api/media/details?title=${encodeURIComponent(queryTitle)}&type=${encodeURIComponent(show.type || 'ALL')}&lang=${encodeURIComponent(lang)}&country=${encodeURIComponent(country)}`, {
-        signal: AbortSignal.timeout(9000)
+        signal: abortCtrl.signal
       });
+      if (abortCtrl.signal.aborted) return;
       if (resp.ok) {
         const json = await resp.json();
         mediaClientCache.set(cKey, json);
-        if (!appStageOverlay.classList.contains('hidden')) {
+        if (!appStageOverlay.classList.contains('hidden') && activeDetailsAbortCtrl === abortCtrl) {
           renderView(json, false);
         }
-      } else if (!appStageOverlay.classList.contains('hidden')) {
+      } else if (!appStageOverlay.classList.contains('hidden') && activeDetailsAbortCtrl === abortCtrl) {
         appStageBody.innerHTML = `<div style="padding:48px;text-align:center;color:var(--text-secondary);">Não foi possível carregar os dados oficiais.</div>`;
       }
-    } catch (_) {
-      if (!appStageOverlay.classList.contains('hidden')) {
+    } catch (err) {
+      if (err.name === 'AbortError') return;
+      if (!appStageOverlay.classList.contains('hidden') && activeDetailsAbortCtrl === abortCtrl) {
         appStageBody.innerHTML = `<div style="padding:48px;text-align:center;color:var(--text-secondary);">Não foi possível carregar os dados oficiais.</div>`;
       }
     }
@@ -5826,6 +5870,21 @@
 
   function closeAppStage() {
     if (appStageOverlay.classList.contains('hidden') || appStageWindow.classList.contains('is-closing')) return;
+    if (activeDetailsAbortCtrl) {
+      try { activeDetailsAbortCtrl.abort(); } catch (_) { }
+      activeDetailsAbortCtrl = null;
+    }
+    // Cancel in-flight image decodes & embeds immediately to reclaim network sockets & compositor thread
+    if (appStageBody) {
+      appStageBody.querySelectorAll('img').forEach((img) => {
+        img.src = '';
+        img.removeAttribute('src');
+      });
+      appStageBody.querySelectorAll('iframe').forEach((ifr) => {
+        ifr.src = 'about:blank';
+        ifr.remove();
+      });
+    }
     playUiSound('back');
     appStageWindow.classList.add('is-closing');
     setTimeout(() => {
@@ -5833,7 +5892,9 @@
       if (window.IrisNativeGames) window.IrisNativeGames.cleanup();
       if (window.IrisMediaPlayer) window.IrisMediaPlayer.cleanup();
       if (appStageBody) appStageBody.innerHTML = '';
+      if (appStageBrand) appStageBrand.innerHTML = '';
       appStageWindow.classList.remove('is-details-mode', 'is-store-mode', 'is-fullscreen-app', 'is-mediaplayer-app', 'is-closing');
+      appStageWindow.style.removeProperty('--stage-glow');
       appStageOverlay.classList.add('hidden');
       if (state.showsGridDirty && state.activeTab === 'shows') {
         state.showsGridDirty = false;
@@ -5843,7 +5904,8 @@
         state.appsGridDirty = false;
         renderTab(state.activeTab);
       }
-      ensureScopeFocus();
+      ensureScopeFocus(lastOpenedMediaCard);
+      lastOpenedMediaCard = null;
     }, 200);
   }
 
@@ -8099,7 +8161,6 @@
     }
     if (!appStageOverlay.classList.contains('hidden')) {
       closeAppStage();
-      ensureScopeFocus();
       return true;
     }
     if (state.activeTab !== 'home') {
