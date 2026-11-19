@@ -366,6 +366,7 @@
         w: 1920,
         h: 1080,
         canvas: canvas,
+        srcBasePath: '../',
         clearColor: 0x00000000,
         precision: 1
       }

@@ -253,7 +253,7 @@
           x: 80,
           y: 110,
           w: 1760,
-          h: 310,
+          h: 300,
           rect: true,
           color: 0x221e293b,
           shader: { type: window.lng.shaders.RoundedRectangle, radius: 18, stroke: 1, strokeColor: 0x33334155 },
@@ -337,7 +337,7 @@
         // Shelf 1: Live Channels
         ChannelsShelf: {
           x: 80,
-          y: 440,
+          y: 425,
           w: 1760,
           h: 160,
           Header: {
@@ -354,7 +354,7 @@
         // Shelf 2: Featured Shows
         ShowsShelf: {
           x: 80,
-          y: 615,
+          y: 580,
           w: 1760,
           h: 360,
           Header: {
@@ -371,7 +371,7 @@
         // Shelf 3: Dock Apps (Bottom)
         DockShelf: {
           x: 80,
-          y: 955,
+          y: 950,
           w: 1760,
           h: 120,
           List: {
@@ -611,7 +611,7 @@
       }
 
       // 2. Channels Shelf
-      if (y >= 460 && y <= 590) {
+      if (y >= 460 && y <= 575) {
         const shelfX = this.tag('ChannelsShelf').tag('List').tag('Items').x || 0;
         const clickX = x - 80 - shelfX;
         const chIdx = Math.floor(clickX / 240);
@@ -623,7 +623,7 @@
       }
 
       // 3. Shows Shelf
-      if (y >= 640 && y <= 950) {
+      if (y >= 615 && y <= 930) {
         const shelfX = this.tag('ShowsShelf').tag('List').tag('Items').x || 0;
         const clickX = x - 80 - shelfX;
         const shIdx = Math.floor(clickX / 240);
@@ -635,7 +635,7 @@
       }
 
       // 4. Dock Apps Shelf
-      if (y >= 955 && y <= 1075) {
+      if (y >= 950 && y <= 1060) {
         const shelfX = this.tag('DockShelf').tag('List').tag('Items').x || 0;
         const clickX = x - 80 - shelfX;
         const appIdx = Math.floor(clickX / 130);
@@ -651,9 +651,9 @@
 
     _isHoverable(x, y) {
       if (y >= 340 && y <= 400 && ((x >= 120 && x <= 340) || (x >= 360 && x <= 540))) return true;
-      if (y >= 460 && y <= 590) return true;
-      if (y >= 640 && y <= 950) return true;
-      if (y >= 955 && y <= 1075) return true;
+      if (y >= 460 && y <= 575) return true;
+      if (y >= 615 && y <= 930) return true;
+      if (y >= 950 && y <= 1060) return true;
       return false;
     }
   }

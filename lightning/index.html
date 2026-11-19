@@ -9,6 +9,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
   <style>
+    @font-face { font-family: 'PlusJakartaSans'; src: url('../public/fonts/PlusJakartaSans.ttf') format('truetype'); font-weight: 100 900; }
     * {
       box-sizing: border-box;
       margin: 0;
@@ -78,9 +79,10 @@
   <script>
     window.addEventListener('DOMContentLoaded', function () {
       var canvas = document.getElementById('lightning-canvas');
-      if (window.launchIrisLightning) {
-        window.launchIrisLightning(canvas);
-      }
+      function go() { if (window.launchIrisLightning) window.launchIrisLightning(canvas); }
+      if (document.fonts && document.fonts.load) {
+        Promise.all([document.fonts.load('20px PlusJakartaSans'), document.fonts.load('bold 20px PlusJakartaSans')]).then(go, go);
+      } else { go(); }
     });
   </script>
 </body>
