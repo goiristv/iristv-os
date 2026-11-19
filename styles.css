@@ -389,7 +389,19 @@ body.theme-light .ambient-vignette {
   flex-direction: column;
   align-items: center;
   z-index: 2;
-  transform: translateZ(0);
+  will-change: transform, opacity;
+  animation: bootWrapIn 0.42s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+@keyframes bootWrapIn {
+  0% {
+    opacity: 0;
+    transform: translate3d(0, 10px, 0) scale(0.92);
+  }
+  100% {
+    opacity: 1;
+    transform: translate3d(0, 0, 0) scale(1);
+  }
 }
 
 .boot-svg {
@@ -398,91 +410,9 @@ body.theme-light .ambient-vignette {
   overflow: visible;
 }
 
-.iris-prism-ring {
-  transform-origin: 100px 100px;
-  animation: irisSpinIn 1.1s var(--spring-ease) forwards;
-}
-
-@keyframes irisSpinIn {
-  0% {
-    transform: scale(0.35) rotate(-40deg);
-  }
-
-  100% {
-    transform: scale(1) rotate(0deg);
-  }
-}
-
+.iris-prism-ring,
 .iris-petal {
-  transform-origin: 100px 100px;
-  opacity: 0;
-  transform: scale(0.2);
-  animation: irisPetalBloom 0.65s var(--spring-ease) forwards;
-}
-
-.iris-petal.ip-1 {
-  animation-delay: 0.03s;
-}
-
-.iris-petal.ip-2 {
-  animation-delay: 0.05s;
-}
-
-.iris-petal.ip-3 {
-  animation-delay: 0.08s;
-}
-
-.iris-petal.ip-4 {
-  animation-delay: 0.11s;
-}
-
-.iris-petal.ip-5 {
-  animation-delay: 0.14s;
-}
-
-.iris-petal.ip-6 {
-  animation-delay: 0.17s;
-}
-
-.iris-petal.ip-7 {
-  animation-delay: 0.20s;
-}
-
-.iris-petal.ip-8 {
-  animation-delay: 0.23s;
-}
-
-.iris-petal.ip-9 {
-  animation-delay: 0.26s;
-}
-
-.iris-petal.ip-10 {
-  animation-delay: 0.29s;
-}
-
-.iris-petal.ip-11 {
-  animation-delay: 0.32s;
-}
-
-.iris-petal.ip-12 {
-  animation-delay: 0.35s;
-}
-
-@keyframes irisPetalBloom {
-  0% {
-    opacity: 0;
-    transform: scale(0.2);
-  }
-
-  75% {
-    opacity: 1;
-    transform: scale(1.05);
-  }
-
-  100% {
-    opacity: 0.95;
-    transform: scale(1);
-  }
+  opacity: 1;
 }
 
 .boot-wordmark {
@@ -491,8 +421,6 @@ body.theme-light .ambient-vignette {
   font-size: 2.9rem;
   font-weight: 700;
   letter-spacing: -0.03em;
-  opacity: 0;
-  animation: wordmarkRise 0.6s var(--spring-ease) 0.32s forwards;
 }
 
 .brand-iris {
@@ -10338,19 +10266,21 @@ html[data-active-tab="news"] .ambient-wallpaper-bg {
 
 .boot-progress-fill {
   height: 100%;
-  width: 0%;
+  width: 100%;
   border-radius: 999px;
   background: linear-gradient(90deg, #00e5ff, #7c4dff, #ff2d6f);
-  animation: bootBarFill 1.1s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+  transform-origin: left center;
+  will-change: transform;
+  animation: bootBarFill 0.85s cubic-bezier(0.22, 1, 0.36, 1) forwards;
 }
 
 @keyframes bootBarFill {
   0% {
-    width: 15%;
+    transform: scaleX(0.12);
   }
 
   100% {
-    width: 100%;
+    transform: scaleX(1);
   }
 }
 

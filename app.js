@@ -1425,6 +1425,7 @@
      Boot Sequence (Ultra-fast + Session Instant)
      ========================================================= */
   function finishBoot(instant = false) {
+    if (typeof mountHomeNow === 'function') mountHomeNow();
     sessionStorage.setItem('irisos-booted', '1');
     const maybeOnboard = () => {
       if (localStorage.getItem('iristv-onboarded') !== '1') {
@@ -9114,26 +9115,38 @@
   /* =========================================================
      Initialize
      ========================================================= */
-  applyTheme(state.theme, false);
-  loadDefaultThemeFromJson();
+  var homeMounted = false;
+  function mountHomeNow() {
+    if (homeMounted) return;
+    homeMounted = true;
+    applyTheme(state.theme, false);
+    loadDefaultThemeFromJson();
+    applyAllSettings();
+    if (localStorage.getItem('iristv-onboarded') === '1') {
+      applyUserPreferences();
+    } else {
+      renderTab('home');
+      setSpotlightItem({ type: 'show', data: TRENDING_SHOWS.find((s) => s.id !== 'severance') || TRENDING_SHOWS[1] });
+    }
+  }
+
   if (window.matchMedia) {
     const darkMq = window.matchMedia('(prefers-color-scheme: dark)');
     darkMq.addEventListener?.('change', () => {
       if (state.settings.autoSystemTheme) applyAllSettings();
     });
   }
-  applyAllSettings();
-  if (localStorage.getItem('iristv-onboarded') === '1') {
-    applyUserPreferences();
-  } else {
-    renderTab('home');
-    setSpotlightItem({ type: 'show', data: TRENDING_SHOWS.find((s) => s.id !== 'severance') || TRENDING_SHOWS[1] });
-  }
 
   if (sessionStorage.getItem('irisos-booted') === '1') {
+    mountHomeNow();
     finishBoot(true);
   } else {
-    setTimeout(() => finishBoot(false), 1100);
+    // Let the boot screen animate at 60 FPS with zero main-thread / image-decode contention,
+    // then mount the Home UI right as the boot screen finishes.
+    setTimeout(() => {
+      mountHomeNow();
+      requestAnimationFrame(() => finishBoot(false));
+    }, 900);
   }
   const bgStartupDelay = sessionStorage.getItem('irisos-booted') === '1' ? 250 : 1550;
   setTimeout(() => {
