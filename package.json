@@ -6,7 +6,8 @@
   "scripts": {
     "start": "node launch-webview.js",
     "web": "node server.js",
-    "build:webview": "mkdir -p irisTV.app/Contents/MacOS && swiftc -O webview.swift -o irisTV.app/Contents/MacOS/iristv-webview -framework Cocoa -framework WebKit",
+    "build:webview": "mkdir -p irisTV.app/Contents/MacOS && swiftc -O -target x86_64-apple-macos10.15 webview.swift -o irisTV.app/Contents/MacOS/iristv-webview -framework Cocoa -framework WebKit -framework GameController",
+    "build:mac": "python3 scripts/build-mac-dist.py",
     "build:webos": "python3 webos/build-webos-ipk.py",
     "dev": "node --watch server.js"
   },

@@ -12,10 +12,98 @@ final class IrisAppDelegate: NSObject, NSApplicationDelegate, WKUIDelegate, WKNa
   var appTitleLabel: NSTextField!
   var currentAppUrl: URL?
   let targetURL: URL
+  private var backendProcess: Process?
 
   init(url: URL) {
     self.targetURL = url
     super.init()
+  }
+
+  private func ensureServerRunning() {
+    let testUrl = URL(string: "http://127.0.0.1:3000/lightning/index.html")!
+    let sem = DispatchSemaphore(value: 0)
+    var isUp = false
+
+    var req = URLRequest(url: testUrl)
+    req.timeoutInterval = 0.5
+    URLSession.shared.dataTask(with: req) { _, res, _ in
+      if let http = res as? HTTPURLResponse, http.statusCode == 200 {
+        isUp = true
+      }
+      sem.signal()
+    }.resume()
+
+    _ = sem.wait(timeout: .now() + 0.6)
+    if isUp {
+      NSLog("[irisTV macOS] Servidor local ativo em http://127.0.0.1:3000")
+      return
+    }
+
+    NSLog("[irisTV macOS] Iniciando servidor Node.js em background...")
+    let nodePaths = [
+      "/usr/local/bin/node",
+      "/opt/homebrew/bin/node",
+      "/usr/bin/node"
+    ]
+    var nodeBin: String? = nil
+    for p in nodePaths {
+      if FileManager.default.fileExists(atPath: p) {
+        nodeBin = p
+        break
+      }
+    }
+
+    if nodeBin == nil {
+      let which = Process()
+      which.launchPath = "/usr/bin/which"
+      which.arguments = ["node"]
+      let pipe = Pipe()
+      which.standardOutput = pipe
+      try? which.run()
+      which.waitUntilExit()
+      let data = pipe.fileHandleForReading.readDataToEndOfFile()
+      if let str = String(data: data, encoding: .utf8)?.trimmingCharacters(in: .whitespacesAndNewlines), !str.isEmpty {
+        nodeBin = str
+      }
+    }
+
+    guard let nodeExecutable = nodeBin else {
+      NSLog("[irisTV macOS] Node.js não localizado no sistema!")
+      return
+    }
+
+    let candidates = [
+      Bundle.main.bundlePath + "/../../server.js",
+      FileManager.default.currentDirectoryPath + "/server.js",
+      "/Users/macosx/Downloads/irisoS/server.js"
+    ]
+    var serverScript: String? = nil
+    for c in candidates {
+      if FileManager.default.fileExists(atPath: c) {
+        serverScript = (c as NSString).standardizingPath
+        break
+      }
+    }
+
+    guard let scriptPath = serverScript else {
+      NSLog("[irisTV macOS] server.js não localizado!")
+      return
+    }
+
+    let proc = Process()
+    proc.launchPath = nodeExecutable
+    proc.arguments = [scriptPath]
+    proc.currentDirectoryPath = (scriptPath as NSString).deletingLastPathComponent
+    try? proc.run()
+    self.backendProcess = proc
+    Thread.sleep(forTimeInterval: 0.8)
+  }
+
+  func applicationWillTerminate(_ notification: Notification) {
+    if let proc = backendProcess, proc.isRunning {
+      NSLog("[irisTV macOS] Encerrando servidor Node.js local...")
+      proc.terminate()
+    }
   }
 
   private func loadTvSpatialNavScript() -> String? {
@@ -247,6 +335,7 @@ final class IrisAppDelegate: NSObject, NSApplicationDelegate, WKUIDelegate, WKNa
     NSApp.activate(ignoringOtherApps: true)
     window.makeFirstResponder(webView)
     setupHardwareRemoteMonitor()
+    ensureServerRunning()
     let cacheTypes: Set<String> = [WKWebsiteDataTypeDiskCache, WKWebsiteDataTypeMemoryCache]
     let url = self.targetURL
     WKWebsiteDataStore.default().removeData(ofTypes: cacheTypes, modifiedSince: .distantPast) { [weak self] in
@@ -551,12 +640,26 @@ final class IrisAppDelegate: NSObject, NSApplicationDelegate, WKUIDelegate, WKNa
     else { appWebView?.reload() }
   }
 
+  @objc func switchToLightningAction() {
+    if let url = URL(string: "http://127.0.0.1:3000/lightning/index.html") {
+      webView.load(URLRequest(url: url))
+    }
+  }
+
+  @objc func switchToClassicAction() {
+    if let url = URL(string: "http://127.0.0.1:3000/index.html") {
+      webView.load(URLRequest(url: url))
+    }
+  }
+
   private func setupMainMenu() {
     let mainMenu = NSMenu()
     let appItem = NSMenuItem()
     mainMenu.addItem(appItem)
 
     let appMenu = NSMenu()
+    appMenu.addItem(withTitle: "Sobre o irisTV", action: #selector(NSApplication.orderFrontStandardAboutPanel(_:)), keyEquivalent: "")
+    appMenu.addItem(NSMenuItem.separator())
     appMenu.addItem(withTitle: "Voltar para irisTV", action: #selector(closeEmbeddedAppAction), keyEquivalent: "[")
     appMenu.addItem(withTitle: "Tela Cheia", action: #selector(toggleFullScreenAction), keyEquivalent: "f")
     appMenu.addItem(withTitle: "Recarregar", action: #selector(reloadAction), keyEquivalent: "r")
@@ -564,12 +667,20 @@ final class IrisAppDelegate: NSObject, NSApplicationDelegate, WKUIDelegate, WKNa
     appMenu.addItem(withTitle: "Encerrar irisTV", action: #selector(NSApplication.terminate(_:)), keyEquivalent: "q")
     appItem.submenu = appMenu
 
+    let engineMenu = NSMenu(title: "Motor")
+    engineMenu.addItem(withTitle: "irisTV Lightning (60 FPS WebGL)", action: #selector(switchToLightningAction), keyEquivalent: "1")
+    engineMenu.addItem(withTitle: "irisTV Clássico (HTML/DOM)", action: #selector(switchToClassicAction), keyEquivalent: "2")
+    let engineItem = NSMenuItem(title: "Motor Gráfico", action: nil, keyEquivalent: "")
+    engineItem.submenu = engineMenu
+    mainMenu.addItem(engineItem)
+
     NSApp.mainMenu = mainMenu
   }
 }
 
-let rawUrl = CommandLine.arguments.dropFirst().first ?? "http://127.0.0.1:3000"
-let url = URL(string: rawUrl) ?? URL(string: "http://127.0.0.1:3000")!
+let defaultUrlString = "http://127.0.0.1:3000/lightning/index.html"
+let rawUrl = CommandLine.arguments.dropFirst().first ?? defaultUrlString
+let url = URL(string: rawUrl) ?? URL(string: defaultUrlString)!
 let app = NSApplication.shared
 app.setActivationPolicy(.regular)
 let delegate = IrisAppDelegate(url: url)
