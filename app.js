@@ -2399,15 +2399,8 @@
 
     attachParallaxTilt(btn);
 
-    const triggerAppPrewarm = () => {
-      if (app.webUrl) postWebViewAction('prewarmApp', { id: app.id, url: app.webUrl });
-    };
     btn.addEventListener('mouseenter', () => {
       setFocus(btn, false);
-      triggerAppPrewarm();
-    });
-    btn.addEventListener('focus', () => {
-      triggerAppPrewarm();
     });
     btn.addEventListener('click', () => launchApp(app));
 

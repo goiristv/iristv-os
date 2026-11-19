@@ -427,20 +427,6 @@ final class IrisAppDelegate: NSObject, NSApplicationDelegate, WKUIDelegate, WKNa
     ensureServerRunning()
     let url = self.targetURL
     self.webView.load(URLRequest(url: url))
-
-    // Cold Boot Anticipation: Pré-aquece o app mais recente do usuário em background (0ms no primeiro clique!)
-    DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) { [weak self] in
-      guard let self = self else { return }
-      let lastKey = UserDefaults.standard.string(forKey: "iris_last_active_app") ?? "netflix"
-      let defaultUrl = (lastKey == "netflix") ? URL(string: "https://www.netflix.com")! : URL(string: "https://www.youtube.com/tv")!
-      var targetUrl = defaultUrl
-      if let session = self.loadAppSession(key: lastKey),
-         let savedUrlStr = session["url"] as? String,
-         let savedUrl = URL(string: savedUrlStr) {
-        targetUrl = savedUrl
-      }
-      self.prewarmApp(url: targetUrl, appId: lastKey)
-    }
   }
 
   private var hwThrottle: [String: Date] = [:]
@@ -612,44 +598,6 @@ final class IrisAppDelegate: NSObject, NSApplicationDelegate, WKUIDelegate, WKNa
     ])
 
     rootView.addSubview(appContainer)
-  }
-
-  func prewarmApp(url: URL, appId: String? = nil) {
-    let appKey = (appId ?? url.host?.lowercased() ?? "app")
-      .replacingOccurrences(of: "www.", with: "")
-      .replacingOccurrences(of: ".com", with: "")
-      .replacingOccurrences(of: ".tv", with: "")
-      .replacingOccurrences(of: ".", with: "_")
-    if warmAppViews[appKey] != nil || warmAppLru.count >= maxWarmApps { return }
-
-    NSLog("[irisTV Anticipation] Pré-aquecendo app em background antes do clique: %@", appKey)
-    let isYouTube = (url.host?.lowercased().contains("youtube.com") == true)
-    var finalUrl = url
-    if let session = loadAppSession(key: appKey),
-       let savedUrlStr = session["url"] as? String,
-       let savedUrl = URL(string: savedUrlStr) {
-      finalUrl = savedUrl
-    }
-
-    let dynamicView = WKWebView(frame: appWebViewSlot.bounds, configuration: buildWebConfig(withBridge: true, injectTvNav: !isYouTube, injectPasswordManager: true))
-    dynamicView.autoresizingMask = [.width, .height]
-    dynamicView.wantsLayer = true
-    dynamicView.layer?.drawsAsynchronously = true
-    dynamicView.isHidden = true
-    if isYouTube {
-      dynamicView.customUserAgent = "Mozilla/5.0 (SMART-TV; Linux; Tizen 6.5) AppleWebKit/537.36 (KHTML, like Gecko) SamsungBrowser/5.0 TV Safari/537.36"
-    } else {
-      dynamicView.customUserAgent = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/18.0 Safari/605.1.15"
-    }
-    dynamicView.uiDelegate = self
-    dynamicView.navigationDelegate = self
-    dynamicView.allowsBackForwardNavigationGestures = true
-
-    appWebViewSlot.addSubview(dynamicView)
-    warmAppViews[appKey] = dynamicView
-    warmAppLru.append(appKey)
-
-    dynamicView.load(URLRequest(url: finalUrl))
   }
 
   private func openEmbeddedApp(url: URL, name: String, appId: String? = nil) {
@@ -825,9 +773,6 @@ final class IrisAppDelegate: NSObject, NSApplicationDelegate, WKUIDelegate, WKNa
         else { self.appWebView?.reload() }
       } else if action == "closeApp" {
         self.closeEmbeddedAppAction()
-      } else if action == "prewarmApp", let urlStr = dict["url"] as? String, let u = URL(string: urlStr) {
-        let appId = dict["id"] as? String
-        self.prewarmApp(url: u, appId: appId)
       } else if action == "openAppUrl", let urlStr = dict["url"] as? String, let u = URL(string: urlStr) {
         let name = (dict["name"] as? String) ?? "App"
         let appId = dict["id"] as? String

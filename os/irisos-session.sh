@@ -285,7 +285,7 @@ if [ -x /usr/bin/waydroid ] && [ -f /var/lib/waydroid/waydroid.cfg ]; then
         # Pré-aquece a sessão Android (Zygote & Dalvik VM) para abertura instantânea dos apps
         waydroid session start >> /var/log/waydroid-session.log 2>&1 &
 
-        # Antecipação em background: compilação nativa AOT (Ahead-of-Time) e pré-carga silenciosa
+        # Compilação AOT (Ahead-of-Time) em background para execução nativa ultra-rápida (sem iniciar apps)
         (
           for _j in $(seq 1 12); do
             if waydroid shell getprop sys.boot_completed 2>/dev/null | grep -q "1"; then
@@ -294,9 +294,6 @@ if [ -x /usr/bin/waydroid ] && [ -f /var/lib/waydroid/waydroid.cfg ]; then
                   waydroid shell cmd package compile -m speed "$pkg" >/dev/null 2>&1 &
                 fi
               done
-              # Pré-carrega o app em memória pausado no backstack (0ms no primeiro clique)
-              waydroid shell am start -W -a android.intent.action.MAIN -c android.intent.category.LAUNCHER com.netflix.ninja >/dev/null 2>&1 && \
-              waydroid shell input keyevent KEYCODE_HOME >/dev/null 2>&1 || true
               break
             fi
             sleep 1
