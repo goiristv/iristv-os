@@ -5833,41 +5833,94 @@
      Spotlight Search & Profiles
      ========================================================= */
   let searchFilter = 'all';
+  let searchRenderToken = 0;
 
   function renderSearchResults() {
+    const token = ++searchRenderToken;
     const q = searchInput.value.trim().toLowerCase();
     const pool = window.IrisStore ? window.IrisStore.getFullCatalog() : APPS;
-    const appMatches = pool.filter((app) => {
+    const allApps = pool.filter((app) => {
       const catOk = searchFilter === 'all' || app.category === searchFilter;
       const textOk = !q || app.name.toLowerCase().includes(q) || (app.tagline || '').toLowerCase().includes(q) || (app.developer || '').toLowerCase().includes(q);
       return catOk && textOk;
     });
 
-    const showMatches = (searchFilter === 'all' || searchFilter === 'streaming')
+    const allShows = (searchFilter === 'all' || searchFilter === 'streaming')
       ? TRENDING_SHOWS.filter((s) => !q || s.title.toLowerCase().includes(q) || s.sub.toLowerCase().includes(q) || s.appName.toLowerCase().includes(q))
       : [];
 
-    searchResults.innerHTML = '';
+    const appMatches = q ? allApps.slice(0, 24) : allApps.slice(0, 14);
+    const showMatches = q ? allShows.slice(0, 18) : allShows.slice(0, 10);
+
+    searchResults.replaceChildren();
     if (!appMatches.length && !showMatches.length) {
-      searchResults.innerHTML = `<div style="grid-column:1/-1;text-align:center;padding:30px;color:var(--text-secondary)">Nenhum resultado encontrado.</div>`;
+      searchResults.innerHTML = `<div style="text-align:center;padding:36px 20px;color:rgba(255,255,255,0.55);font-weight:500;">Nenhum resultado encontrado para "${escHtml(searchInput.value.trim())}".</div>`;
       return;
     }
 
-    const frag = document.createDocumentFragment();
-    appMatches.forEach((app, idx) => {
-      const tile = createAppTile(app, 'search', idx);
-      tile.querySelector('button').addEventListener('click', closeSearch);
-      frag.appendChild(tile);
-    });
-    showMatches.forEach((show, idx) => {
-      const card = createPosterCard(show, 'search', appMatches.length + idx);
-      card.style.width = '100%';
-      card.style.height = 'auto';
-      card.style.aspectRatio = '2 / 3';
-      card.addEventListener('click', closeSearch);
-      frag.appendChild(card);
-    });
-    searchResults.appendChild(frag);
+    const appendSmoothBatch = (host, list, makeEl, batchSize = 5) => {
+      let i = 0;
+      const next = () => {
+        if (searchRenderToken !== token || searchOverlay.classList.contains('hidden')) return;
+        const frag = document.createDocumentFragment();
+        const batch = [];
+        const end = Math.min(list.length, i + batchSize);
+        for (; i < end; i++) {
+          const el = makeEl(list[i], i);
+          if (el) {
+            el.style.transitionDelay = `${(batch.length) * 24}ms`;
+            el.classList.add('iris-card-pre');
+            enhanceProgressiveImages(el);
+            batch.push(el);
+            frag.appendChild(el);
+          }
+        }
+        host.appendChild(frag);
+        requestAnimationFrame(() => {
+          if (searchRenderToken !== token) return;
+          batch.forEach((el) => {
+            el.classList.remove('iris-card-pre');
+            el.classList.add('iris-card-in');
+          });
+        });
+        if (i < list.length) {
+          setTimeout(() => {
+            if (searchRenderToken === token) requestAnimationFrame(next);
+          }, 16);
+        }
+      };
+      requestAnimationFrame(next);
+    };
+
+    if (appMatches.length) {
+      const appSec = document.createElement('div');
+      appSec.innerHTML = `<div class="spotlight-section-title">Aplicativos (${allApps.length})</div>`;
+      const appGrid = document.createElement('div');
+      appGrid.className = 'spotlight-apps-grid';
+      appSec.appendChild(appGrid);
+      searchResults.appendChild(appSec);
+
+      appendSmoothBatch(appGrid, appMatches, (app, idx) => {
+        const tile = createAppTile(app, 'search', idx);
+        tile.querySelector('button')?.addEventListener('click', closeSearch);
+        return tile;
+      }, 6);
+    }
+
+    if (showMatches.length) {
+      const showSec = document.createElement('div');
+      showSec.innerHTML = `<div class="spotlight-section-title">Séries &amp; Filmes (${allShows.length})</div>`;
+      const showGrid = document.createElement('div');
+      showGrid.className = 'spotlight-shows-grid';
+      showSec.appendChild(showGrid);
+      searchResults.appendChild(showSec);
+
+      appendSmoothBatch(showGrid, showMatches, (show, idx) => {
+        const card = createPosterCard(show, 'search', idx);
+        card.addEventListener('click', closeSearch);
+        return card;
+      }, 5);
+    }
   }
 
   let searchDebounce = null;
