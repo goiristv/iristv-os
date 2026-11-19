@@ -9082,11 +9082,12 @@
   } else {
     setTimeout(() => finishBoot(false), 1100);
   }
+  const bgStartupDelay = sessionStorage.getItem('irisos-booted') === '1' ? 250 : 1550;
   setTimeout(() => {
     prefetchDefaultShowsCatalog();
     const isTvProfile = Boolean(window.IrisWebOS?.isWebOS || /Web0S|webOS/i.test(navigator.userAgent || ''));
     if (!isTvProfile) {
-      refreshWifiStatus(false, true);
+      setTimeout(() => refreshWifiStatus(false, true), 150);
       setInterval(() => {
         if (document.hidden) return;
         const busy = Boolean(
@@ -9097,19 +9098,21 @@
         );
         if (!busy) refreshWifiStatus(false, false);
       }, 15000);
-      checkChannelsHealth();
+      setTimeout(() => checkChannelsHealth(), 400);
       setInterval(() => {
         if (!document.hidden) checkChannelsHealth();
       }, 45000);
     }
-    fetch('/api/news').then((r) => (r.ok ? r.json() : null)).then((d) => {
-      if (d?.items?.length) {
-        state.newsItems = d.items;
-        state.newsUpdatedAt = d.updatedAt || Date.now();
-        newsClientCache.set('all|all|', { ts: Date.now(), updatedAt: state.newsUpdatedAt, items: d.items });
-      }
-    }).catch(() => { });
-  }, 250);
+    setTimeout(() => {
+      fetch('/api/news').then((r) => (r.ok ? r.json() : null)).then((d) => {
+        if (d?.items?.length) {
+          state.newsItems = d.items;
+          state.newsUpdatedAt = d.updatedAt || Date.now();
+          newsClientCache.set('all|all|', { ts: Date.now(), updatedAt: state.newsUpdatedAt, items: d.items });
+        }
+      }).catch(() => { });
+    }, 300);
+  }, bgStartupDelay);
 
   // CPU/RAM Hygiene: Pausa animacoes secundarias e timers quando a TV desliga a tela ou muda de HDMI
   document.addEventListener('visibilitychange', () => {
