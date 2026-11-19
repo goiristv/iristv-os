@@ -1549,17 +1549,29 @@ async function getRealOsStatus() {
             const model = d.sppci_model || d._name || 'GPU';
             const vram = d.spdisplays_vram || d.spdisplays_vram_shared || '';
             const isDedicated = d.sppci_bus === 'spdisplays_pcie_device' || (Boolean(d.spdisplays_vram) && !d.spdisplays_vram_shared);
-            const vendor = /amd|radeon/i.test(model) || (d.spdisplays_vendor && d.spdisplays_vendor.includes('amd')) ? 'AMD'
-              : (/nvidia|geforce/i.test(model) ? 'NVIDIA'
-              : (/intel/i.test(model) ? 'Intel' : (model.includes('Apple') ? 'Apple' : 'Desconhecido')));
+            const rawVendor = String(d.spdisplays_vendor || '').toLowerCase();
+            const rawModel = String(model).toLowerCase();
+            let vendor = 'GPU';
+            if (/nvidia|geforce|quadro|titan|rtx|gtx/.test(rawVendor + rawModel)) vendor = 'NVIDIA';
+            else if (/amd|radeon|firepro|ati/.test(rawVendor + rawModel)) vendor = 'AMD';
+            else if (/intel|iris|uhd|arc/.test(rawVendor + rawModel)) vendor = 'Intel';
+            else if (/apple|m1|m2|m3|m4/.test(rawVendor + rawModel)) vendor = 'Apple';
+
+            let metalStr = null;
+            if (d.spdisplays_mtlgpufamilysupport) {
+              const mMatch = String(d.spdisplays_mtlgpufamilysupport).match(/metal(\d+)/i);
+              metalStr = mMatch ? `Metal ${mMatch[1]}` : 'Metal';
+            }
+
             return {
               name: model,
               model,
               vendor,
               vram: (vram || '').trim(),
+              bus: d.sppci_bus === 'spdisplays_pcie_device' ? 'PCIe' : (d.sppci_bus === 'spdisplays_builtin' ? 'Integrada' : ''),
               isDedicated: Boolean(isDedicated),
-              metal: d.spdisplays_mtlgpufamilysupport || null,
-              isHighPerformance: Boolean(isDedicated || vendor === 'AMD' || vendor === 'NVIDIA')
+              metal: metalStr,
+              isHighPerformance: Boolean(isDedicated || vendor === 'AMD' || vendor === 'NVIDIA' || vendor === 'Apple')
             };
           });
         } catch (_) {}
@@ -1636,6 +1648,40 @@ async function getRealOsStatus() {
     if (fs.existsSync('/sys/class/rc/rc0')) {
       irReceiver = { available: true, name: 'Receptor IR / HDMI-CEC (Linux Kernel RC)' };
     }
+
+    if (!gpus.length || Date.now() - hwStatusCache.ts > 30000) {
+      try {
+        const lspciRes = await runCmd('lspci', ['-mm']);
+        if (lspciRes.ok && lspciRes.stdout) {
+          const lines = lspciRes.stdout.split('\n');
+          const found = [];
+          for (const line of lines) {
+            if (/VGA|3D|Display/i.test(line)) {
+              const matches = line.match(/"([^"]*)"/g);
+              if (matches && matches.length >= 3) {
+                const vendorClean = matches[1].replace(/"/g, '').trim();
+                const modelClean = matches[2].replace(/"/g, '').trim();
+                const isDedicated = !/intel|integrated/i.test(`${vendorClean} ${modelClean}`);
+                found.push({
+                  name: `${vendorClean} ${modelClean}`,
+                  model: modelClean,
+                  vendor: vendorClean,
+                  vram: '',
+                  bus: 'PCIe',
+                  isDedicated,
+                  metal: null,
+                  isHighPerformance: isDedicated
+                });
+              }
+            }
+          }
+          if (found.length) {
+            hwStatusCache.gpus = found;
+            gpus = found;
+          }
+        }
+      } catch (_) {}
+    }
   } else if (platform === 'win32') {
     const [regRes, wlanRes, battRes] = await Promise.all([
       runCmd('reg', ['query', 'HKCU\\Software\\Microsoft\\Windows\\CurrentVersion\\Themes\\Personalize', '/v', 'AppsUseLightTheme'], 2500),
@@ -1661,6 +1707,34 @@ async function getRealOsStatus() {
             charging: b.BatteryStatus === 2 || b.BatteryStatus === 6,
             source: b.BatteryStatus === 2 ? 'AC Power' : 'Bateria'
           };
+        }
+      } catch (_) {}
+    }
+
+    if (!gpus.length || Date.now() - hwStatusCache.ts > 30000) {
+      try {
+        const wmicRes = await runCmd('powershell', ['-NoProfile', '-Command', 'Get-CimInstance Win32_VideoController | Select-Object Name,AdapterRAM | ConvertTo-Json'], 3000);
+        if (wmicRes.ok && wmicRes.stdout) {
+          let parsed = JSON.parse(wmicRes.stdout);
+          if (!Array.isArray(parsed)) parsed = [parsed];
+          const found = parsed.filter(p => p && p.Name).map(p => {
+            const vramGb = p.AdapterRAM ? `${(p.AdapterRAM / (1024 ** 3)).toFixed(1)} GB` : '';
+            const isDedicated = !/intel|integrated/i.test(p.Name);
+            return {
+              name: p.Name,
+              model: p.Name,
+              vendor: /nvidia/i.test(p.Name) ? 'NVIDIA' : (/amd|radeon/i.test(p.Name) ? 'AMD' : (/intel/i.test(p.Name) ? 'Intel' : 'GPU')),
+              vram: vramGb,
+              bus: isDedicated ? 'PCIe' : 'Integrada',
+              isDedicated,
+              metal: null,
+              isHighPerformance: isDedicated
+            };
+          });
+          if (found.length) {
+            hwStatusCache.gpus = found;
+            gpus = found;
+          }
         }
       } catch (_) {}
     }

@@ -5514,31 +5514,40 @@
       let activeGpuSub = 'Aceleração por Hardware Metal / WebGL2 Ativa';
       let isDedicatedActive = gpuInfo.isDedicated;
 
-      const dedicatedCard = detectedGpus.find((g) => g.isDedicated || g.isHighPerformance);
-      const integratedCard = detectedGpus.find((g) => !g.isDedicated && !g.isHighPerformance);
+      // Sort GPUs by capability (dedicated, high-performance, VRAM) dynamically
+      const sortedGpus = [...detectedGpus].sort((a, b) => {
+        const aScore = (a.isDedicated ? 10 : 0) + (a.isHighPerformance ? 5 : 0) + (a.vram ? 2 : 0);
+        const bScore = (b.isDedicated ? 10 : 0) + (b.isHighPerformance ? 5 : 0) + (b.vram ? 2 : 0);
+        return bScore - aScore;
+      });
+      const dedicatedCard = sortedGpus.find((g) => g.isDedicated || g.isHighPerformance) || sortedGpus[0];
+      const integratedCard = sortedGpus.find((g) => !g.isDedicated && !g.isHighPerformance) || sortedGpus[sortedGpus.length - 1];
 
       if (currentGpuPref === 'dedicated') {
         if (dedicatedCard) {
           activeGpuLabel = `${dedicatedCard.name}${dedicatedCard.vram ? ` (${dedicatedCard.vram})` : ''}`;
-          activeGpuSub = `GPU Dedicada (Mais Potente) • ${dedicatedCard.metal ? 'Metal 3 • ' : ''}PCIe x16 Ativa a 60 FPS`;
+          const metalStr = dedicatedCard.metal ? `${dedicatedCard.metal} • ` : '';
+          const busStr = dedicatedCard.bus ? `${dedicatedCard.bus} • ` : (dedicatedCard.isDedicated ? 'Dedicada • ' : '');
+          activeGpuSub = `GPU Mais Potente • ${metalStr}${busStr}Ativa a 60 FPS`;
           isDedicatedActive = true;
         } else {
-          activeGpuLabel = gpuInfo.name || 'GPU Dedicada / Alta Performance';
-          activeGpuSub = 'Aceleração de alta performance ativa';
+          activeGpuLabel = gpuInfo.name || 'GPU de Alto Desempenho';
+          activeGpuSub = 'Aceleração por hardware ativa a 60 FPS';
           isDedicatedActive = true;
         }
       } else if (currentGpuPref === 'integrated') {
-        if (integratedCard) {
+        if (integratedCard && (integratedCard !== dedicatedCard || sortedGpus.length > 1)) {
           activeGpuLabel = `${integratedCard.name}${integratedCard.vram ? ` (${integratedCard.vram})` : ''}`;
-          activeGpuSub = 'GPU Integrada • Modo Econômico de Bateria';
+          activeGpuSub = 'GPU Integrada • Modo de Economia de Energia';
           isDedicatedActive = false;
         } else {
-          activeGpuLabel = gpuInfo.name || 'GPU Integrada';
+          activeGpuLabel = gpuInfo.name || 'GPU do Sistema';
           activeGpuSub = 'Modo de economia de energia ativo';
           isDedicatedActive = false;
         }
       } else {
-        activeGpuLabel = `${(dedicatedCard || integratedCard)?.name || gpuInfo.name || 'Automático'} (Automático)`;
+        const primaryGpu = dedicatedCard || integratedCard;
+        activeGpuLabel = primaryGpu ? `${primaryGpu.name} (Automático)` : (gpuInfo.name || 'Automático');
         activeGpuSub = 'Gerenciamento automático de GPU pelo sistema operacional';
       }
 
@@ -5622,12 +5631,15 @@
                 <h4 style="margin-bottom:6px;">Placas de Vídeo Detectadas no Sistema</h4>
                 <div style="display:flex;flex-direction:column;gap:6px;margin-top:8px;">
                   ${detectedGpus.map((g) => {
-                    const isSelected = (currentGpuPref === 'dedicated' && (g.isDedicated || g.isHighPerformance)) || (currentGpuPref === 'integrated' && !g.isDedicated && !g.isHighPerformance);
+                    const isSelected = (currentGpuPref === 'dedicated' && g === dedicatedCard)
+                      || (currentGpuPref === 'integrated' && g === integratedCard)
+                      || (currentGpuPref === 'auto' && g === (dedicatedCard || integratedCard));
+                    const typeLabel = g.isDedicated ? (g.bus ? `Dedicada (${g.bus})` : 'Dedicada') : (g.bus || 'Integrada');
                     return `
                       <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 14px;border-radius:12px;background:rgba(255,255,255,${isSelected ? '0.08' : '0.03'});border:1px solid rgba(255,255,255,${isSelected ? '0.2' : '0.07'});">
                         <div>
                           <strong style="font-size:0.88rem;color:${isSelected ? 'var(--iris-cyan, #00c2ff)' : 'var(--text-primary)'};">${escHtml(g.name)}</strong>
-                          <span style="font-size:0.78rem;color:var(--text-secondary);margin-left:8px;">${g.isDedicated ? 'Dedicada (PCIe)' : 'Integrada'} ${g.vram ? `• ${g.vram}` : ''} ${g.metal ? '• Metal 3' : ''}</span>
+                          <span style="font-size:0.78rem;color:var(--text-secondary);margin-left:8px;">${typeLabel} ${g.vram ? `• ${g.vram}` : ''} ${g.metal ? `• ${g.metal}` : ''}</span>
                         </div>
                         <span style="font-size:0.78rem;font-weight:700;padding:3px 8px;border-radius:6px;background:${isSelected ? 'rgba(16,185,129,0.2)' : 'rgba(255,255,255,0.06)'};color:${isSelected ? '#34d399' : 'var(--text-muted)'};">${isSelected ? 'Em Uso' : 'Disponível'}</span>
                       </div>
