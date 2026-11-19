@@ -2720,7 +2720,12 @@
       btn.addEventListener('click', () => {
         playUiSound('move');
         state.activeShowView = btn.dataset.sview;
-        renderTab('shows');
+        section.querySelectorAll('[data-sview]').forEach((b) => b.classList.toggle('active', b === btn));
+        if (state.activeShowView === 'watched' || state.activeShowView === 'watchlist') {
+          renderShowsGridOnly();
+        } else {
+          loadShowsCatalog();
+        }
       });
     });
 
@@ -2728,7 +2733,8 @@
       chip.addEventListener('click', () => {
         playUiSound('move');
         state.activeShowGenre = chip.dataset.genre;
-        renderTab('shows');
+        section.querySelectorAll('[data-genre]').forEach((c) => c.classList.toggle('active', c === chip));
+        loadShowsCatalog();
       });
     });
   }
@@ -3617,8 +3623,11 @@
       renderShowsAndMoviesTab(pane);
       rowsContainer.replaceChildren(pane);
       state.showsGridDirty = false;
-      renderShowsGridOnly();
-      loadShowsCatalog();
+      if (state.activeShowView === 'watched' || state.activeShowView === 'watchlist') {
+        renderShowsGridOnly();
+      } else {
+        loadShowsCatalog();
+      }
     } else if (tab === 'news') {
       const pane = document.createElement('div');
       pane.className = 'tab-pane';
@@ -6423,9 +6432,13 @@
     let best = null;
     let bestScore = Infinity;
 
-    for (const cand of candidates) {
-      if (cand === cur) continue;
+    const candRects = candidates.map((cand) => {
       const r = cand.getBoundingClientRect();
+      return { cand, r };
+    });
+
+    for (const { cand, r } of candRects) {
+      if (cand === cur) continue;
       const nx = r.left + r.width / 2;
       const ny = r.top + r.height / 2;
       const dx = nx - cx;
