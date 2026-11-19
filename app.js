@@ -2493,7 +2493,7 @@
   }
 
   function renderGridProgressively(grid, items, createCardFn, opts = {}) {
-    const { batchSize = 6, label = 'Carregando', progressHost = grid } = opts;
+    const { batchSize = 4, batchDelayMs = 18, label = 'Carregando', progressHost = grid } = opts;
     const token = (grid.__irisRenderToken || 0) + 1;
     grid.__irisRenderToken = token;
     grid.replaceChildren();
@@ -2513,7 +2513,7 @@
       if (grid.__irisRenderToken !== token || !bar) return;
       const domRatio = renderedCount / total;
       const imgRatio = totalImgs > 0 ? Math.min(1, loadedImgs / totalImgs) : 1;
-      const pct = Math.min(100, Math.round((domRatio * 0.55 + imgRatio * 0.45) * 100));
+      const pct = Math.min(100, Math.round((domRatio * 0.65 + imgRatio * 0.35) * 100));
       bar.fillEl.style.width = `${pct}%`;
       bar.pctEl.textContent = `${pct}%`;
       bar.labelEl.textContent = renderedCount < total
@@ -2524,7 +2524,17 @@
         bar.pctEl.textContent = '100%';
         setTimeout(() => {
           if (grid.__irisRenderToken === token) bar.wrap.classList.add('is-done');
-        }, 320);
+        }, 280);
+      }
+    };
+
+    const scheduleNext = () => {
+      if (batchDelayMs > 0) {
+        setTimeout(() => {
+          if (grid.__irisRenderToken === token) requestAnimationFrame(step);
+        }, batchDelayMs);
+      } else {
+        requestAnimationFrame(step);
       }
     };
 
@@ -2548,7 +2558,7 @@
       updateBar();
 
       if (renderedCount < total) {
-        requestAnimationFrame(step);
+        scheduleNext();
       } else {
         // Safety timeout so lazy off-screen images don't keep the bar open forever
         setTimeout(() => {
@@ -2559,7 +2569,7 @@
               if (grid.__irisRenderToken === token) bar.wrap.classList.add('is-done');
             }, 220);
           }
-        }, 1400);
+        }, 1200);
       }
     };
 
@@ -2624,7 +2634,8 @@
     }
 
     renderGridProgressively(grid, items, (show) => createPosterCard(show, 'row-1', 0), {
-      batchSize: 6,
+      batchSize: 4,
+      batchDelayMs: 18,
       label: 'Carregando séries e filmes'
     });
   }
@@ -2909,7 +2920,8 @@
         });
         return btn;
       }, {
-        batchSize: 6,
+        batchSize: 5,
+        batchDelayMs: 18,
         label: 'Carregando notícias',
         progressHost: grid
       });
@@ -3223,23 +3235,6 @@
     requestAnimationFrame(() => {
       rowsContainer.classList.add(isForward ? 'tab-anim-enter-right' : 'tab-anim-enter-left');
     });
-
-    // Fast-path Keep-Alive Cache for heavy tabs (shows, apps, news) — < 1ms switch!
-    if (!forceRebuild && (tab === 'shows' || tab === 'news' || tab === 'apps')) {
-      const cachedPane = tabPaneCache.get(tab);
-      const isAppsValid = tab !== 'apps' || (!state.appsGridDirty && lastAppsFilterRendered === state.activeAppFilter && lastAppsCountRendered === APPS.length);
-      const isShowsValid = tab !== 'shows' || !state.showsGridDirty;
-      if (cachedPane && isAppsValid && isShowsValid) {
-        rowsContainer.replaceChildren(cachedPane);
-        if (tab === 'news' && Date.now() - lastNewsFetchAt > 120000) {
-          lastNewsFetchAt = Date.now();
-          loadNewsFeed(false);
-        }
-        const tvContent = document.getElementById('tv-content');
-        if (tvContent) tvContent.scrollTop = 0;
-        return;
-      }
-    }
 
     rowsContainer.replaceChildren();
 
@@ -3597,7 +3592,6 @@
       const pane = document.createElement('div');
       pane.className = 'tab-pane';
       renderShowsAndMoviesTab(pane);
-      tabPaneCache.set('shows', pane);
       rowsContainer.replaceChildren(pane);
       state.showsGridDirty = false;
       renderShowsGridOnly();
@@ -3606,11 +3600,12 @@
       const pane = document.createElement('div');
       pane.className = 'tab-pane';
       renderNewsTab(pane);
-      tabPaneCache.set('news', pane);
       rowsContainer.replaceChildren(pane);
       renderNewsGridOnly();
-      lastNewsFetchAt = Date.now();
-      loadNewsFeed(false);
+      if (!state.newsItems?.length || Date.now() - lastNewsFetchAt > 120000) {
+        lastNewsFetchAt = Date.now();
+        loadNewsFeed(false);
+      }
     } else if (tab === 'apps') {
       const pane = document.createElement('div');
       pane.className = 'tab-pane';
@@ -3634,17 +3629,18 @@
       const populateAppsGrid = () => {
         const filtered = state.activeAppFilter === 'all' ? APPS : APPS.filter((a) => a.category === state.activeAppFilter);
         renderGridProgressively(grid, filtered, (app, idx) => createAppTile(app, 'row-1', idx), {
-          batchSize: 8,
+          batchSize: 4,
+          batchDelayMs: 18,
           label: 'Carregando aplicativos'
         });
         lastAppsFilterRendered = state.activeAppFilter;
         lastAppsCountRendered = APPS.length;
         state.appsGridDirty = false;
       };
-      populateAppsGrid();
       section.appendChild(grid);
       pane.appendChild(section);
-      tabPaneCache.set('apps', pane);
+      rowsContainer.replaceChildren(pane);
+      populateAppsGrid();
 
       section.querySelector('#apps-open-store-btn')?.addEventListener('click', () => {
         const storeApp = APPS.find((a) => a.id === 'appstore') || window.IrisStore?.getFullCatalog().find((a) => a.id === 'appstore');

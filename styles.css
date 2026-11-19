@@ -1564,21 +1564,20 @@ body.theme-aurora .theme-swatch-dot {
   display: none !important;
 }
 
-.apps-grid-layout .app-tile,
-.shows-grid .poster-card,
-.shows-grid .show-card,
-.news-grid .news-card {
+.apps-grid-layout .app-tile-item,
+.poster-grid-layout .poster-card,
+.news-split-list .news-list-item {
   contain: layout style paint;
   content-visibility: auto;
-  contain-intrinsic-size: 220px 260px;
+  contain-intrinsic-size: 200px 280px;
 }
 
-.apps-grid-layout .app-tile {
-  contain-intrinsic-size: 160px 180px;
+.apps-grid-layout .app-tile-item {
+  contain-intrinsic-size: 150px 175px;
 }
 
-.news-grid .news-card {
-  contain-intrinsic-size: 320px 300px;
+.news-split-list .news-list-item {
+  contain-intrinsic-size: 320px 130px;
 }
 
 /* =========================================
