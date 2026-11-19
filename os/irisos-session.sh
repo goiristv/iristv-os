@@ -249,9 +249,20 @@ if ! pgrep -f "/opt/iristv/server.js" >/dev/null 2>&1; then
   ) &
 fi
 
-# 4b. Inicializa Waydroid container e Widevine L3 DRM em background se presente na imagem
-mkdir -p /opt/iristv/apks
+# 4b. Inicializa Waydroid container, Widevine L3 DRM e Armazenamento Persistente de .APKs
+mkdir -p /opt/iristv/apks /root/.iristv
 chmod 777 /opt/iristv/apks 2>/dev/null || true
+
+# Persistência de APKs, Logins e Sessões Android no Pendrive de Boot
+if [ -n "$BOOT_MNT" ]; then
+  mkdir -p "$BOOT_MNT/irisos-data/waydroid-data" "$BOOT_MNT/irisos-data/apks" "$BOOT_MNT/irisos-data/sessions"
+  mount --bind "$BOOT_MNT/irisos-data/apks" /opt/iristv/apks 2>/dev/null || true
+  mount --bind "$BOOT_MNT/irisos-data/sessions" /root/.iristv 2>/dev/null || true
+  if [ -d /var/lib/waydroid ]; then
+    mkdir -p /var/lib/waydroid/data
+    mount --bind "$BOOT_MNT/irisos-data/waydroid-data" /var/lib/waydroid/data 2>/dev/null || true
+  fi
+fi
 
 if [ -x /usr/bin/waydroid ] && [ -f /var/lib/waydroid/waydroid.cfg ]; then
   (

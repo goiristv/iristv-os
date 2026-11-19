@@ -2460,6 +2460,9 @@ function createAppServer() {
             id,
             url: body.url || '',
             name: body.name || '',
+            package: body.package || '',
+            activity: body.activity || '',
+            isApk: Boolean(body.isApk),
             scrollX: Number(body.scrollX) || 0,
             scrollY: Number(body.scrollY) || 0,
             savedAt: Date.now()
@@ -3092,6 +3095,35 @@ function createAppServer() {
     }
 
     if (req.method === 'POST' && pathname === '/api/os/close-tv-app') {
+      const waydroidBin = findExec(['waydroid']);
+      if (process.platform === 'linux' && waydroidBin) {
+        try {
+          const actOut = execSync("waydroid shell dumpsys activity activities 2>/dev/null | grep -E '(mResumedActivity|topResumedActivity)' | head -n 1", { timeout: 2500, encoding: 'utf8' });
+          const m = actOut.match(/([a-zA-Z0-9_\.]+\/[a-zA-Z0-9_\.]+)/);
+          if (m) {
+            const comp = m[1];
+            const [pkg] = comp.split('/');
+            const foundId = Object.keys(TV_ANDROID_PACKAGES).find((k) => TV_ANDROID_PACKAGES[k] === pkg) || pkg;
+            const sessions = readSessions();
+            sessions[foundId] = {
+              ...(sessions[foundId] || {}),
+              id: foundId,
+              package: pkg,
+              activity: comp,
+              isApk: true,
+              savedAt: Date.now()
+            };
+            sessions[pkg] = sessions[foundId];
+            writeSessions(sessions);
+            console.log(`[irisOS] Sessão persistente do APK salva: ${foundId} (${comp})`);
+          }
+        } catch (_) {}
+
+        try {
+          execSync("waydroid shell input keyevent KEYCODE_HOME 2>/dev/null", { timeout: 2000, stdio: 'ignore' });
+        } catch (_) {}
+      }
+
       if (global.__irisActiveTvAppProc) {
         try { global.__irisActiveTvAppProc.kill('SIGTERM'); } catch (_) { }
         global.__irisActiveTvAppProc = null;
@@ -3128,7 +3160,7 @@ function createAppServer() {
         const apkDir = process.platform === 'linux' ? '/opt/iristv/apks' : path.join(ROOT_DIR, 'apks');
         const localApkPath = path.join(apkDir, `${appId}.apk`);
 
-        // 1. Android TV Nativo (.APK) com Widevine DRM (Netflix, Prime, Disney+, Max, etc.)
+        // 1. Android TV Nativo (.APK) com Widevine DRM (Netflix, Prime, Disney+, Max, etc.) e Restauração de Sessão
         if (waydroidBin && androidPkg) {
           // Se o APK existe localmente mas ainda não foi instalado no contêiner Waydroid, instala agora
           if (fs.existsSync(localApkPath)) {
@@ -3138,7 +3170,28 @@ function createAppServer() {
             } catch (_) { }
           }
 
-          console.log(`[irisOS] Abrindo APK Android TV com Widevine DRM: ${androidPkg} (${appName})`);
+          // Restauração de Sessão Persistente para o APK
+          const allSessions = readSessions();
+          const savedSession = allSessions[appId] || allSessions[androidPkg];
+          const resumeActivity = savedSession?.activity;
+
+          console.log(`[irisOS] Abrindo APK Android TV com Widevine DRM: ${androidPkg} (${appName})${resumeActivity ? ` [Restaurando sessão: ${resumeActivity}]` : ''}`);
+
+          if (resumeActivity && resumeActivity.startsWith(androidPkg)) {
+            try {
+              execSync(`waydroid session action "am start -n ${resumeActivity}" 2>/dev/null`, { timeout: 5000, stdio: 'ignore' });
+              return sendJson(req, res, 200, {
+                ok: true,
+                launched: true,
+                mode: 'waydroid-widevine-resumed',
+                package: androidPkg,
+                activity: resumeActivity,
+                name: appName,
+                drm: 'Widevine L3'
+              });
+            } catch (_) {}
+          }
+
           const proc = spawn(waydroidBin, ['app', 'launch', androidPkg], {
             env: {
               ...process.env,
