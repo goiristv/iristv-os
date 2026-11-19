@@ -290,9 +290,9 @@
       bg: '#141414',
       glow: 'rgba(229, 9, 20, 0.6)',
       orbs: ['rgba(56, 108, 210, 0.55)', 'rgba(95, 130, 95, 0.45)', 'rgba(229, 9, 20, 0.35)'],
-      kicker: 'ANDROID TV • WIDEVINE DRM',
-      meta: 'APK Oficial • 4K HDR • Widevine L3',
-      tagline: 'Séries e filmes em altíssima definição rodando diretamente via APK nativo Android TV.'
+      kicker: 'DESTAQUE • FILMES & SÉRIES',
+      meta: 'Brasil • Séries & Filmes',
+      tagline: 'Séries, filmes e documentários premiados para assistir a qualquer hora.'
     },
     {
       id: 'prime',
@@ -314,9 +314,9 @@
       bg: '#051a2e',
       glow: 'rgba(0, 168, 225, 0.6)',
       orbs: ['rgba(0, 140, 225, 0.55)', 'rgba(20, 90, 160, 0.48)', 'rgba(0, 210, 255, 0.38)'],
-      kicker: 'ANDROID TV • WIDEVINE DRM',
-      meta: 'APK Oficial • 4K UHD • Widevine L3',
-      tagline: 'Originais Amazon e transmissões ao vivo direto no APK nativo para Smart TV.'
+      kicker: 'DESTAQUE • STREAMING',
+      meta: 'Amazon • Originais',
+      tagline: 'Originais Amazon, sucessos de bilheteria e esportes ao vivo.'
     },
     {
       id: 'disney',
@@ -338,9 +338,9 @@
       bg: '#041236',
       glow: 'rgba(0, 194, 255, 0.6)',
       orbs: ['rgba(0, 160, 240, 0.58)', 'rgba(20, 80, 200, 0.5)', 'rgba(0, 229, 180, 0.35)'],
-      kicker: 'ANDROID TV • WIDEVINE DRM',
-      meta: 'APK Oficial • IMAX Enhanced • Widevine',
-      tagline: 'Disney, Pixar, Marvel, Star Wars e ESPN no aplicativo Android TV.'
+      kicker: 'DESTAQUE • FAMÍLIA & CINEMA',
+      meta: 'Disney • Pixar • Marvel • ESPN',
+      tagline: 'Histórias da Disney, Pixar, Marvel, Star Wars e transmissões ESPN.'
     },
     {
       id: 'max',
@@ -362,9 +362,9 @@
       bg: '#050a30',
       glow: 'rgba(30, 100, 255, 0.62)',
       orbs: ['rgba(30, 90, 255, 0.58)', 'rgba(110, 70, 240, 0.48)', 'rgba(10, 35, 120, 0.5)'],
-      kicker: 'ANDROID TV • WIDEVINE DRM',
-      meta: 'APK Oficial • HBO & Warner • Widevine L3',
-      tagline: 'Séries da HBO, filmes da Warner e Champions League em APK nativo.'
+      kicker: 'DESTAQUE • HBO & WARNER',
+      meta: 'HBO • DC • Champions League',
+      tagline: 'Séries icônicas da HBO, filmes da Warner Bros. e esportes ao vivo.'
     },
     {
       id: 'smarttube',
@@ -481,9 +481,9 @@
       bg: '#1c060e',
       glow: 'rgba(255, 70, 95, 0.58)',
       orbs: ['rgba(235, 65, 90, 0.55)', 'rgba(230, 120, 45, 0.44)', 'rgba(80, 35, 95, 0.45)'],
-      kicker: 'BRASIL • ANDROID TV',
-      meta: 'APK Oficial • TV Ao Vivo • Widevine',
-      tagline: 'Novelas, jornalismo, esportes e canais Globo ao vivo no APK da TV.'
+      kicker: 'BRASIL',
+      meta: 'Novelas • Séries • TV Ao Vivo',
+      tagline: 'Novelas, séries nacionais, Big Brother, jornalismo e canais ao vivo.'
     },
     {
       id: 'appletv',
@@ -505,9 +505,9 @@
       bg: '#1c1c1e',
       glow: 'rgba(255, 255, 255, 0.4)',
       orbs: ['rgba(120, 150, 210, 0.5)', 'rgba(70, 110, 175, 0.44)', 'rgba(50, 65, 110, 0.45)'],
-      kicker: 'APPLE ORIGINALS • APK TV',
-      meta: 'APK Oficial • 4K Dolby Vision • Widevine',
-      tagline: 'Apple Originals com máxima fidelidade e som imersivo via APK.'
+      kicker: 'APPLE ORIGINALS',
+      meta: 'Séries & Filmes Premiados',
+      tagline: 'Produções originais Apple com qualidade cinematográfica.'
     },
     {
       id: 'paramount',
@@ -528,9 +528,9 @@
       bg: '#02163b',
       glow: 'rgba(0, 110, 255, 0.58)',
       orbs: ['rgba(0, 100, 255, 0.58)', 'rgba(0, 180, 255, 0.45)', 'rgba(20, 50, 140, 0.48)'],
-      kicker: 'ANDROID TV • LIBERTADORES',
-      meta: 'APK Oficial • Séries & Futebol • Widevine',
-      tagline: 'Cinema, séries exclusivas e grandes torneios de futebol em APK nativo.'
+      kicker: 'ENTRETENIMENTO',
+      meta: 'Paramount • Showtime • Libertadores',
+      tagline: 'Cinema, séries exclusivas e grandes torneios de futebol.'
     },
     {
       id: 'crunchyroll',
@@ -551,9 +551,9 @@
       bg: '#1c120b',
       glow: 'rgba(244, 117, 33, 0.62)',
       orbs: ['rgba(244, 117, 33, 0.58)', 'rgba(190, 95, 35, 0.45)', 'rgba(70, 50, 80, 0.42)'],
-      kicker: 'ANIME • ANDROID TV',
-      meta: 'APK Oficial • Simulcast em HD • Widevine',
-      tagline: 'O maior catálogo de animes do mundo direto do Japão com Widevine DRM.'
+      kicker: 'ANIME',
+      meta: 'Simulcast • Dublado & Legendado',
+      tagline: 'O maior catálogo de animes do mundo direto do Japão.'
     },
     {
       id: 'plutotv',
@@ -861,7 +861,7 @@
               delete activeApkPollers[appId];
               installAppById(appId);
               if (playUiSound) playUiSound('chime');
-              if (showToast) showToast(`${item.name} instalado via APK Android TV (Widevine L3 DRM)!`);
+              if (showToast) showToast(`${item.name} instalado!`);
               if (onInstalledChanged) onInstalledChanged();
             } else if (stData.status === 'error') {
               clearInterval(activeApkPollers[appId]);
@@ -925,7 +925,6 @@
         const inst = isAppInstalled(item.id);
         const apkSt = apkDownloadProgress[item.id];
         const isApkBusy = apkSt && (apkSt.status === 'downloading' || apkSt.status === 'installing');
-        const isApk = Boolean(item.isApk || item.androidPackage);
 
         let ctaButtonHtml = '';
         if (inst) {
@@ -937,17 +936,12 @@
           ctaButtonHtml = `<button class="store-btn-get" type="button" data-store-get="${escHtml(item.id)}">Obter</button>`;
         }
 
-        const drmBadge = isApk
-          ? `<span class="store-apk-tag" style="display:inline-block;padding:2px 6px;margin-top:4px;border-radius:4px;font-size:10px;font-weight:700;color:#00e5ff;background:rgba(0,229,255,0.12);border:1px solid rgba(0,229,255,0.3);">🤖 APK DRM L3</span>`
-          : '';
-
         return `
           <article class="store-app-card ${inst ? 'is-installed' : ''}" tabindex="0" data-store-card="${escHtml(item.id)}">
             <div class="store-app-icon" style="background:${item.bg}">${iconMarkup(item)}</div>
             <div class="store-app-info">
               <strong class="store-app-name">${escHtml(item.name)}</strong>
               <span class="store-app-sub">${escHtml(item.developer || 'Web')}</span>
-              ${drmBadge}
             </div>
             <div class="store-app-cta">
               ${ctaButtonHtml}
@@ -962,26 +956,19 @@
         const sys = CORE_SYSTEM_IDS.has(d.id);
         const apkSt = apkDownloadProgress[d.id];
         const isApkBusy = apkSt && (apkSt.status === 'downloading' || apkSt.status === 'installing');
-        const isApk = Boolean(d.isApk || d.androidPackage);
 
         let actionBtnHtml = '';
         if (inst) {
           actionBtnHtml = `
-            <button class="btn-prism" id="store-detail-open" type="button">${d.isNative ? 'Abrir' : (isApk ? 'Abrir TV' : 'Abrir ↗')}</button>
+            <button class="btn-prism" id="store-detail-open" type="button">${d.isNative ? 'Abrir' : 'Abrir'}</button>
             ${!sys ? `<button class="btn-glass store-remove-btn" id="store-detail-uninstall" type="button">Desinstalar</button>` : `<span class="store-sys-note">Essencial do sistema</span>`}
           `;
         } else if (isApkBusy) {
-          const label = apkSt.status === 'installing' ? '⚙ Instalando no Android TV...' : `⬇ Baixando mirror real (${apkSt.progress || 0}%)...`;
+          const label = apkSt.status === 'installing' ? '⚙ Instalando...' : `⬇ Baixando (${apkSt.progress || 0}%)...`;
           actionBtnHtml = `<button class="btn-prism" id="store-detail-install" type="button" disabled style="opacity:0.85;cursor:wait;">${label}</button>`;
         } else {
-          actionBtnHtml = `<button class="btn-prism" id="store-detail-install" type="button">${isApk ? 'Baixar & Instalar APK' : 'Instalar'}</button>`;
+          actionBtnHtml = `<button class="btn-prism" id="store-detail-install" type="button">Instalar</button>`;
         }
-
-        const drmNote = isApk ? `
-          <div style="margin-top:10px;padding:8px 12px;border-radius:8px;background:rgba(0,229,255,0.08);border:1px solid rgba(0,229,255,0.22);font-size:12px;color:#cceeff;line-height:1.4;">
-            <strong style="color:#00e5ff;">🤖 Android TV Nativo com Widevine DRM (L3):</strong> Este app roda via contêiner Waydroid com aceleração por GPU dedicada e decodificação VA-API de vídeo protegido. Downloads obtidos de mirrors verificados.
-          </div>
-        ` : '';
 
         return `
           <div class="store-detail-sheet">
@@ -992,7 +979,6 @@
                 <h2>${escHtml(d.name)}</h2>
                 <p class="store-detail-dev">${escHtml(d.developer || 'Web')}</p>
                 <p class="store-detail-desc">${escHtml(d.tagline || '')}</p>
-                ${drmNote}
                 <div class="store-detail-actions">
                   ${actionBtnHtml}
                 </div>
