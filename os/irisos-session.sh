@@ -276,8 +276,32 @@ if [ -x /usr/bin/waydroid ] && [ -f /var/lib/waydroid/waydroid.cfg ]; then
         waydroid prop set persist.waydroid.fake_touch false 2>/dev/null || true
         waydroid prop set persist.waydroid.uevent 1 2>/dev/null || true
         waydroid prop set ro.hardware.gralloc gbm 2>/dev/null || true
+        waydroid prop set debug.sf.disable_backpressure 1 2>/dev/null || true
+        waydroid prop set debug.sf.latch_unsignaled 1 2>/dev/null || true
+        waydroid prop set dalvik.vm.dex2oat-filter speed 2>/dev/null || true
+        waydroid prop set dalvik.vm.image-dex2oat-filter speed 2>/dev/null || true
+        waydroid prop set dalvik.vm.dex2oat-threads 4 2>/dev/null || true
+
         # Pré-aquece a sessão Android (Zygote & Dalvik VM) para abertura instantânea dos apps
         waydroid session start >> /var/log/waydroid-session.log 2>&1 &
+
+        # Antecipação em background: compilação nativa AOT (Ahead-of-Time) e pré-carga silenciosa
+        (
+          for _j in $(seq 1 12); do
+            if waydroid shell getprop sys.boot_completed 2>/dev/null | grep -q "1"; then
+              for pkg in com.netflix.ninja com.teamsmart.videomanager.tv com.amazon.amazonvideo.livingroom com.disney.disneyplus; do
+                if waydroid shell pm list packages 2>/dev/null | grep -q "$pkg"; then
+                  waydroid shell cmd package compile -m speed "$pkg" >/dev/null 2>&1 &
+                fi
+              done
+              # Pré-carrega o app em memória pausado no backstack (0ms no primeiro clique)
+              waydroid shell am start -W -a android.intent.action.MAIN -c android.intent.category.LAUNCHER com.netflix.ninja >/dev/null 2>&1 && \
+              waydroid shell input keyevent KEYCODE_HOME >/dev/null 2>&1 || true
+              break
+            fi
+            sleep 1
+          done
+        ) &
         break
       fi
       sleep 1
