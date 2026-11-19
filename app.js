@@ -3979,7 +3979,7 @@
       openAppStage(app);
       return;
     }
-    if (app.webUrl) {
+    if (app.isApk || app.androidPackage || app.webUrl) {
       if (window.IrisWebOS?.isWebOS && window.IrisWebOS.launchApp(app.id, app.webUrl)) {
         playUiSound('open');
         closeAppStage();
@@ -3988,10 +3988,10 @@
       if (isNativeWebView) {
         playUiSound('open');
         closeAppStage();
-        postWebViewAction('openAppUrl', { url: app.webUrl, name: app.name });
+        postWebViewAction('openAppUrl', { url: app.webUrl, name: app.name, androidPackage: app.androidPackage });
         return;
       }
-      if (/linux/i.test(state.systemInfo?.hostPlatform || '')) {
+      if (/linux/i.test(state.systemInfo?.hostPlatform || '') || app.isApk || app.androidPackage) {
         playUiSound('open');
         closeAppStage();
         openExternalAppUrl(app.webUrl, app.name, app);

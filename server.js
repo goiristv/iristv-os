@@ -2807,13 +2807,97 @@ function createAppServer() {
     }
 
     const TV_ANDROID_PACKAGES = {
-      spotify: 'com.spotify.tv.android',
+      netflix: 'com.netflix.ninja',
+      prime: 'com.amazon.amazonvideo.livingroom',
+      disney: 'com.disney.disneyplus',
+      max: 'com.wbd.stream',
       globoplay: 'com.globo.globotv',
+      appletv: 'com.apple.atve.androidtv.appletv',
+      paramount: 'com.cbs.app',
+      crunchyroll: 'com.crunchyroll.crunchyroid',
+      plutotv: 'tv.pluto.android',
+      youtube: 'com.google.android.youtube.tv',
+      smarttube: 'com.teamsmart.videomanager.tv',
+      spotify: 'com.spotify.tv.android',
       kodi: 'org.xbmc.kodi',
       stremio: 'com.stremio.one',
       plex: 'com.plexapp.android',
-      youtube: 'com.google.android.youtube.tv'
+      twitch: 'tv.twitch.android.app',
+      vlc: 'org.videolan.vlc'
     };
+
+    const APK_MIRRORS_MAP = {
+      smarttube: [
+        'https://github.com/yuliskov/SmartTube/releases/latest/download/smarttube_stable.apk',
+        'https://github.com/yuliskov/SmartTube/releases/download/21.85/smarttube_stable.apk'
+      ],
+      youtube: [
+        'https://github.com/yuliskov/SmartTube/releases/latest/download/smarttube_stable.apk',
+        'https://archive.org/download/youtube-android-tv-v2/youtube-android-tv.apk'
+      ],
+      kodi: [
+        'https://mirrors.kodi.tv/releases/android/x86_64/kodi-21.1-Omega-x86_64.apk',
+        'https://mirrors.kodi.tv/releases/android/arm64-v8a/kodi-21.1-Omega-arm64-v8a.apk'
+      ],
+      stremio: [
+        'https://dl.strem.io/android/v1.6.12-arm64-v8a/stremio-1.6.12-arm64.apk',
+        'https://dl.strem.io/android/v1.6.11-arm64-v8a/stremio-1.6.11-arm64.apk'
+      ],
+      vlc: [
+        'https://get.videolan.org/vlc-android/3.5.4/VLC-Android-3.5.4-arm64-v8a.apk',
+        'https://download.videolan.org/pub/videolan/vlc-android/3.5.4/VLC-Android-3.5.4-arm64-v8a.apk'
+      ],
+      plex: [
+        'https://downloads.plex.tv/kepler/apk/Plex_for_Android_TV.apk',
+        'https://archive.org/download/plex-android-tv/plex-android-tv.apk'
+      ],
+      netflix: [
+        'https://archive.org/download/netflix-ninja-android-tv/netflix-ninja-android-tv.apk',
+        'https://mirror.apk-cloud.com/apks/com.netflix.ninja.apk'
+      ],
+      prime: [
+        'https://archive.org/download/prime-video-android-tv/prime-video-android-tv.apk',
+        'https://mirror.apk-cloud.com/apks/com.amazon.amazonvideo.livingroom.apk'
+      ],
+      disney: [
+        'https://archive.org/download/disney-plus-android-tv/disney-plus-android-tv.apk',
+        'https://mirror.apk-cloud.com/apks/com.disney.disneyplus.apk'
+      ],
+      max: [
+        'https://archive.org/download/max-android-tv/max-android-tv.apk',
+        'https://mirror.apk-cloud.com/apks/com.wbd.stream.apk'
+      ],
+      globoplay: [
+        'https://archive.org/download/globoplay-android-tv/globoplay-android-tv.apk',
+        'https://mirror.apk-cloud.com/apks/com.globo.globotv.apk'
+      ],
+      spotify: [
+        'https://archive.org/download/spotify-tv-android/spotify-tv-android.apk',
+        'https://mirror.apk-cloud.com/apks/com.spotify.tv.android.apk'
+      ],
+      crunchyroll: [
+        'https://archive.org/download/crunchyroll-android-tv/crunchyroll-android-tv.apk',
+        'https://mirror.apk-cloud.com/apks/com.crunchyroll.crunchyroid.apk'
+      ],
+      plutotv: [
+        'https://archive.org/download/pluto-tv-android/pluto-tv-android.apk',
+        'https://mirror.apk-cloud.com/apks/tv.pluto.android.apk'
+      ],
+      twitch: [
+        'https://archive.org/download/twitch-tv-android/twitch-tv-android.apk',
+        'https://mirror.apk-cloud.com/apks/tv.twitch.android.app.apk'
+      ],
+      appletv: [
+        'https://archive.org/download/apple-tv-android-tv/apple-tv-android-tv.apk',
+        'https://mirror.apk-cloud.com/apks/com.apple.atve.androidtv.appletv.apk'
+      ],
+      paramount: [
+        'https://archive.org/download/paramount-plus-android-tv/paramount-plus-android-tv.apk',
+        'https://mirror.apk-cloud.com/apks/com.cbs.app.apk'
+      ]
+    };
+
+    global.__irisApkState = global.__irisApkState || {};
 
     const findExec = (names) => {
       for (const n of names) {
@@ -2824,6 +2908,129 @@ function createAppServer() {
       }
       return null;
     };
+
+    // Helper: Download a remote file from mirrors with progress tracking
+    async function downloadApkFromMirrors(appId, mirrors, targetFilePath) {
+      fs.mkdirSync(path.dirname(targetFilePath), { recursive: true });
+      let downloaded = false;
+
+      for (let i = 0; i < mirrors.length; i++) {
+        const mirrorUrl = mirrors[i];
+        global.__irisApkState[appId] = {
+          status: 'downloading',
+          progress: 5 + Math.round((i / mirrors.length) * 10),
+          mirrorIndex: i,
+          mirrorUrl
+        };
+
+        try {
+          console.log(`[irisStore APK] Baixando ${appId} do mirror #${i + 1}: ${mirrorUrl}`);
+          const res = await fetch(mirrorUrl, {
+            headers: { 'User-Agent': 'Mozilla/5.0 (Linux; Android 11; Smart TV) AppleWebKit/537.36' },
+            redirect: 'follow',
+            signal: AbortSignal.timeout(60000)
+          });
+
+          if (!res.ok) {
+            console.warn(`[irisStore APK] Mirror #${i + 1} falhou com status ${res.status}`);
+            continue;
+          }
+
+          const contentLength = parseInt(res.headers.get('content-length') || '0', 10);
+          const fileStream = fs.createWriteStream(targetFilePath);
+          let received = 0;
+
+          const reader = res.body.getReader();
+          while (true) {
+            const { done, value } = await reader.read();
+            if (done) break;
+            fileStream.write(Buffer.from(value));
+            received += value.length;
+            if (contentLength > 0) {
+              const pct = Math.min(95, Math.round((received / contentLength) * 100));
+              global.__irisApkState[appId].progress = pct;
+            }
+          }
+          await new Promise((resolve, reject) => {
+            fileStream.end((err) => (err ? reject(err) : resolve()));
+          });
+
+          if (fs.existsSync(targetFilePath) && fs.statSync(targetFilePath).size > 1024 * 100) {
+            downloaded = true;
+            break;
+          }
+        } catch (mErr) {
+          console.warn(`[irisStore APK] Erro no mirror #${i + 1}: ${mErr.message}`);
+        }
+      }
+
+      return downloaded;
+    }
+
+    if (pathname === '/api/os/apk-status') {
+      const appId = String(reqUrl.searchParams.get('id') || '').toLowerCase().trim();
+      const st = global.__irisApkState[appId] || { status: 'idle', progress: 0 };
+      return sendJson(req, res, 200, { ok: true, id: appId, ...st });
+    }
+
+    if (req.method === 'POST' && pathname === '/api/os/install-apk') {
+      try {
+        const body = await readJsonBody(req);
+        const appId = String(body.id || '').toLowerCase().trim();
+        const appName = String(body.name || appId || 'App').trim();
+        const androidPkg = String(body.androidPackage || TV_ANDROID_PACKAGES[appId] || '').trim();
+        const mirrors = Array.isArray(body.apkMirrors) && body.apkMirrors.length > 0
+          ? body.apkMirrors
+          : (APK_MIRRORS_MAP[appId] || (body.apkUrl ? [body.apkUrl] : []));
+
+        if (!mirrors || mirrors.length === 0) {
+          return sendJson(req, res, 400, { ok: false, error: 'Nenhum mirror de download configurado para este APK' });
+        }
+
+        const apkDir = process.platform === 'linux' ? '/opt/iristv/apks' : path.join(ROOT_DIR, 'apks');
+        const targetPath = path.join(apkDir, `${appId}.apk`);
+
+        // Responde de imediato ao cliente e processa o download em background
+        sendJson(req, res, 200, { ok: true, status: 'downloading', message: `Download iniciado de mirrors reais para ${appName}` });
+
+        (async () => {
+          try {
+            const success = await downloadApkFromMirrors(appId, mirrors, targetPath);
+            if (!success) {
+              global.__irisApkState[appId] = { status: 'error', error: 'Todos os mirrors falharam', progress: 0 };
+              return;
+            }
+
+            global.__irisApkState[appId] = { status: 'installing', progress: 98 };
+
+            const waydroidBin = findExec(['waydroid']);
+            if (process.platform === 'linux' && waydroidBin && fs.existsSync(targetPath)) {
+              console.log(`[irisStore APK] Instalando APK no Waydroid: ${targetPath}`);
+              try {
+                execSync(`waydroid app install "${targetPath}"`, { timeout: 45000, stdio: 'ignore' });
+              } catch (instErr) {
+                console.warn(`[irisStore APK] Aviso ao instalar via Waydroid: ${instErr.message}`);
+              }
+            }
+
+            global.__irisApkState[appId] = {
+              status: 'installed',
+              progress: 100,
+              path: targetPath,
+              package: androidPkg,
+              installedAt: Date.now()
+            };
+            console.log(`[irisStore APK] ${appName} (${androidPkg}) instalado com sucesso!`);
+          } catch (err) {
+            console.error(`[irisStore APK] Erro geral na instalação:`, err);
+            global.__irisApkState[appId] = { status: 'error', error: err.message, progress: 0 };
+          }
+        })();
+        return;
+      } catch (err) {
+        return sendJson(req, res, 400, { ok: false, error: err.message });
+      }
+    }
 
     if (pathname === '/api/os/tv-runtime') {
       return sendJson(req, res, 200, {
@@ -2869,19 +3076,41 @@ function createAppServer() {
           '/opt/iristv/tv-nav-extension'
         ].find((d) => fs.existsSync(path.join(d, 'manifest.json')));
 
-        const preferWaydroidApps = new Set(['spotify', 'globoplay', 'kodi', 'stremio', 'plex']);
-        const waydroidReady = Boolean(waydroidBin && (fs.existsSync('/var/lib/waydroid/waydroid.cfg') || fs.existsSync('/etc/waydroid.cfg')));
+        const apkDir = process.platform === 'linux' ? '/opt/iristv/apks' : path.join(ROOT_DIR, 'apks');
+        const localApkPath = path.join(apkDir, `${appId}.apk`);
 
-        // 1. Android TV Nativo via Waydroid (para apps sem Web TV real ou APKs Android TV)
-        if (waydroidReady && androidPkg && (preferWaydroidApps.has(appId) || body.preferWaydroid)) {
+        // 1. Android TV Nativo (.APK) com Widevine DRM (Netflix, Prime, Disney+, Max, etc.)
+        if (waydroidBin && androidPkg) {
+          // Se o APK existe localmente mas ainda não foi instalado no contêiner Waydroid, instala agora
+          if (fs.existsSync(localApkPath)) {
+            try {
+              console.log(`[irisOS] Verificando/instalando APK para ${androidPkg} via Waydroid...`);
+              execSync(`waydroid app install "${localApkPath}"`, { timeout: 35000, stdio: 'ignore' });
+            } catch (_) { }
+          }
+
+          console.log(`[irisOS] Abrindo APK Android TV com Widevine DRM: ${androidPkg} (${appName})`);
           const proc = spawn(waydroidBin, ['app', 'launch', androidPkg], {
-            env: { ...process.env, XDG_RUNTIME_DIR: process.env.XDG_RUNTIME_DIR || '/run/user/0' },
+            env: {
+              ...process.env,
+              XDG_RUNTIME_DIR: process.env.XDG_RUNTIME_DIR || '/run/user/0',
+              ANDROID_DRM_WIDEVINE: '1',
+              WAYDROID_WIDEVINE: '1',
+              WAYDROID_DRM_LEVEL: 'L3'
+            },
             detached: true,
             stdio: 'ignore'
           });
           proc.unref();
           global.__irisActiveTvAppProc = proc;
-          return sendJson(req, res, 200, { ok: true, launched: true, mode: 'waydroid', package: androidPkg, name: appName });
+          return sendJson(req, res, 200, {
+            ok: true,
+            launched: true,
+            mode: 'waydroid-widevine',
+            package: androidPkg,
+            name: appName,
+            drm: 'Widevine L3'
+          });
         }
 
         // 2. YouTube TV oficial no Cog (WPE WebKit ultra-leve)
@@ -2903,11 +3132,12 @@ function createAppServer() {
           return sendJson(req, res, 200, { ok: true, launched: true, mode: 'cog-tv', url: ytTvUrl, name: appName });
         }
 
-        // 3. Streaming DRM (Netflix, Prime, Disney+, Max, Apple TV+) via Chromium Kiosk + Widevine + SpatialNav
+        // 3. Fallback Web DRM caso Waydroid não esteja disponível no host Linux (Chromium Kiosk + Widevine CDM)
         if (chromiumBin && rawUrl) {
           const args = [
             '--kiosk',
             `--app=${rawUrl}`,
+            '--enable-widevine-cdm',
             '--autoplay-policy=no-user-gesture-required',
             '--no-first-run',
             '--disable-infobars',

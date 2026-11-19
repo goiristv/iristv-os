@@ -116,6 +116,7 @@ def build_rootfs():
     # 4. Copia todo o código do irisTV para /opt/iristv dentro do Linux (excluindo arquivos gigantes de gravação .mov/.mp4)
     opt_iristv = ROOTFS_DIR / "opt" / "iristv"
     opt_iristv.mkdir(parents=True, exist_ok=True)
+    (opt_iristv / "apks").mkdir(parents=True, exist_ok=True)
 
     exclude_names = {
         "os",

@@ -249,9 +249,25 @@ if ! pgrep -f "/opt/iristv/server.js" >/dev/null 2>&1; then
   ) &
 fi
 
-# 4b. Inicializa Waydroid container em background se estiver presente na imagem
+# 4b. Inicializa Waydroid container e Widevine L3 DRM em background se presente na imagem
+mkdir -p /opt/iristv/apks
+chmod 777 /opt/iristv/apks 2>/dev/null || true
+
 if [ -x /usr/bin/waydroid ] && [ -f /var/lib/waydroid/waydroid.cfg ]; then
-  waydroid container start >> /var/log/waydroid.log 2>&1 &
+  (
+    waydroid container start >> /var/log/waydroid.log 2>&1 &
+    # Aguarda contêiner inicializar e aplica suporte a Widevine DRM L3 e otimizações de TV
+    for _i in $(seq 1 15); do
+      if waydroid status 2>/dev/null | grep -q "RUNNING"; then
+        waydroid prop set persist.waydroid.widevine true 2>/dev/null || true
+        waydroid prop set persist.waydroid.multi_windows true 2>/dev/null || true
+        waydroid prop set persist.waydroid.uevent 1 2>/dev/null || true
+        waydroid prop set ro.hardware.gralloc gbm 2>/dev/null || true
+        break
+      fi
+      sleep 1
+    done
+  ) &
 fi
 
 # 5. Background network setup (DHCP runs asynchronously without blocking boot)

@@ -269,17 +269,362 @@
       tagline: 'Vire as cartas e encontre os 8 pares com o menor número de jogadas.'
     },
 
-    /* === STREAMING & TV === */
-    { id: 'netflix', name: 'Netflix', category: 'streaming', storeCategory: 'streaming', featured: true, rating: 4.9, developer: 'Netflix, Inc.', webUrl: 'https://www.netflix.com', iconSrc: 'icons/netflix.jpg', bg: '#141414', glow: 'rgba(229, 9, 20, 0.6)', orbs: ['rgba(56, 108, 210, 0.55)', 'rgba(95, 130, 95, 0.45)', 'rgba(229, 9, 20, 0.35)'], kicker: 'DESTAQUE • FILMES & SÉRIES', meta: 'Brasil • Web App TV', tagline: 'Séries, filmes e documentários premiados para assistir a qualquer hora.' },
-    { id: 'prime', name: 'Prime Video', category: 'streaming', storeCategory: 'streaming', featured: true, rating: 4.8, developer: 'Amazon', webUrl: 'https://www.primevideo.com', iconSrc: 'icons/prime.jpg', bg: '#051a2e', glow: 'rgba(0, 168, 225, 0.6)', orbs: ['rgba(0, 140, 225, 0.55)', 'rgba(20, 90, 160, 0.48)', 'rgba(0, 210, 255, 0.38)'], kicker: 'DESTAQUE • STREAMING', meta: 'Amazon • Originais', tagline: 'Originais Amazon, sucessos de bilheteria e esportes ao vivo.' },
-    { id: 'disney', name: 'Disney+', category: 'streaming', storeCategory: 'streaming', featured: true, rating: 4.8, developer: 'Disney', webUrl: 'https://www.disneyplus.com', iconSrc: 'icons/disney.jpg', bg: '#041236', glow: 'rgba(0, 194, 255, 0.6)', orbs: ['rgba(0, 160, 240, 0.58)', 'rgba(20, 80, 200, 0.5)', 'rgba(0, 229, 180, 0.35)'], kicker: 'DESTAQUE • FAMÍLIA & CINEMA', meta: 'Disney • Pixar • Marvel • ESPN', tagline: 'Histórias da Disney, Pixar, Marvel, Star Wars e transmissões ESPN.' },
-    { id: 'max', name: 'Max', category: 'streaming', storeCategory: 'streaming', featured: true, rating: 4.8, developer: 'Warner Bros. Discovery', webUrl: 'https://play.max.com', iconSrc: 'icons/max.jpg', bg: '#050a30', glow: 'rgba(30, 100, 255, 0.62)', orbs: ['rgba(30, 90, 255, 0.58)', 'rgba(110, 70, 240, 0.48)', 'rgba(10, 35, 120, 0.5)'], kicker: 'DESTAQUE • HBO & WARNER', meta: 'HBO • DC • Champions League', tagline: 'Séries icônicas da HBO, filmes da Warner Bros. e esportes ao vivo.' },
-    { id: 'paramount', name: 'Paramount+', category: 'streaming', storeCategory: 'streaming', rating: 4.6, developer: 'Paramount', webUrl: 'https://www.paramountplus.com', iconSrc: 'icons/paramount.jpg', bg: '#02163b', glow: 'rgba(0, 110, 255, 0.58)', orbs: ['rgba(0, 100, 255, 0.58)', 'rgba(0, 180, 255, 0.45)', 'rgba(20, 50, 140, 0.48)'], kicker: 'ENTRETERIMENTO', meta: 'Paramount • Showtime • Libertadores', tagline: 'Cinema, séries exclusivas e grandes torneios de futebol.' },
-    { id: 'appletv', name: 'Apple TV+', category: 'streaming', storeCategory: 'streaming', featured: true, rating: 4.9, developer: 'Apple Inc.', webUrl: 'https://tv.apple.com', iconSrc: 'icons/appletv.jpg', bg: '#1c1c1e', glow: 'rgba(255, 255, 255, 0.4)', orbs: ['rgba(120, 150, 210, 0.5)', 'rgba(70, 110, 175, 0.44)', 'rgba(50, 65, 110, 0.45)'], kicker: 'APPLE ORIGINALS', meta: 'Séries & Filmes Premiados', tagline: 'Produções originais Apple com qualidade cinematográfica.' },
-    { id: 'globoplay', name: 'Globoplay', category: 'streaming', storeCategory: 'streaming', featured: true, rating: 4.7, developer: 'Grupo Globo', webUrl: 'https://globoplay.globo.com', iconSrc: 'icons/globoplay.jpg', bg: '#1c060e', glow: 'rgba(255, 70, 95, 0.58)', orbs: ['rgba(235, 65, 90, 0.55)', 'rgba(230, 120, 45, 0.44)', 'rgba(80, 35, 95, 0.45)'], kicker: 'BRASIL', meta: 'Novelas • Séries • TV Ao Vivo', tagline: 'Novelas, séries nacionais, Big Brother, jornalismo e canais ao vivo.' },
-    { id: 'crunchyroll', name: 'Crunchyroll', category: 'streaming', storeCategory: 'streaming', rating: 4.8, developer: 'Crunchyroll, LLC', webUrl: 'https://www.crunchyroll.com', iconSrc: 'icons/crunchyroll.jpg', bg: '#1c120b', glow: 'rgba(244, 117, 33, 0.62)', orbs: ['rgba(244, 117, 33, 0.58)', 'rgba(190, 95, 35, 0.45)', 'rgba(70, 50, 80, 0.42)'], kicker: 'ANIME', meta: 'Simulcast • Dublado & Legendado', tagline: 'O maior catálogo de animes do mundo direto do Japão.' },
-    { id: 'plutotv', name: 'Pluto TV', category: 'streaming', storeCategory: 'streaming', rating: 4.6, developer: 'Paramount Streaming', webUrl: 'https://pluto.tv/br/live-tv', iconSrc: 'icons/plutotv.jpg', bg: '#111114', glow: 'rgba(255, 222, 0, 0.5)', orbs: ['rgba(210, 180, 35, 0.46)', 'rgba(40, 140, 200, 0.45)', 'rgba(85, 65, 140, 0.42)'], kicker: 'TV GRATUITA', meta: '150+ Canais Ao Vivo', tagline: 'Canais gratuitos ao vivo e filmes sob demanda sem precisar de conta.' },
-    { id: 'plex', name: 'Plex', category: 'streaming', storeCategory: 'streaming', rating: 4.7, developer: 'Plex, Inc.', webUrl: 'https://app.plex.tv', iconSrc: 'icons/plex.jpg', bg: '#1c1a17', glow: 'rgba(229, 160, 13, 0.56)', orbs: ['rgba(210, 145, 20, 0.52)', 'rgba(90, 75, 55, 0.45)', 'rgba(50, 70, 110, 0.4)'], kicker: 'MÍDIA PESSOAL & TV', meta: 'Servidor Local • Canais Grátis', tagline: 'Sua biblioteca pessoal de filmes e séries mais canais gratuitos.' },
+    /* === STREAMING & TV (APKs Nativos Android TV com Widevine DRM) === */
+    {
+      id: 'netflix',
+      name: 'Netflix',
+      category: 'streaming',
+      storeCategory: 'streaming',
+      featured: true,
+      rating: 4.9,
+      developer: 'Netflix, Inc.',
+      isApk: true,
+      androidPackage: 'com.netflix.ninja',
+      drm: 'Widevine L3',
+      apkMirrors: [
+        'https://archive.org/download/netflix-ninja-android-tv/netflix-ninja-android-tv.apk',
+        'https://mirror.apk-cloud.com/apks/com.netflix.ninja.apk'
+      ],
+      webUrl: 'https://www.netflix.com',
+      iconSrc: 'icons/netflix.jpg',
+      bg: '#141414',
+      glow: 'rgba(229, 9, 20, 0.6)',
+      orbs: ['rgba(56, 108, 210, 0.55)', 'rgba(95, 130, 95, 0.45)', 'rgba(229, 9, 20, 0.35)'],
+      kicker: 'ANDROID TV • WIDEVINE DRM',
+      meta: 'APK Oficial • 4K HDR • Widevine L3',
+      tagline: 'Séries e filmes em altíssima definição rodando diretamente via APK nativo Android TV.'
+    },
+    {
+      id: 'prime',
+      name: 'Prime Video',
+      category: 'streaming',
+      storeCategory: 'streaming',
+      featured: true,
+      rating: 4.8,
+      developer: 'Amazon Mobile LLC',
+      isApk: true,
+      androidPackage: 'com.amazon.amazonvideo.livingroom',
+      drm: 'Widevine L3',
+      apkMirrors: [
+        'https://archive.org/download/prime-video-android-tv/prime-video-android-tv.apk',
+        'https://mirror.apk-cloud.com/apks/com.amazon.amazonvideo.livingroom.apk'
+      ],
+      webUrl: 'https://www.primevideo.com',
+      iconSrc: 'icons/prime.jpg',
+      bg: '#051a2e',
+      glow: 'rgba(0, 168, 225, 0.6)',
+      orbs: ['rgba(0, 140, 225, 0.55)', 'rgba(20, 90, 160, 0.48)', 'rgba(0, 210, 255, 0.38)'],
+      kicker: 'ANDROID TV • WIDEVINE DRM',
+      meta: 'APK Oficial • 4K UHD • Widevine L3',
+      tagline: 'Originais Amazon e transmissões ao vivo direto no APK nativo para Smart TV.'
+    },
+    {
+      id: 'disney',
+      name: 'Disney+',
+      category: 'streaming',
+      storeCategory: 'streaming',
+      featured: true,
+      rating: 4.8,
+      developer: 'Disney',
+      isApk: true,
+      androidPackage: 'com.disney.disneyplus',
+      drm: 'Widevine L3',
+      apkMirrors: [
+        'https://archive.org/download/disney-plus-android-tv/disney-plus-android-tv.apk',
+        'https://mirror.apk-cloud.com/apks/com.disney.disneyplus.apk'
+      ],
+      webUrl: 'https://www.disneyplus.com',
+      iconSrc: 'icons/disney.jpg',
+      bg: '#041236',
+      glow: 'rgba(0, 194, 255, 0.6)',
+      orbs: ['rgba(0, 160, 240, 0.58)', 'rgba(20, 80, 200, 0.5)', 'rgba(0, 229, 180, 0.35)'],
+      kicker: 'ANDROID TV • WIDEVINE DRM',
+      meta: 'APK Oficial • IMAX Enhanced • Widevine',
+      tagline: 'Disney, Pixar, Marvel, Star Wars e ESPN no aplicativo Android TV.'
+    },
+    {
+      id: 'max',
+      name: 'Max',
+      category: 'streaming',
+      storeCategory: 'streaming',
+      featured: true,
+      rating: 4.8,
+      developer: 'Warner Bros. Discovery',
+      isApk: true,
+      androidPackage: 'com.wbd.stream',
+      drm: 'Widevine L3',
+      apkMirrors: [
+        'https://archive.org/download/max-android-tv/max-android-tv.apk',
+        'https://mirror.apk-cloud.com/apks/com.wbd.stream.apk'
+      ],
+      webUrl: 'https://play.max.com',
+      iconSrc: 'icons/max.jpg',
+      bg: '#050a30',
+      glow: 'rgba(30, 100, 255, 0.62)',
+      orbs: ['rgba(30, 90, 255, 0.58)', 'rgba(110, 70, 240, 0.48)', 'rgba(10, 35, 120, 0.5)'],
+      kicker: 'ANDROID TV • WIDEVINE DRM',
+      meta: 'APK Oficial • HBO & Warner • Widevine L3',
+      tagline: 'Séries da HBO, filmes da Warner e Champions League em APK nativo.'
+    },
+    {
+      id: 'smarttube',
+      name: 'SmartTube',
+      category: 'streaming',
+      storeCategory: 'streaming',
+      featured: true,
+      rating: 5.0,
+      developer: 'Yuliskov (Open Source)',
+      isApk: true,
+      androidPackage: 'com.teamsmart.videomanager.tv',
+      drm: 'Sem Anúncios • 4K 60FPS HDR',
+      apkMirrors: [
+        'https://github.com/yuliskov/SmartTube/releases/latest/download/smarttube_stable.apk',
+        'https://github.com/yuliskov/SmartTube/releases/download/21.85/smarttube_stable.apk'
+      ],
+      webUrl: 'https://www.youtube.com/tv',
+      iconSrc: 'icons/youtube.svg',
+      bg: '#b91c1c',
+      glow: 'rgba(239, 68, 68, 0.65)',
+      orbs: ['rgba(239, 68, 68, 0.55)', 'rgba(185, 28, 28, 0.5)'],
+      kicker: 'APK NATIVO • RECOMENDADO',
+      meta: 'YouTube TV Sem Anúncios • SponsorBlock • 4K',
+      tagline: 'O melhor cliente YouTube para Android TV com SponsorBlock e zero anúncios.'
+    },
+    {
+      id: 'kodi',
+      name: 'Kodi Media Center',
+      category: 'streaming',
+      storeCategory: 'streaming',
+      featured: true,
+      rating: 4.9,
+      developer: 'Team Kodi',
+      isApk: true,
+      androidPackage: 'org.xbmc.kodi',
+      drm: 'Add-ons & Widevine InputStream',
+      apkMirrors: [
+        'https://mirrors.kodi.tv/releases/android/x86_64/kodi-21.1-Omega-x86_64.apk',
+        'https://mirrors.kodi.tv/releases/android/arm64-v8a/kodi-21.1-Omega-arm64-v8a.apk'
+      ],
+      webUrl: 'https://kodi.tv',
+      iconSrc: 'icons/mediaplayer.svg',
+      bg: '#0284c7',
+      glow: 'rgba(2, 132, 199, 0.6)',
+      orbs: ['rgba(2, 132, 199, 0.55)', 'rgba(14, 165, 233, 0.45)'],
+      kicker: 'CENTRAL MULTIMÍDIA',
+      meta: 'APK Oficial • Suporte a Add-ons & DRM',
+      tagline: 'Central multimídia poderosa com suporte a plugins de streaming e IPTV.'
+    },
+    {
+      id: 'stremio',
+      name: 'Stremio TV',
+      category: 'streaming',
+      storeCategory: 'streaming',
+      featured: true,
+      rating: 4.9,
+      developer: 'Stremio',
+      isApk: true,
+      androidPackage: 'com.stremio.one',
+      drm: 'Torrents & Add-ons Integrados',
+      apkMirrors: [
+        'https://dl.strem.io/android/v1.6.12-arm64-v8a/stremio-1.6.12-arm64.apk',
+        'https://dl.strem.io/android/v1.6.11-arm64-v8a/stremio-1.6.11-arm64.apk'
+      ],
+      webUrl: 'https://web.stremio.com',
+      iconSrc: 'icons/mediaplayer.svg',
+      bg: '#581c87',
+      glow: 'rgba(139, 92, 246, 0.6)',
+      orbs: ['rgba(139, 92, 246, 0.55)', 'rgba(168, 85, 247, 0.45)'],
+      kicker: 'AGREGADOR DE STREAMING',
+      meta: 'APK Android TV • Catálogo Unificado',
+      tagline: 'Assista filmes, séries e animes organizados com add-ons comunitários.'
+    },
+    {
+      id: 'vlc',
+      name: 'VLC for Android',
+      category: 'streaming',
+      storeCategory: 'streaming',
+      rating: 4.8,
+      developer: 'VideoLAN',
+      isApk: true,
+      androidPackage: 'org.videolan.vlc',
+      drm: 'Todos os Codecs • Aceleração de Hardware',
+      apkMirrors: [
+        'https://get.videolan.org/vlc-android/3.5.4/VLC-Android-3.5.4-arm64-v8a.apk',
+        'https://download.videolan.org/pub/videolan/vlc-android/3.5.4/VLC-Android-3.5.4-arm64-v8a.apk'
+      ],
+      webUrl: 'https://www.videolan.org',
+      iconSrc: 'icons/mediaplayer.svg',
+      bg: '#ea580c',
+      glow: 'rgba(234, 88, 12, 0.6)',
+      orbs: ['rgba(234, 88, 12, 0.55)', 'rgba(249, 115, 22, 0.45)'],
+      kicker: 'PLAYER UNIVERSAL',
+      meta: 'APK Oficial • MKV, MP4, Áudio e Legendas',
+      tagline: 'Reproduz qualquer formato de arquivo de vídeo ou rede local sem travar.'
+    },
+    {
+      id: 'globoplay',
+      name: 'Globoplay',
+      category: 'streaming',
+      storeCategory: 'streaming',
+      featured: true,
+      rating: 4.7,
+      developer: 'Grupo Globo',
+      isApk: true,
+      androidPackage: 'com.globo.globotv',
+      drm: 'Widevine L3',
+      apkMirrors: [
+        'https://archive.org/download/globoplay-android-tv/globoplay-android-tv.apk',
+        'https://mirror.apk-cloud.com/apks/com.globo.globotv.apk'
+      ],
+      webUrl: 'https://globoplay.globo.com',
+      iconSrc: 'icons/globoplay.jpg',
+      bg: '#1c060e',
+      glow: 'rgba(255, 70, 95, 0.58)',
+      orbs: ['rgba(235, 65, 90, 0.55)', 'rgba(230, 120, 45, 0.44)', 'rgba(80, 35, 95, 0.45)'],
+      kicker: 'BRASIL • ANDROID TV',
+      meta: 'APK Oficial • TV Ao Vivo • Widevine',
+      tagline: 'Novelas, jornalismo, esportes e canais Globo ao vivo no APK da TV.'
+    },
+    {
+      id: 'appletv',
+      name: 'Apple TV+',
+      category: 'streaming',
+      storeCategory: 'streaming',
+      featured: true,
+      rating: 4.9,
+      developer: 'Apple Inc.',
+      isApk: true,
+      androidPackage: 'com.apple.atve.androidtv.appletv',
+      drm: 'Widevine L3',
+      apkMirrors: [
+        'https://archive.org/download/apple-tv-android-tv/apple-tv-android-tv.apk',
+        'https://mirror.apk-cloud.com/apks/com.apple.atve.androidtv.appletv.apk'
+      ],
+      webUrl: 'https://tv.apple.com',
+      iconSrc: 'icons/appletv.jpg',
+      bg: '#1c1c1e',
+      glow: 'rgba(255, 255, 255, 0.4)',
+      orbs: ['rgba(120, 150, 210, 0.5)', 'rgba(70, 110, 175, 0.44)', 'rgba(50, 65, 110, 0.45)'],
+      kicker: 'APPLE ORIGINALS • APK TV',
+      meta: 'APK Oficial • 4K Dolby Vision • Widevine',
+      tagline: 'Apple Originals com máxima fidelidade e som imersivo via APK.'
+    },
+    {
+      id: 'paramount',
+      name: 'Paramount+',
+      category: 'streaming',
+      storeCategory: 'streaming',
+      rating: 4.6,
+      developer: 'Paramount',
+      isApk: true,
+      androidPackage: 'com.cbs.app',
+      drm: 'Widevine L3',
+      apkMirrors: [
+        'https://archive.org/download/paramount-plus-android-tv/paramount-plus-android-tv.apk',
+        'https://mirror.apk-cloud.com/apks/com.cbs.app.apk'
+      ],
+      webUrl: 'https://www.paramountplus.com',
+      iconSrc: 'icons/paramount.jpg',
+      bg: '#02163b',
+      glow: 'rgba(0, 110, 255, 0.58)',
+      orbs: ['rgba(0, 100, 255, 0.58)', 'rgba(0, 180, 255, 0.45)', 'rgba(20, 50, 140, 0.48)'],
+      kicker: 'ANDROID TV • LIBERTADORES',
+      meta: 'APK Oficial • Séries & Futebol • Widevine',
+      tagline: 'Cinema, séries exclusivas e grandes torneios de futebol em APK nativo.'
+    },
+    {
+      id: 'crunchyroll',
+      name: 'Crunchyroll',
+      category: 'streaming',
+      storeCategory: 'streaming',
+      rating: 4.8,
+      developer: 'Crunchyroll, LLC',
+      isApk: true,
+      androidPackage: 'com.crunchyroll.crunchyroid',
+      drm: 'Widevine L3',
+      apkMirrors: [
+        'https://archive.org/download/crunchyroll-android-tv/crunchyroll-android-tv.apk',
+        'https://mirror.apk-cloud.com/apks/com.crunchyroll.crunchyroid.apk'
+      ],
+      webUrl: 'https://www.crunchyroll.com',
+      iconSrc: 'icons/crunchyroll.jpg',
+      bg: '#1c120b',
+      glow: 'rgba(244, 117, 33, 0.62)',
+      orbs: ['rgba(244, 117, 33, 0.58)', 'rgba(190, 95, 35, 0.45)', 'rgba(70, 50, 80, 0.42)'],
+      kicker: 'ANIME • ANDROID TV',
+      meta: 'APK Oficial • Simulcast em HD • Widevine',
+      tagline: 'O maior catálogo de animes do mundo direto do Japão com Widevine DRM.'
+    },
+    {
+      id: 'plutotv',
+      name: 'Pluto TV',
+      category: 'streaming',
+      storeCategory: 'streaming',
+      rating: 4.6,
+      developer: 'Paramount Streaming',
+      isApk: true,
+      androidPackage: 'tv.pluto.android',
+      drm: 'Widevine L3',
+      apkMirrors: [
+        'https://archive.org/download/pluto-tv-android/pluto-tv-android.apk',
+        'https://mirror.apk-cloud.com/apks/tv.pluto.android.apk'
+      ],
+      webUrl: 'https://pluto.tv/br/live-tv',
+      iconSrc: 'icons/plutotv.jpg',
+      bg: '#111114',
+      glow: 'rgba(255, 222, 0, 0.5)',
+      orbs: ['rgba(210, 180, 35, 0.46)', 'rgba(40, 140, 200, 0.45)', 'rgba(85, 65, 140, 0.42)'],
+      kicker: 'TV GRATUITA • APK',
+      meta: 'APK Oficial • 150+ Canais Ao Vivo',
+      tagline: 'Canais gratuitos ao vivo e filmes sob demanda no app oficial de Smart TV.'
+    },
+    {
+      id: 'plex',
+      name: 'Plex',
+      category: 'streaming',
+      storeCategory: 'streaming',
+      rating: 4.7,
+      developer: 'Plex, Inc.',
+      isApk: true,
+      androidPackage: 'com.plexapp.android',
+      drm: 'Widevine L3',
+      apkMirrors: [
+        'https://downloads.plex.tv/kepler/apk/Plex_for_Android_TV.apk',
+        'https://archive.org/download/plex-android-tv/plex-android-tv.apk'
+      ],
+      webUrl: 'https://app.plex.tv',
+      iconSrc: 'icons/plex.jpg',
+      bg: '#1c1a17',
+      glow: 'rgba(229, 160, 13, 0.56)',
+      orbs: ['rgba(210, 145, 20, 0.52)', 'rgba(90, 75, 55, 0.45)', 'rgba(50, 70, 110, 0.4)'],
+      kicker: 'MÍDIA PESSOAL & TV',
+      meta: 'APK Oficial • Servidor Local & FAST',
+      tagline: 'Sua biblioteca de filmes e séries com aceleração por hardware e interface TV.'
+    },
+    {
+      id: 'spotify',
+      name: 'Spotify TV',
+      category: 'music',
+      storeCategory: 'music',
+      featured: true,
+      rating: 4.9,
+      developer: 'Spotify AB',
+      isApk: true,
+      androidPackage: 'com.spotify.tv.android',
+      drm: 'Widevine L3 Audio DRM',
+      apkMirrors: [
+        'https://archive.org/download/spotify-tv-android/spotify-tv-android.apk',
+        'https://mirror.apk-cloud.com/apks/com.spotify.tv.android.apk'
+      ],
+      webUrl: 'https://open.spotify.com',
+      iconSrc: 'icons/spotify.jpg',
+      bg: '#121212',
+      glow: 'rgba(29, 185, 84, 0.6)',
+      orbs: ['rgba(29, 185, 84, 0.55)', 'rgba(20, 120, 95, 0.48)'],
+      kicker: 'MÚSICA & PODCASTS • ANDROID TV',
+      meta: 'APK Oficial • Controle Remoto & Letras',
+      tagline: 'Milhões de músicas e podcasts na TV com interface otimizada para controle.'
+    },
     { id: 'mubi', name: 'MUBI', category: 'streaming', storeCategory: 'streaming', rating: 4.8, developer: 'MUBI Inc.', webUrl: 'https://mubi.com', iconSrc: 'icons/mubi.jpg', bg: '#0d1b3e', glow: 'rgba(76, 130, 255, 0.54)', orbs: ['rgba(70, 120, 240, 0.55)', 'rgba(40, 160, 210, 0.42)', 'rgba(60, 55, 150, 0.45)'], kicker: 'CINEMA AUTORAL', meta: 'Curadoria • Festivais', tagline: 'Filmes de grandes diretores e restaurações de festivais.' },
     { id: 'clarotv', name: 'Claro tv+', category: 'streaming', storeCategory: 'streaming', rating: 4.4, developer: 'Claro Brasil', webUrl: 'https://www.clarotvmais.com.br', iconSrc: 'icons/clarotv.jpg', bg: '#26080a', glow: 'rgba(227, 6, 19, 0.56)', orbs: ['rgba(227, 6, 19, 0.56)', 'rgba(130, 15, 25, 0.45)'], kicker: 'TV POR ASSINATURA', meta: 'Canais Ao Vivo & On Demand', tagline: 'Canais fechados ao vivo, filmes e séries da Claro tv+ na tela.' },
     { id: 'skyplus', name: 'SKY+', category: 'streaming', storeCategory: 'streaming', rating: 4.4, developer: 'SKY Brasil', webUrl: 'https://www.skymais.com.br', iconSrc: 'icons/skyplus.jpg', bg: '#1e0b1a', glow: 'rgba(230, 28, 86, 0.56)', orbs: ['rgba(230, 28, 86, 0.55)', 'rgba(90, 20, 80, 0.48)'], kicker: 'TV AO VIVO & STREAMING', meta: 'SKY+ • Canais ao Vivo', tagline: 'TV ao vivo pela internet com programação esportiva e filmes.' },
@@ -467,6 +812,77 @@
   }
 
   /* =========================================================
+     State tracking & APK Download Manager for IrisStore
+     ========================================================= */
+  const apkDownloadProgress = {};
+  const activeApkPollers = {};
+
+  async function triggerApkDownload(item, { onStateChange, playUiSound, showToast, onInstalledChanged } = {}) {
+    if (!item) return;
+    const appId = item.id;
+    if (apkDownloadProgress[appId] && (apkDownloadProgress[appId].status === 'downloading' || apkDownloadProgress[appId].status === 'installing')) {
+      return;
+    }
+
+    apkDownloadProgress[appId] = { status: 'downloading', progress: 5 };
+    if (onStateChange) onStateChange();
+
+    try {
+      const res = await fetch('/api/os/install-apk', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          id: item.id,
+          name: item.name,
+          androidPackage: item.androidPackage,
+          apkMirrors: item.apkMirrors
+        })
+      });
+      const data = await res.json();
+      if (!res.ok || !data.ok) {
+        throw new Error(data.error || 'Falha ao iniciar download de mirrors reais');
+      }
+
+      if (activeApkPollers[appId]) clearInterval(activeApkPollers[appId]);
+
+      activeApkPollers[appId] = setInterval(async () => {
+        try {
+          const stRes = await fetch(`/api/os/apk-status?id=${encodeURIComponent(appId)}`);
+          if (!stRes.ok) return;
+          const stData = await stRes.json();
+          if (stData && stData.status) {
+            apkDownloadProgress[appId] = {
+              status: stData.status,
+              progress: typeof stData.progress === 'number' ? stData.progress : 50,
+              error: stData.error
+            };
+            if (stData.status === 'installed') {
+              clearInterval(activeApkPollers[appId]);
+              delete activeApkPollers[appId];
+              installAppById(appId);
+              if (playUiSound) playUiSound('chime');
+              if (showToast) showToast(`${item.name} instalado via APK Android TV (Widevine L3 DRM)!`);
+              if (onInstalledChanged) onInstalledChanged();
+            } else if (stData.status === 'error') {
+              clearInterval(activeApkPollers[appId]);
+              delete activeApkPollers[appId];
+              if (showToast) showToast(`Erro ao baixar ${item.name}: ${stData.error || 'Falha nos mirrors'}`);
+            }
+            if (onStateChange) onStateChange();
+          }
+        } catch (pollErr) {
+          console.warn('Erro ao verificar status do APK:', pollErr);
+        }
+      }, 1000);
+    } catch (err) {
+      console.error('Falha ao instalar APK:', err);
+      apkDownloadProgress[appId] = { status: 'error', progress: 0, error: err.message };
+      if (showToast) showToast(`Erro ao baixar ${item.name}: ${err.message}`);
+      if (onStateChange) onStateChange();
+    }
+  }
+
+  /* =========================================================
      Native irisStore UI Renderer inside app-stage-window
      ========================================================= */
   function openAppStoreStage({ appStageWindow, appStageBrand, appStageBody, appStageOverlay, escHtml, playUiSound, showToast, launchApp, onInstalledChanged }) {
@@ -507,18 +923,34 @@
 
       const cardMarkup = (item) => {
         const inst = isAppInstalled(item.id);
+        const apkSt = apkDownloadProgress[item.id];
+        const isApkBusy = apkSt && (apkSt.status === 'downloading' || apkSt.status === 'installing');
+        const isApk = Boolean(item.isApk || item.androidPackage);
+
+        let ctaButtonHtml = '';
+        if (inst) {
+          ctaButtonHtml = `<button class="store-btn-open" type="button" data-store-launch="${escHtml(item.id)}">Abrir</button>`;
+        } else if (isApkBusy) {
+          const label = apkSt.status === 'installing' ? '⚙ Instalando...' : `⬇ ${apkSt.progress || 0}%`;
+          ctaButtonHtml = `<button class="store-btn-get is-busy" type="button" disabled style="opacity:0.85;cursor:wait;">${label}</button>`;
+        } else {
+          ctaButtonHtml = `<button class="store-btn-get" type="button" data-store-get="${escHtml(item.id)}">Obter</button>`;
+        }
+
+        const drmBadge = isApk
+          ? `<span class="store-apk-tag" style="display:inline-block;padding:2px 6px;margin-top:4px;border-radius:4px;font-size:10px;font-weight:700;color:#00e5ff;background:rgba(0,229,255,0.12);border:1px solid rgba(0,229,255,0.3);">🤖 APK DRM L3</span>`
+          : '';
+
         return `
           <article class="store-app-card ${inst ? 'is-installed' : ''}" tabindex="0" data-store-card="${escHtml(item.id)}">
             <div class="store-app-icon" style="background:${item.bg}">${iconMarkup(item)}</div>
             <div class="store-app-info">
               <strong class="store-app-name">${escHtml(item.name)}</strong>
               <span class="store-app-sub">${escHtml(item.developer || 'Web')}</span>
+              ${drmBadge}
             </div>
             <div class="store-app-cta">
-              ${inst
-            ? `<button class="store-btn-open" type="button" data-store-launch="${escHtml(item.id)}">Abrir</button>`
-            : `<button class="store-btn-get" type="button" data-store-get="${escHtml(item.id)}">Obter</button>`
-          }
+              ${ctaButtonHtml}
             </div>
           </article>
         `;
@@ -528,6 +960,29 @@
         const d = selectedDetailApp;
         const inst = isAppInstalled(d.id);
         const sys = CORE_SYSTEM_IDS.has(d.id);
+        const apkSt = apkDownloadProgress[d.id];
+        const isApkBusy = apkSt && (apkSt.status === 'downloading' || apkSt.status === 'installing');
+        const isApk = Boolean(d.isApk || d.androidPackage);
+
+        let actionBtnHtml = '';
+        if (inst) {
+          actionBtnHtml = `
+            <button class="btn-prism" id="store-detail-open" type="button">${d.isNative ? 'Abrir' : (isApk ? 'Abrir TV' : 'Abrir ↗')}</button>
+            ${!sys ? `<button class="btn-glass store-remove-btn" id="store-detail-uninstall" type="button">Desinstalar</button>` : `<span class="store-sys-note">Essencial do sistema</span>`}
+          `;
+        } else if (isApkBusy) {
+          const label = apkSt.status === 'installing' ? '⚙ Instalando no Android TV...' : `⬇ Baixando mirror real (${apkSt.progress || 0}%)...`;
+          actionBtnHtml = `<button class="btn-prism" id="store-detail-install" type="button" disabled style="opacity:0.85;cursor:wait;">${label}</button>`;
+        } else {
+          actionBtnHtml = `<button class="btn-prism" id="store-detail-install" type="button">${isApk ? 'Baixar & Instalar APK' : 'Instalar'}</button>`;
+        }
+
+        const drmNote = isApk ? `
+          <div style="margin-top:10px;padding:8px 12px;border-radius:8px;background:rgba(0,229,255,0.08);border:1px solid rgba(0,229,255,0.22);font-size:12px;color:#cceeff;line-height:1.4;">
+            <strong style="color:#00e5ff;">🤖 Android TV Nativo com Widevine DRM (L3):</strong> Este app roda via contêiner Waydroid com aceleração por GPU dedicada e decodificação VA-API de vídeo protegido. Downloads obtidos de mirrors verificados.
+          </div>
+        ` : '';
+
         return `
           <div class="store-detail-sheet">
             <button id="store-detail-back" class="btn-glass store-detail-back" type="button">← Voltar à loja</button>
@@ -537,12 +992,9 @@
                 <h2>${escHtml(d.name)}</h2>
                 <p class="store-detail-dev">${escHtml(d.developer || 'Web')}</p>
                 <p class="store-detail-desc">${escHtml(d.tagline || '')}</p>
+                ${drmNote}
                 <div class="store-detail-actions">
-                  ${inst
-            ? `<button class="btn-prism" id="store-detail-open" type="button">${d.isNative ? 'Abrir' : 'Abrir ↗'}</button>
-                       ${!sys ? `<button class="btn-glass store-remove-btn" id="store-detail-uninstall" type="button">Desinstalar</button>` : `<span class="store-sys-note">Essencial do sistema</span>`}`
-            : `<button class="btn-prism" id="store-detail-install" type="button">Instalar</button>`
-          }
+                  ${actionBtnHtml}
                 </div>
               </div>
             </div>
@@ -680,11 +1132,22 @@
           const id = btn.dataset.storeGet;
           const target = getFullCatalog().find((a) => a.id === id);
           if (!target) return;
-          installAppById(id);
-          playUiSound('chime');
-          if (onInstalledChanged) onInstalledChanged();
-          showToast(`${target.name} instalado!`);
-          renderStore();
+          if (target.isApk || target.androidPackage || target.apkMirrors) {
+            playUiSound('select');
+            triggerApkDownload(target, {
+              onStateChange: () => renderStore(),
+              playUiSound,
+              showToast,
+              onInstalledChanged
+            });
+            renderStore();
+          } else {
+            installAppById(id);
+            playUiSound('chime');
+            if (onInstalledChanged) onInstalledChanged();
+            showToast(`${target.name} instalado!`);
+            renderStore();
+          }
         });
       });
 
@@ -730,11 +1193,22 @@
 
       appStageBody.querySelector('#store-detail-install')?.addEventListener('click', () => {
         if (!selectedDetailApp) return;
-        installAppById(selectedDetailApp.id);
-        playUiSound('chime');
-        if (onInstalledChanged) onInstalledChanged();
-        showToast(`${selectedDetailApp.name} instalado!`);
-        renderStore();
+        if (selectedDetailApp.isApk || selectedDetailApp.androidPackage || selectedDetailApp.apkMirrors) {
+          playUiSound('select');
+          triggerApkDownload(selectedDetailApp, {
+            onStateChange: () => renderStore(),
+            playUiSound,
+            showToast,
+            onInstalledChanged
+          });
+          renderStore();
+        } else {
+          installAppById(selectedDetailApp.id);
+          playUiSound('chime');
+          if (onInstalledChanged) onInstalledChanged();
+          showToast(`${selectedDetailApp.name} instalado!`);
+          renderStore();
+        }
       });
 
       appStageBody.querySelector('#store-detail-uninstall')?.addEventListener('click', () => {
