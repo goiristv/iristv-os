@@ -3340,10 +3340,29 @@ function createAppServer() {
       return res.end('403 Forbidden');
     }
 
-    const allowedFiles = new Set(['index.html', 'styles.css', 'app.js', 'app-store.js', 'app-native.js', 'app-games.js', 'app-player.js', 'logo.svg', 'default-theme.json', 'webos/webos-bridge.js', 'NOTICIA_MIGRACAO_WPE_WEBKIT_E_REQUISITOS.md']);
+    const allowedFiles = new Set([
+      'index.html',
+      'lightning.html',
+      'styles.css',
+      'app.js',
+      'app-lightning.js',
+      'app-store.js',
+      'app-native.js',
+      'app-games.js',
+      'app-player.js',
+      'logo.svg',
+      'default-theme.json',
+      'webos/webos-bridge.js',
+      'webos/polyfills.js',
+      'webos/tv-compat.css',
+      'vendor/lightning.es5.min.js',
+      'vendor/lightning.min.js',
+      'vendor/hls.min.js',
+      'NOTICIA_MIGRACAO_WPE_WEBKIT_E_REQUISITOS.md'
+    ]);
     const relPath = path.relative(ROOT_DIR, resolvedPath).replace(/\\/g, '/');
     const isSiteAsset = /^site\/[a-z0-9_.\/-]+\.(html|css|js|svg|png|jpg|webp)$/i.test(relPath);
-    const isMediaAsset = /^(icons|media|sounds)\/[a-z0-9_.\/-]+\.(jpg|jpeg|png|mp3|svg|webp|json)$/i.test(relPath);
+    const isMediaAsset = /^(icons|media|sounds|vendor|public)\/[a-z0-9_.\/-]+\.(jpg|jpeg|png|mp3|svg|webp|json|ttf|woff2|js|map)$/i.test(relPath);
     if (!allowedFiles.has(relPath) && !isMediaAsset && !isSiteAsset) {
       res.writeHead(404, { 'Content-Type': 'text/plain; charset=utf-8' });
       return res.end('404 Not Found');

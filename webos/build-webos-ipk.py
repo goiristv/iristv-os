@@ -14,6 +14,7 @@ import os
 import re
 import shutil
 import subprocess
+import sys
 import tarfile
 from pathlib import Path
 
@@ -79,18 +80,21 @@ def build_ipk():
     app_root.mkdir(parents=True, exist_ok=True)
     ctrl_root.mkdir(parents=True, exist_ok=True)
 
+    use_lightning = os.environ.get("IRISTV_ENGINE", "lightning") == "lightning" or "--lightning" in sys.argv
+    main_file = "lightning.html" if use_lightning else "index.html"
+
     # 1. appinfo.json oficial webOS com resolution 1920x1080 (evita render 4K que consome 4x VRAM)
     appinfo = {
         "id": APP_ID,
         "version": APP_VERSION,
         "vendor": "irisTV",
         "type": "web",
-        "main": "index.html",
-        "title": "irisTV",
+        "main": main_file,
+        "title": "irisTV (Lightning 60FPS)",
         "icon": "icon.png",
         "largeIcon": "largeIcon.png",
-        "bgColor": "#0b101b",
-        "iconColor": "#0b101b",
+        "bgColor": "#070b13",
+        "iconColor": "#070b13",
         "resolution": "1920x1080",
         "disableBackHistoryAPI": True,
         "handlesRelaunch": True,
@@ -121,6 +125,10 @@ def build_ipk():
         )
     (app_root / "index.html").write_text(index_html, encoding="utf-8")
 
+    lightning_html_src = ROOT_DIR / "lightning.html"
+    if lightning_html_src.exists():
+        shutil.copy2(lightning_html_src, app_root / "lightning.html")
+
     for fname in ("default-theme.json", "logo.svg"):
         src = ROOT_DIR / fname
         if src.exists():
@@ -139,7 +147,7 @@ def build_ipk():
     transpile_js_esbuild(WEBOS_DIR / "polyfills.js", app_root / "webos" / "polyfills.js")
     transpile_js_esbuild(WEBOS_DIR / "webos-bridge.js", app_root / "webos" / "webos-bridge.js")
 
-    for js_name in ("app.js", "app-player.js", "app-store.js", "app-native.js", "app-games.js"):
+    for js_name in ("app-lightning.js", "app.js", "app-player.js", "app-store.js", "app-native.js", "app-games.js"):
         jf = ROOT_DIR / js_name
         if jf.exists():
             transpile_js_esbuild(jf, app_root / js_name)
