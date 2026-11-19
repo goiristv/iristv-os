@@ -2441,6 +2441,132 @@
     }
   }
 
+  function ensureTabProgressBar(gridEl) {
+    if (!gridEl || !gridEl.parentElement) return null;
+    const parent = gridEl.parentElement;
+    let wrap = parent.querySelector(':scope > .tab-progress-wrap');
+    if (!wrap) {
+      wrap = document.createElement('div');
+      wrap.className = 'tab-progress-wrap';
+      wrap.innerHTML = `
+        <div class="tab-progress-meta">
+          <span class="tab-progress-label">Carregando...</span>
+          <span class="tab-progress-pct">0%</span>
+        </div>
+        <div class="tab-progress-track">
+          <div class="tab-progress-fill"></div>
+        </div>
+      `;
+      parent.insertBefore(wrap, gridEl);
+    }
+    wrap.classList.remove('is-done');
+    return {
+      wrap,
+      labelEl: wrap.querySelector('.tab-progress-label'),
+      pctEl: wrap.querySelector('.tab-progress-pct'),
+      fillEl: wrap.querySelector('.tab-progress-fill')
+    };
+  }
+
+  function enhanceProgressiveImages(rootEl, onImgDone) {
+    const imgs = rootEl.querySelectorAll('img');
+    imgs.forEach((img) => {
+      img.loading = 'lazy';
+      img.decoding = 'async';
+      const box = img.parentElement;
+      if (img.complete && img.naturalWidth > 0) {
+        img.classList.add('iris-progressive-img', 'is-loaded');
+        if (onImgDone) onImgDone();
+        return;
+      }
+      img.classList.add('iris-progressive-img');
+      if (box) box.classList.add('iris-img-loading-box');
+      const finish = () => {
+        img.classList.add('is-loaded');
+        if (box) box.classList.remove('iris-img-loading-box');
+        if (onImgDone) onImgDone();
+      };
+      img.addEventListener('load', finish, { once: true });
+      img.addEventListener('error', finish, { once: true });
+    });
+    return imgs.length;
+  }
+
+  function renderGridProgressively(grid, items, createCardFn, opts = {}) {
+    const { batchSize = 6, label = 'Carregando', progressHost = grid } = opts;
+    const token = (grid.__irisRenderToken || 0) + 1;
+    grid.__irisRenderToken = token;
+    grid.replaceChildren();
+
+    const bar = ensureTabProgressBar(progressHost);
+    const total = items.length;
+    if (!total) {
+      if (bar) bar.wrap.classList.add('is-done');
+      return;
+    }
+
+    let renderedCount = 0;
+    let totalImgs = 0;
+    let loadedImgs = 0;
+
+    const updateBar = () => {
+      if (grid.__irisRenderToken !== token || !bar) return;
+      const domRatio = renderedCount / total;
+      const imgRatio = totalImgs > 0 ? Math.min(1, loadedImgs / totalImgs) : 1;
+      const pct = Math.min(100, Math.round((domRatio * 0.55 + imgRatio * 0.45) * 100));
+      bar.fillEl.style.width = `${pct}%`;
+      bar.pctEl.textContent = `${pct}%`;
+      bar.labelEl.textContent = renderedCount < total
+        ? `${label}... (${renderedCount}/${total})`
+        : (loadedImgs < totalImgs ? `Carregando imagens... (${loadedImgs}/${totalImgs})` : 'Pronto');
+      if (renderedCount >= total && (totalImgs === 0 || loadedImgs >= totalImgs)) {
+        bar.fillEl.style.width = '100%';
+        bar.pctEl.textContent = '100%';
+        setTimeout(() => {
+          if (grid.__irisRenderToken === token) bar.wrap.classList.add('is-done');
+        }, 320);
+      }
+    };
+
+    const step = () => {
+      if (grid.__irisRenderToken !== token) return;
+      const frag = document.createDocumentFragment();
+      const end = Math.min(total, renderedCount + batchSize);
+      for (let i = renderedCount; i < end; i++) {
+        const card = createCardFn(items[i], i);
+        if (card) {
+          card.classList.add('iris-card-reveal');
+          totalImgs += enhanceProgressiveImages(card, () => {
+            loadedImgs++;
+            updateBar();
+          });
+          frag.appendChild(card);
+        }
+      }
+      grid.appendChild(frag);
+      renderedCount = end;
+      updateBar();
+
+      if (renderedCount < total) {
+        requestAnimationFrame(step);
+      } else {
+        // Safety timeout so lazy off-screen images don't keep the bar open forever
+        setTimeout(() => {
+          if (grid.__irisRenderToken === token && bar && !bar.wrap.classList.contains('is-done')) {
+            bar.fillEl.style.width = '100%';
+            bar.pctEl.textContent = '100%';
+            setTimeout(() => {
+              if (grid.__irisRenderToken === token) bar.wrap.classList.add('is-done');
+            }, 220);
+          }
+        }, 1400);
+      }
+    };
+
+    updateBar();
+    requestAnimationFrame(step);
+  }
+
   function renderShowsGridOnly() {
     const grid = document.getElementById('shows-catalog-grid');
     const countBadge = document.getElementById('shows-view-counts');
@@ -2497,9 +2623,10 @@
       return;
     }
 
-    const frag = document.createDocumentFragment();
-    items.forEach((show) => frag.appendChild(createPosterCard(show, 'row-1', 0)));
-    grid.appendChild(frag);
+    renderGridProgressively(grid, items, (show) => createPosterCard(show, 'row-1', 0), {
+      batchSize: 6,
+      label: 'Carregando séries e filmes'
+    });
   }
 
   let showsSearchDebounce = null;
@@ -2696,33 +2823,16 @@
 
     grid.innerHTML = `
       <div class="news-split-shell">
-        <div class="news-split-list" id="news-split-list">
-          ${items.map((art, idx) => {
-      const isAct = idx === activeIdx;
-      return `
-              <button type="button" class="news-list-item focusable ${isAct ? 'is-active' : ''}" data-nav="row-1" data-news-idx="${idx}">
-                <div class="news-list-top">
-                  <span class="news-list-src">${escHtml(art.source)}</span>
-                  <span class="news-list-time">${escHtml(formatRelativeNewsTime(art.ts))}</span>
-                </div>
-                <div class="news-list-title">${escHtml(art.title)}</div>
-                <div class="news-list-bottom">
-                  ${art.imageUrl ? `<img class="news-list-thumb" src="${escHtml(art.imageUrl)}" alt="" loading="lazy" onerror="this.style.display='none'" />` : ''}
-                  ${art.summary ? `<p class="news-list-snippet">${escHtml(art.summary)}</p>` : ''}
-                </div>
-              </button>
-            `;
-    }).join('')}
-        </div>
+        <div class="news-split-list" id="news-split-list"></div>
         <article class="news-split-reader" id="news-split-reader">
           <div class="news-reader-topbar">
-            <span class="news-reader-source">${escHtml(activeArt.source)} • ${escHtml(formatRelativeNewsTime(activeArt.ts))}</span>
+            <span class="news-reader-source" id="news-reader-source">${escHtml(activeArt.source)} • ${escHtml(formatRelativeNewsTime(activeArt.ts))}</span>
             <div class="news-reader-btns">
               <button id="news-smart-summary-btn" class="news-smart-btn ${state.newsSmartSummary ? 'active' : ''}" type="button" title="Resumo Inteligente">✨ Smart Summary</button>
               <button id="news-open-source-btn" class="news-smart-btn" type="button">Ler na fonte ↗</button>
             </div>
           </div>
-          <h2 class="news-reader-headline">${escHtml(activeArt.title)}</h2>
+          <h2 class="news-reader-headline" id="news-reader-headline">${escHtml(activeArt.title)}</h2>
           <div id="news-reader-body" class="news-reader-paragraphs">
             ${activeArt.summary ? `<p>${escHtml(activeArt.summary)}</p>` : ''}
             <p class="news-reader-loading">Carregando matéria completa...</p>
@@ -2762,17 +2872,48 @@
 
     loadReaderBody(activeArt);
 
-    grid.querySelectorAll('[data-news-idx]').forEach((card) => {
-      card.addEventListener('click', (e) => {
-        e.stopPropagation();
-        const idx = Number(card.dataset.newsIdx);
-        if (!Number.isFinite(idx) || !items[idx]) return;
-        playUiSound('move');
-        state.activeNewsIdx = idx;
-        state.activeNewsId = items[idx].id || items[idx].link || String(idx);
-        renderNewsGridOnly();
+    const listEl = grid.querySelector('#news-split-list');
+    if (listEl) {
+      renderGridProgressively(listEl, items, (art, idx) => {
+        const isAct = idx === activeIdx;
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = `news-list-item focusable ${isAct ? 'is-active' : ''}`;
+        btn.dataset.nav = 'row-1';
+        btn.dataset.newsIdx = String(idx);
+        btn.innerHTML = `
+          <div class="news-list-top">
+            <span class="news-list-src">${escHtml(art.source)}</span>
+            <span class="news-list-time">${escHtml(formatRelativeNewsTime(art.ts))}</span>
+          </div>
+          <div class="news-list-title">${escHtml(art.title)}</div>
+          <div class="news-list-bottom">
+            ${art.imageUrl ? `<img class="news-list-thumb" src="${escHtml(art.imageUrl)}" alt="" loading="lazy" decoding="async" onerror="this.style.display='none'" />` : ''}
+            ${art.summary ? `<p class="news-list-snippet">${escHtml(art.summary)}</p>` : ''}
+          </div>
+        `;
+        btn.addEventListener('click', (e) => {
+          e.stopPropagation();
+          playUiSound('move');
+          state.activeNewsIdx = idx;
+          state.activeNewsId = art.id || art.link || String(idx);
+          listEl.querySelectorAll('.news-list-item.is-active').forEach((el) => el.classList.remove('is-active'));
+          btn.classList.add('is-active');
+          const srcEl = document.getElementById('news-reader-source');
+          const headEl = document.getElementById('news-reader-headline');
+          const bodyEl = document.getElementById('news-reader-body');
+          if (srcEl) srcEl.textContent = `${art.source} • ${formatRelativeNewsTime(art.ts)}`;
+          if (headEl) headEl.textContent = art.title;
+          if (bodyEl) bodyEl.innerHTML = `${art.summary ? `<p>${escHtml(art.summary)}</p>` : ''}<p class="news-reader-loading">Carregando matéria completa...</p>`;
+          loadReaderBody(art);
+        });
+        return btn;
+      }, {
+        batchSize: 6,
+        label: 'Carregando notícias',
+        progressHost: grid
       });
-    });
+    }
 
     grid.querySelector('#news-smart-summary-btn')?.addEventListener('click', () => {
       playUiSound('select');
@@ -3491,10 +3632,11 @@
       const grid = document.createElement('div');
       grid.className = 'apps-grid-layout';
       const populateAppsGrid = () => {
-        const gFrag = document.createDocumentFragment();
         const filtered = state.activeAppFilter === 'all' ? APPS : APPS.filter((a) => a.category === state.activeAppFilter);
-        filtered.forEach((app, idx) => gFrag.appendChild(createAppTile(app, 'row-1', idx)));
-        grid.replaceChildren(gFrag);
+        renderGridProgressively(grid, filtered, (app, idx) => createAppTile(app, 'row-1', idx), {
+          batchSize: 8,
+          label: 'Carregando aplicativos'
+        });
         lastAppsFilterRendered = state.activeAppFilter;
         lastAppsCountRendered = APPS.length;
         state.appsGridDirty = false;
