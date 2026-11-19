@@ -5932,10 +5932,18 @@
 
   function openSearch() {
     playUiSound('select');
-    searchOverlay.classList.remove('hidden');
+    searchRenderToken++;
     searchInput.value = '';
-    renderSearchResults();
-    setTimeout(() => ensureScopeFocus(searchInput), 30);
+    searchResults.innerHTML = `<div style="text-align:center;padding:28px 20px;color:rgba(255,255,255,0.55);font-size:0.9rem;font-weight:500;">Carregando sugestões...</div>`;
+    searchOverlay.classList.remove('hidden');
+    searchInput.focus({ preventScroll: true });
+    requestAnimationFrame(() => {
+      setTimeout(() => {
+        if (!searchOverlay.classList.contains('hidden')) {
+          renderSearchResults();
+        }
+      }, 45);
+    });
   }
 
   function closeSearch() {
