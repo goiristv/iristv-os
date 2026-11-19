@@ -267,13 +267,17 @@ fi
 if [ -x /usr/bin/waydroid ] && [ -f /var/lib/waydroid/waydroid.cfg ]; then
   (
     waydroid container start >> /var/log/waydroid.log 2>&1 &
-    # Aguarda contêiner inicializar e aplica suporte a Widevine DRM L3 e otimizações de TV
+    # Aguarda contêiner inicializar e aplica suporte a Widevine DRM L3 e otimizações de TV de alta velocidade
     for _i in $(seq 1 15); do
       if waydroid status 2>/dev/null | grep -q "RUNNING"; then
         waydroid prop set persist.waydroid.widevine true 2>/dev/null || true
         waydroid prop set persist.waydroid.multi_windows true 2>/dev/null || true
+        waydroid prop set persist.waydroid.suspend false 2>/dev/null || true
+        waydroid prop set persist.waydroid.fake_touch false 2>/dev/null || true
         waydroid prop set persist.waydroid.uevent 1 2>/dev/null || true
         waydroid prop set ro.hardware.gralloc gbm 2>/dev/null || true
+        # Pré-aquece a sessão Android (Zygote & Dalvik VM) para abertura instantânea dos apps
+        waydroid session start >> /var/log/waydroid-session.log 2>&1 &
         break
       fi
       sleep 1

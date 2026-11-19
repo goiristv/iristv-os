@@ -3160,46 +3160,56 @@ function createAppServer() {
         const apkDir = process.platform === 'linux' ? '/opt/iristv/apks' : path.join(ROOT_DIR, 'apks');
         const localApkPath = path.join(apkDir, `${appId}.apk`);
 
-        // 1. Android TV Nativo (.APK) com Widevine DRM (Netflix, Prime, Disney+, Max, etc.) e Restauração de Sessão
+        // 1. Android TV Nativo (.APK) com Widevine DRM (Netflix, Prime, Disney+, Max, etc.) e Restauração de Sessão Ultra-Rápida
         if (waydroidBin && androidPkg) {
-          // Se o APK existe localmente mas ainda não foi instalado no contêiner Waydroid, instala agora
-          if (fs.existsSync(localApkPath)) {
-            try {
-              console.log(`[irisOS] Verificando/instalando APK para ${androidPkg} via Waydroid...`);
-              execSync(`waydroid app install "${localApkPath}"`, { timeout: 35000, stdio: 'ignore' });
-            } catch (_) { }
+          global.__irisInstalledWaydroidPkgs = global.__irisInstalledWaydroidPkgs || new Set();
+
+          // Instalação assíncrona apenas se o pacote ainda não estiver instalado
+          if (fs.existsSync(localApkPath) && !global.__irisInstalledWaydroidPkgs.has(androidPkg)) {
+            (async () => {
+              try {
+                execSync(`waydroid app install "${localApkPath}"`, { timeout: 25000, stdio: 'ignore' });
+                global.__irisInstalledWaydroidPkgs.add(androidPkg);
+              } catch (_) {}
+            })();
           }
 
-          // Restauração de Sessão Persistente para o APK
+          // Restauração Instantânea de Sessão Persistente para o APK (0ms de espera)
           const allSessions = readSessions();
           const savedSession = allSessions[appId] || allSessions[androidPkg];
           const resumeActivity = savedSession?.activity;
 
-          console.log(`[irisOS] Abrindo APK Android TV com Widevine DRM: ${androidPkg} (${appName})${resumeActivity ? ` [Restaurando sessão: ${resumeActivity}]` : ''}`);
+          console.log(`[irisOS FastLaunch] Abertura ultra-rápida do APK: ${androidPkg} (${appName})${resumeActivity ? ` [Restaurando atividade: ${resumeActivity}]` : ''}`);
+
+          const envArgs = {
+            ...process.env,
+            XDG_RUNTIME_DIR: process.env.XDG_RUNTIME_DIR || '/run/user/0',
+            ANDROID_DRM_WIDEVINE: '1',
+            WAYDROID_WIDEVINE: '1',
+            WAYDROID_DRM_LEVEL: 'L3'
+          };
 
           if (resumeActivity && resumeActivity.startsWith(androidPkg)) {
-            try {
-              execSync(`waydroid session action "am start -n ${resumeActivity}" 2>/dev/null`, { timeout: 5000, stdio: 'ignore' });
-              return sendJson(req, res, 200, {
-                ok: true,
-                launched: true,
-                mode: 'waydroid-widevine-resumed',
-                package: androidPkg,
-                activity: resumeActivity,
-                name: appName,
-                drm: 'Widevine L3'
-              });
-            } catch (_) {}
+            const proc = spawn(waydroidBin, ['session', 'action', `am start -W -n ${resumeActivity}`], {
+              env: envArgs,
+              detached: true,
+              stdio: 'ignore'
+            });
+            proc.unref();
+            global.__irisActiveTvAppProc = proc;
+            return sendJson(req, res, 200, {
+              ok: true,
+              launched: true,
+              mode: 'waydroid-widevine-resumed',
+              package: androidPkg,
+              activity: resumeActivity,
+              name: appName,
+              drm: 'Widevine L3'
+            });
           }
 
           const proc = spawn(waydroidBin, ['app', 'launch', androidPkg], {
-            env: {
-              ...process.env,
-              XDG_RUNTIME_DIR: process.env.XDG_RUNTIME_DIR || '/run/user/0',
-              ANDROID_DRM_WIDEVINE: '1',
-              WAYDROID_WIDEVINE: '1',
-              WAYDROID_DRM_LEVEL: 'L3'
-            },
+            env: envArgs,
             detached: true,
             stdio: 'ignore'
           });
