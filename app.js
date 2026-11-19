@@ -2024,10 +2024,142 @@
     return false;
   }
 
+  /* =========================================================
+     Apple TV Fast App Switching & Session Restoration (Web Layer)
+     ========================================================= */
+  const webAppWarmPool = new Map();
+  const MAX_WARM_WEB_APPS = 3;
+  let activeWebStageAppId = null;
+
+  function saveWebSession(appId, url) {
+    if (!appId) return;
+    try {
+      const data = { id: appId, url, scrollY: window.scrollY || 0, savedAt: Date.now() };
+      localStorage.setItem(`iris_session_${appId}`, JSON.stringify(data));
+      fetch('/api/os/app-sessions', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data)
+      }).catch(() => {});
+    } catch (_) {}
+  }
+
+  function getSavedWebSession(appId) {
+    if (!appId) return null;
+    try {
+      const local = localStorage.getItem(`iris_session_${appId}`);
+      if (local) return JSON.parse(local);
+    } catch (_) {}
+    return null;
+  }
+
+  function closeFastAppWebStage() {
+    if (!activeWebStageAppId) return;
+    const entry = webAppWarmPool.get(activeWebStageAppId);
+    if (entry && entry.container) {
+      try {
+        entry.iframe.contentWindow?.postMessage({ action: 'iris-suspend' }, '*');
+        const doc = entry.iframe.contentDocument;
+        if (doc) {
+          doc.querySelectorAll('video, audio').forEach((m) => { try { m.pause(); } catch (_) {} });
+          saveWebSession(activeWebStageAppId, doc.location.href);
+        }
+      } catch (_) {}
+      entry.container.style.display = 'none';
+    }
+    const stage = document.getElementById('iris-web-app-stage');
+    if (stage) stage.classList.add('hidden');
+    activeWebStageAppId = null;
+    playUiSound('back');
+  }
+
+  function openFastAppWebStage(url, name, appMeta = {}) {
+    const appId = (appMeta.id || appMeta.name || url).toLowerCase().replace(/[^a-z0-9]/g, '_');
+    activeWebStageAppId = appId;
+
+    let stage = document.getElementById('iris-web-app-stage');
+    if (!stage) {
+      stage = document.createElement('div');
+      stage.id = 'iris-web-app-stage';
+      stage.className = 'iris-web-app-stage hidden';
+      stage.innerHTML = `
+        <div class="iris-web-stage-header">
+          <button id="iris-web-stage-back" class="btn-glass" type="button">← Voltar ao irisTV (ESC)</button>
+          <strong id="iris-web-stage-title" class="iris-web-stage-title">App</strong>
+          <button id="iris-web-stage-reload" class="btn-glass" type="button">↻</button>
+        </div>
+        <div id="iris-web-stage-slot" class="iris-web-stage-slot"></div>
+      `;
+      document.body.appendChild(stage);
+
+      stage.querySelector('#iris-web-stage-back')?.addEventListener('click', () => closeFastAppWebStage());
+      stage.querySelector('#iris-web-stage-reload')?.addEventListener('click', () => {
+        const ent = webAppWarmPool.get(activeWebStageAppId);
+        if (ent && ent.iframe) ent.iframe.src = ent.iframe.src;
+      });
+
+      window.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && activeWebStageAppId) {
+          e.preventDefault();
+          closeFastAppWebStage();
+        }
+      });
+    }
+
+    const titleEl = stage.querySelector('#iris-web-stage-title');
+    if (titleEl) titleEl.textContent = `${name || 'App'} • ESC para voltar ao irisTV`;
+    const slot = stage.querySelector('#iris-web-stage-slot');
+
+    webAppWarmPool.forEach((item) => {
+      if (item.container) item.container.style.display = 'none';
+    });
+
+    stage.classList.remove('hidden');
+
+    if (webAppWarmPool.has(appId)) {
+      const entry = webAppWarmPool.get(appId);
+      entry.container.style.display = 'block';
+      playUiSound('open');
+      try {
+        entry.iframe.contentWindow?.postMessage({ action: 'iris-resume' }, '*');
+      } catch (_) {}
+      return;
+    }
+
+    let finalUrl = url;
+    const session = getSavedWebSession(appId);
+    if (session && session.url) {
+      finalUrl = session.url;
+    }
+
+    if (webAppWarmPool.size >= MAX_WARM_WEB_APPS) {
+      const oldestKey = webAppWarmPool.keys().next().value;
+      const oldest = webAppWarmPool.get(oldestKey);
+      if (oldest) {
+        saveWebSession(oldestKey, oldest.url);
+        oldest.container.remove();
+        webAppWarmPool.delete(oldestKey);
+      }
+    }
+
+    const container = document.createElement('div');
+    container.className = 'iris-web-app-frame-wrap';
+    const iframe = document.createElement('iframe');
+    iframe.src = finalUrl;
+    iframe.className = 'iris-web-app-iframe';
+    iframe.setAttribute('allow', 'autoplay; fullscreen; encrypted-media; picture-in-picture');
+    iframe.setAttribute('referrerpolicy', 'no-referrer-when-downgrade');
+    container.appendChild(iframe);
+    slot.appendChild(container);
+
+    webAppWarmPool.set(appId, { container, iframe, url: finalUrl, savedAt: Date.now() });
+    playUiSound('open');
+  }
+
   async function openExternalAppUrl(url, name, appMeta = {}) {
     if (!url && !appMeta?.id) return;
     if (window.IrisWebOS?.isWebOS && window.IrisWebOS.launchApp(appMeta.id, url)) return;
-    if (postWebViewAction('openAppUrl', { url, name: name || 'App' })) return;
+    if (postWebViewAction('openAppUrl', { url, name: name || 'App', id: appMeta?.id })) return;
     try {
       const r = await fetch('/api/os/launch-tv-app', {
         method: 'POST',
@@ -2047,7 +2179,9 @@
         }
       }
     } catch (_) { }
-    if (url) window.location.href = url;
+    if (url) {
+      openFastAppWebStage(url, name, appMeta);
+    }
   }
 
   async function refreshOsStatus() {
@@ -3988,15 +4122,13 @@
       if (isNativeWebView) {
         playUiSound('open');
         closeAppStage();
-        postWebViewAction('openAppUrl', { url: app.webUrl, name: app.name, androidPackage: app.androidPackage });
+        postWebViewAction('openAppUrl', { url: app.webUrl, name: app.name, androidPackage: app.androidPackage, id: app.id });
         return;
       }
-      if (/linux/i.test(state.systemInfo?.hostPlatform || '') || app.isApk || app.androidPackage) {
-        playUiSound('open');
-        closeAppStage();
-        openExternalAppUrl(app.webUrl, app.name, app);
-        return;
-      }
+      playUiSound('open');
+      closeAppStage();
+      openExternalAppUrl(app.webUrl, app.name, app);
+      return;
     }
     openAppStage(app);
   }

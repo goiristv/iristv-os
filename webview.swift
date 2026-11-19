@@ -17,6 +17,13 @@ final class IrisAppDelegate: NSObject, NSApplicationDelegate, WKUIDelegate, WKNa
   private var activeMetalDevice: MTLDevice?
   private var activeCommandQueue: MTLCommandQueue?
 
+  // Apple TV Fast App Switching, State Restoration & Low RAM Suspend
+  private var warmAppViews: [String: WKWebView] = [:]
+  private var warmAppLru: [String] = []
+  private var currentAppKey: String? = nil
+  private var snapshotImageView: NSImageView!
+  private let maxWarmApps = 3
+
   func applyGpuPreference(_ pref: String) {
     let devices = MTLCopyAllDevices()
     NSLog("[irisTV GPU] Configurando GPU: \(pref). GPUs: \(devices.map { $0.name }.joined(separator: ", "))")
@@ -125,10 +132,65 @@ final class IrisAppDelegate: NSObject, NSApplicationDelegate, WKUIDelegate, WKNa
   }
 
   func applicationWillTerminate(_ notification: Notification) {
+    for (key, view) in warmAppViews {
+      if let url = view.url?.absoluteString {
+        saveAppSession(key: key, url: url)
+      }
+    }
     if let proc = backendProcess, proc.isRunning {
       NSLog("[irisTV macOS] Encerrando servidor Node.js local...")
       proc.terminate()
     }
+  }
+
+  // MARK: - Apple TV Session & Snapshot Storage
+  private var irisDataDirectory: URL {
+    let home = FileManager.default.homeDirectoryForCurrentUser
+    let dir = home.appendingPathComponent(".iristv", isDirectory: true)
+    try? FileManager.default.createDirectory(at: dir, withIntermediateDirectories: true)
+    return dir
+  }
+
+  private var snapshotsDirectory: URL {
+    let dir = irisDataDirectory.appendingPathComponent("snapshots", isDirectory: true)
+    try? FileManager.default.createDirectory(at: dir, withIntermediateDirectories: true)
+    return dir
+  }
+
+  private func saveSnapshot(key: String, image: NSImage) {
+    guard let tiff = image.tiffRepresentation,
+          let rep = NSBitmapImageRep(data: tiff),
+          let jpeg = rep.representation(using: .jpeg, properties: [.compressionFactor: 0.72]) else { return }
+    let file = snapshotsDirectory.appendingPathComponent("\(key.lowercased()).jpg")
+    try? jpeg.write(to: file)
+  }
+
+  private func loadSnapshot(key: String) -> NSImage? {
+    let file = snapshotsDirectory.appendingPathComponent("\(key.lowercased()).jpg")
+    guard FileManager.default.fileExists(atPath: file.path) else { return nil }
+    return NSImage(contentsOf: file)
+  }
+
+  private func sessionKey(for appKey: String) -> String {
+    return "iris_session_\(appKey.lowercased())"
+  }
+
+  private func saveAppSession(key: String, url: String, scrollX: Double = 0, scrollY: Double = 0) {
+    let cleanKey = key.lowercased()
+    let dict: [String: Any] = [
+      "key": cleanKey,
+      "url": url,
+      "scrollX": scrollX,
+      "scrollY": scrollY,
+      "savedAt": Date().timeIntervalSince1970
+    ]
+    UserDefaults.standard.set(dict, forKey: sessionKey(for: cleanKey))
+    UserDefaults.standard.synchronize()
+  }
+
+  private func loadAppSession(key: String) -> [String: Any]? {
+    let cleanKey = key.lowercased()
+    return UserDefaults.standard.dictionary(forKey: sessionKey(for: cleanKey))
   }
 
   private func loadTvSpatialNavScript() -> String? {
@@ -497,6 +559,13 @@ final class IrisAppDelegate: NSObject, NSApplicationDelegate, WKUIDelegate, WKNa
     appWebViewSlot.layer?.backgroundColor = NSColor(calibratedRed: 0.04, green: 0.05, blue: 0.09, alpha: 1.0).cgColor
     appWebViewSlot.translatesAutoresizingMaskIntoConstraints = false
 
+    snapshotImageView = NSImageView()
+    snapshotImageView.imageScaling = .scaleAxesIndependently
+    snapshotImageView.wantsLayer = true
+    snapshotImageView.translatesAutoresizingMaskIntoConstraints = false
+    snapshotImageView.isHidden = true
+    appWebViewSlot.addSubview(snapshotImageView)
+
     appContainer.addSubview(appHeaderBar)
     appContainer.addSubview(appWebViewSlot)
 
@@ -523,33 +592,74 @@ final class IrisAppDelegate: NSObject, NSApplicationDelegate, WKUIDelegate, WKNa
       appWebViewSlot.topAnchor.constraint(equalTo: appHeaderBar.bottomAnchor),
       appWebViewSlot.leadingAnchor.constraint(equalTo: appContainer.leadingAnchor),
       appWebViewSlot.trailingAnchor.constraint(equalTo: appContainer.trailingAnchor),
-      appWebViewSlot.bottomAnchor.constraint(equalTo: appContainer.bottomAnchor)
+      appWebViewSlot.bottomAnchor.constraint(equalTo: appContainer.bottomAnchor),
+
+      snapshotImageView.topAnchor.constraint(equalTo: appWebViewSlot.topAnchor),
+      snapshotImageView.leadingAnchor.constraint(equalTo: appWebViewSlot.leadingAnchor),
+      snapshotImageView.trailingAnchor.constraint(equalTo: appWebViewSlot.trailingAnchor),
+      snapshotImageView.bottomAnchor.constraint(equalTo: appWebViewSlot.bottomAnchor)
     ])
 
     rootView.addSubview(appContainer)
   }
 
-  private func destroyAppWebView() {
-    if let existing = appWebView {
-      existing.stopLoading()
-      existing.uiDelegate = nil
-      existing.navigationDelegate = nil
-      existing.removeFromSuperview()
-      appWebView = nil
-    }
-  }
-
-  private func openEmbeddedApp(url: URL, name: String) {
-    destroyAppWebView()
+  private func openEmbeddedApp(url: URL, name: String, appId: String? = nil) {
     appContainer.layoutSubtreeIfNeeded()
 
+    let appKey = (appId ?? url.host?.lowercased() ?? "app")
+      .replacingOccurrences(of: "www.", with: "")
+      .replacingOccurrences(of: ".com", with: "")
+      .replacingOccurrences(of: ".tv", with: "")
+      .replacingOccurrences(of: ".", with: "_")
     let isYouTube = (url.host?.lowercased().contains("youtube.com") == true)
-    let finalUrl: URL = {
+
+    // Cenário 1: App já aquecido na memória (Warm Pool) -> ABERTURA INSTANTÂNEA EM 0ms!
+    if let warmView = warmAppViews[appKey] {
+      NSLog("[irisTV FastSwitch] Resumindo instantaneamente '%@' em 0ms (Apple TV Fast Switch)", appKey)
+      appWebViewSlot.subviews.forEach { sub in
+        if sub != warmView && sub != snapshotImageView { sub.isHidden = true }
+      }
+      snapshotImageView.isHidden = true
+      warmView.frame = appWebViewSlot.bounds
+      warmView.isHidden = false
+      appWebView = warmView
+      currentAppKey = appKey
+      currentAppUrl = warmView.url ?? url
+
+      appTitleLabel.stringValue = "\(name)  •  Setas: Navegar  |  F2: Cursor Virtual  |  ESC: Voltar ao irisTV"
+      appContainer.isHidden = false
+      window.makeFirstResponder(warmView)
+
+      warmAppLru.removeAll(where: { $0 == appKey })
+      warmAppLru.append(appKey)
+
+      warmView.evaluateJavaScript("window.dispatchEvent(new Event('iris-app-resume'));", completionHandler: nil)
+      return
+    }
+
+    // Cenário 2: Cold Start com Restauração de Sessão e Snapshot Instantâneo
+    var finalUrl: URL = {
       if isYouTube && (url.path.isEmpty || url.path == "/") {
         return URL(string: "https://www.youtube.com/tv") ?? url
       }
       return url
     }()
+
+    if let session = loadAppSession(key: appKey),
+       let savedUrlStr = session["url"] as? String,
+       let savedUrl = URL(string: savedUrlStr),
+       !savedUrlStr.isEmpty {
+      NSLog("[irisTV Session] Restaurando sessão salva para '%@': %@", appKey, savedUrlStr)
+      finalUrl = savedUrl
+    }
+
+    if let snap = loadSnapshot(key: appKey) {
+      snapshotImageView.image = snap
+      snapshotImageView.alphaValue = 1.0
+      snapshotImageView.isHidden = false
+    } else {
+      snapshotImageView.isHidden = true
+    }
 
     let dynamicView = WKWebView(frame: appWebViewSlot.bounds, configuration: buildWebConfig(withBridge: true, injectTvNav: !isYouTube, injectPasswordManager: true))
     dynamicView.autoresizingMask = [.width, .height]
@@ -563,19 +673,83 @@ final class IrisAppDelegate: NSObject, NSApplicationDelegate, WKUIDelegate, WKNa
     dynamicView.uiDelegate = self
     dynamicView.navigationDelegate = self
     dynamicView.allowsBackForwardNavigationGestures = true
-    appWebViewSlot.addSubview(dynamicView)
-    appWebView = dynamicView
 
+    appWebViewSlot.subviews.forEach { sub in
+      if sub != snapshotImageView { sub.isHidden = true }
+    }
+    appWebViewSlot.addSubview(dynamicView)
+    warmAppViews[appKey] = dynamicView
+    warmAppLru.append(appKey)
+
+    appWebView = dynamicView
+    currentAppKey = appKey
     currentAppUrl = finalUrl
+
     appTitleLabel.stringValue = "\(name)  •  Setas: Navegar  |  F2: Cursor Virtual  |  ESC: Voltar ao irisTV"
     appContainer.isHidden = false
     window.makeFirstResponder(dynamicView)
+
     dynamicView.load(URLRequest(url: finalUrl))
   }
 
   @objc func closeEmbeddedAppAction() {
-    destroyAppWebView()
+    guard let key = currentAppKey, let active = appWebView else {
+      appContainer.isHidden = true
+      currentAppUrl = nil
+      window.makeFirstResponder(webView)
+      return
+    }
+
+    // 1. Snapshot da tela atual para exibição imediata em 0ms no próximo retorno
+    active.takeSnapshot(with: nil) { [weak self] img, _ in
+      if let img = img { self?.saveSnapshot(key: key, image: img) }
+    }
+
+    // 2. Extrai e salva URL exata e rolagem na sessão persistente
+    active.evaluateJavaScript("""
+      JSON.stringify({
+        url: window.location.href,
+        scrollX: window.scrollX || 0,
+        scrollY: window.scrollY || 0
+      })
+    """) { [weak self] res, _ in
+      guard let self = self,
+            let jsonStr = res as? String,
+            let data = jsonStr.data(using: .utf8),
+            let obj = try? JSONSerialization.jsonObject(with: data) as? [String: Any],
+            let savedUrl = obj["url"] as? String else { return }
+      self.saveAppSession(
+        key: key,
+        url: savedUrl,
+        scrollX: obj["scrollX"] as? Double ?? 0,
+        scrollY: obj["scrollY"] as? Double ?? 0
+      )
+    }
+
+    // 3. Suspensão com Ultra-baixa RAM: pausa vídeos e áudios para liberar decodificadores de hardware
+    active.evaluateJavaScript("""
+      document.querySelectorAll('video, audio').forEach(function(m) {
+        try { m.pause(); } catch(_) {}
+      });
+      window.dispatchEvent(new Event('iris-app-suspend'));
+    """, completionHandler: nil)
+
+    active.isHidden = true
+
+    // 4. Estratégia Jetsam / LRU (mantém no máximo maxWarmApps em RAM)
+    if warmAppLru.count > maxWarmApps {
+      let oldestKey = warmAppLru.removeFirst()
+      if let evicted = warmAppViews.removeValue(forKey: oldestKey) {
+        NSLog("[irisTV FastSwitch] Liberando memória do app mais antigo (Jetsam): %@", oldestKey)
+        evicted.stopLoading()
+        evicted.uiDelegate = nil
+        evicted.navigationDelegate = nil
+        evicted.removeFromSuperview()
+      }
+    }
+
     appContainer.isHidden = true
+    currentAppKey = nil
     currentAppUrl = nil
     window.makeFirstResponder(webView)
   }
@@ -603,10 +777,12 @@ final class IrisAppDelegate: NSObject, NSApplicationDelegate, WKUIDelegate, WKNa
         self.closeEmbeddedAppAction()
       } else if action == "openAppUrl", let urlStr = dict["url"] as? String, let u = URL(string: urlStr) {
         let name = (dict["name"] as? String) ?? "App"
-        self.openEmbeddedApp(url: u, name: name)
+        let appId = dict["id"] as? String
+        self.openEmbeddedApp(url: u, name: name, appId: appId)
       } else if action == "openExternal", let urlStr = dict["url"] as? String, let u = URL(string: urlStr) {
         let name = (dict["name"] as? String) ?? (u.host ?? "App")
-        self.openEmbeddedApp(url: u, name: name)
+        let appId = dict["id"] as? String
+        self.openEmbeddedApp(url: u, name: name, appId: appId)
       } else if action == "saveCredentials", let host = dict["host"] as? String, let password = dict["password"] as? String {
         let username = (dict["username"] as? String) ?? ""
         self.saveCredentialToIrisVault(host: host, username: username, password: password)
@@ -620,6 +796,30 @@ final class IrisAppDelegate: NSObject, NSApplicationDelegate, WKUIDelegate, WKNa
                 let pJson = String(data: pData, encoding: .utf8) else { return }
           self?.appWebView?.evaluateJavaScript("window.__irisFillCredentials && window.__irisFillCredentials(\(uJson), \(pJson));", completionHandler: nil)
         }
+      }
+    }
+  }
+
+  func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
+    if webView == self.appWebView {
+      if let snapView = self.snapshotImageView, !snapView.isHidden {
+        NSAnimationContext.runAnimationGroup({ ctx in
+          ctx.duration = 0.12
+          snapView.animator().alphaValue = 0.0
+        }, completionHandler: {
+          snapView.isHidden = true
+          snapView.alphaValue = 1.0
+        })
+      }
+      if let key = self.currentAppKey, let session = self.loadAppSession(key: key) {
+        let sx = session["scrollX"] as? Double ?? 0
+        let sy = session["scrollY"] as? Double ?? 0
+        if sx > 0 || sy > 0 {
+          webView.evaluateJavaScript("window.scrollTo(\(sx), \(sy));", completionHandler: nil)
+        }
+      }
+      if let currentUrl = webView.url?.absoluteString, let key = self.currentAppKey {
+        self.saveAppSession(key: key, url: currentUrl)
       }
     }
   }

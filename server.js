@@ -2423,6 +2423,55 @@ function createAppServer() {
       return sendJson(req, res, 200, { preference: globalGpuPreference, gpus: hwStatusCache.gpus || [] });
     }
 
+    // === Apple TV Persistent App Sessions (0ms Restore & Low-RAM State) ===
+    if (pathname === '/api/os/app-sessions') {
+      const sessionsFile = path.join(os.homedir(), '.iristv', 'app-sessions.json');
+      const readSessions = () => {
+        try {
+          if (fs.existsSync(sessionsFile)) {
+            return JSON.parse(fs.readFileSync(sessionsFile, 'utf8'));
+          }
+        } catch (_) {}
+        return {};
+      };
+      const writeSessions = (data) => {
+        try {
+          fs.mkdirSync(path.dirname(sessionsFile), { recursive: true });
+          fs.writeFileSync(sessionsFile, JSON.stringify(data, null, 2), 'utf8');
+        } catch (_) {}
+      };
+
+      if (req.method === 'GET') {
+        const id = String(reqUrl.searchParams.get('id') || '').toLowerCase().trim();
+        const allSessions = readSessions();
+        if (id) {
+          return sendJson(req, res, 200, { ok: true, session: allSessions[id] || null });
+        }
+        return sendJson(req, res, 200, { ok: true, sessions: allSessions });
+      }
+
+      if (req.method === 'POST') {
+        try {
+          const body = await readJsonBody(req);
+          const id = String(body.id || body.key || '').toLowerCase().trim();
+          if (!id) return sendJson(req, res, 400, { ok: false, error: 'App id missing' });
+          const allSessions = readSessions();
+          allSessions[id] = {
+            id,
+            url: body.url || '',
+            name: body.name || '',
+            scrollX: Number(body.scrollX) || 0,
+            scrollY: Number(body.scrollY) || 0,
+            savedAt: Date.now()
+          };
+          writeSessions(allSessions);
+          return sendJson(req, res, 200, { ok: true, session: allSessions[id] });
+        } catch (err) {
+          return sendJson(req, res, 400, { ok: false, error: err.message });
+        }
+      }
+    }
+
     if (pathname === '/api/wifi/status') {
       try {
         const doScan = reqUrl.searchParams.get('scan') === '1';
