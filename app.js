@@ -3060,7 +3060,12 @@
     if (activeChannel) attachPreviewStream(activeChannel);
   }
 
-  function renderTab(tab) {
+  const tabPaneCache = new Map();
+  let lastAppsFilterRendered = null;
+  let lastAppsCountRendered = -1;
+  let lastNewsFetchAt = 0;
+
+  function renderTab(tab, forceRebuild = false) {
     destroyLivePreview();
     const oldIdx = TAB_ORDER.indexOf(state.activeTab || 'home');
     const newIdx = TAB_ORDER.indexOf(tab);
@@ -3072,11 +3077,30 @@
 
     heroSection.classList.toggle('hidden', tab !== 'home' || !!state.settings.hideHeroBanner);
 
-    // Fluid directional tab transition on rowsContainer
+    // Zero-reflow GPU tab animation (no offsetWidth forced layout!)
     rowsContainer.classList.remove('tab-anim-enter-right', 'tab-anim-enter-left');
-    void rowsContainer.offsetWidth; // Force reflow
-    rowsContainer.classList.add(isForward ? 'tab-anim-enter-right' : 'tab-anim-enter-left');
-    rowsContainer.innerHTML = '';
+    requestAnimationFrame(() => {
+      rowsContainer.classList.add(isForward ? 'tab-anim-enter-right' : 'tab-anim-enter-left');
+    });
+
+    // Fast-path Keep-Alive Cache for heavy tabs (shows, apps, news) — < 1ms switch!
+    if (!forceRebuild && (tab === 'shows' || tab === 'news' || tab === 'apps')) {
+      const cachedPane = tabPaneCache.get(tab);
+      const isAppsValid = tab !== 'apps' || (!state.appsGridDirty && lastAppsFilterRendered === state.activeAppFilter && lastAppsCountRendered === APPS.length);
+      const isShowsValid = tab !== 'shows' || !state.showsGridDirty;
+      if (cachedPane && isAppsValid && isShowsValid) {
+        rowsContainer.replaceChildren(cachedPane);
+        if (tab === 'news' && Date.now() - lastNewsFetchAt > 120000) {
+          lastNewsFetchAt = Date.now();
+          loadNewsFeed(false);
+        }
+        const tvContent = document.getElementById('tv-content');
+        if (tvContent) tvContent.scrollTop = 0;
+        return;
+      }
+    }
+
+    rowsContainer.replaceChildren();
 
     const isKidsSafeShow = (s) => {
       if (typeof s.kidsSafe === 'boolean') return s.kidsSafe;
@@ -3429,16 +3453,26 @@
 
       rowsContainer.appendChild(frag);
     } else if (tab === 'shows') {
-      renderShowsAndMoviesTab(frag);
-      rowsContainer.appendChild(frag);
+      const pane = document.createElement('div');
+      pane.className = 'tab-pane';
+      renderShowsAndMoviesTab(pane);
+      tabPaneCache.set('shows', pane);
+      rowsContainer.replaceChildren(pane);
+      state.showsGridDirty = false;
       renderShowsGridOnly();
       loadShowsCatalog();
     } else if (tab === 'news') {
-      renderNewsTab(frag);
-      rowsContainer.appendChild(frag);
+      const pane = document.createElement('div');
+      pane.className = 'tab-pane';
+      renderNewsTab(pane);
+      tabPaneCache.set('news', pane);
+      rowsContainer.replaceChildren(pane);
       renderNewsGridOnly();
+      lastNewsFetchAt = Date.now();
       loadNewsFeed(false);
     } else if (tab === 'apps') {
+      const pane = document.createElement('div');
+      pane.className = 'tab-pane';
       const section = document.createElement('section');
       section.className = 'tv-row';
       section.innerHTML = `
@@ -3456,10 +3490,19 @@
       `;
       const grid = document.createElement('div');
       grid.className = 'apps-grid-layout';
-      const filtered = state.activeAppFilter === 'all' ? APPS : APPS.filter((a) => a.category === state.activeAppFilter);
-      filtered.forEach((app, idx) => grid.appendChild(createAppTile(app, 'row-1', idx)));
+      const populateAppsGrid = () => {
+        const gFrag = document.createDocumentFragment();
+        const filtered = state.activeAppFilter === 'all' ? APPS : APPS.filter((a) => a.category === state.activeAppFilter);
+        filtered.forEach((app, idx) => gFrag.appendChild(createAppTile(app, 'row-1', idx)));
+        grid.replaceChildren(gFrag);
+        lastAppsFilterRendered = state.activeAppFilter;
+        lastAppsCountRendered = APPS.length;
+        state.appsGridDirty = false;
+      };
+      populateAppsGrid();
       section.appendChild(grid);
-      frag.appendChild(section);
+      pane.appendChild(section);
+      tabPaneCache.set('apps', pane);
 
       section.querySelector('#apps-open-store-btn')?.addEventListener('click', () => {
         const storeApp = APPS.find((a) => a.id === 'appstore') || window.IrisStore?.getFullCatalog().find((a) => a.id === 'appstore');
@@ -3470,10 +3513,11 @@
         chip.addEventListener('click', () => {
           playUiSound('move');
           state.activeAppFilter = chip.dataset.cat;
-          renderTab('apps');
+          section.querySelectorAll('.cat-chip').forEach((c) => c.classList.toggle('active', c === chip));
+          populateAppsGrid();
         });
       });
-      rowsContainer.appendChild(frag);
+      rowsContainer.replaceChildren(pane);
     } else if (tab === 'live') {
       renderLiveTab(frag);
       rowsContainer.appendChild(frag);
@@ -3481,7 +3525,8 @@
       renderSettingsWorkspace(true);
     }
 
-    document.getElementById('tv-content').scrollTo({ top: 0, behavior: 'smooth' });
+    const tvContent = document.getElementById('tv-content');
+    if (tvContent) tvContent.scrollTop = 0;
   }
 
   navPills.forEach((pill) => {

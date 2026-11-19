@@ -678,7 +678,7 @@ final class IrisAppDelegate: NSObject, NSApplicationDelegate, WKUIDelegate, WKNa
   }
 }
 
-let defaultUrlString = "http://127.0.0.1:3000/lightning/index.html"
+let defaultUrlString = "http://127.0.0.1:3000/index.html"
 let rawUrl = CommandLine.arguments.dropFirst().first ?? defaultUrlString
 let url = URL(string: rawUrl) ?? URL(string: defaultUrlString)!
 let app = NSApplication.shared
