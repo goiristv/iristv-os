@@ -190,4 +190,5 @@
 
   window.IrisViews = window.IrisViews || {};
   window.IrisViews.NewsView = NewsView;
+  window.IrisNewsView = NewsView;
 })();

@@ -133,6 +133,19 @@
       this.fireAncestors('$goHome');
     }
 
+    _handleClick(x, y) {
+      // Start button bounds: 750 <= x <= 1170, 730 <= y <= 800 (or click anywhere on the card)
+      if ((x >= 700 && x <= 1220 && y >= 700 && y <= 830) || (x >= 410 && x <= 1510 && y >= 200 && y <= 880)) {
+        this._handleEnter();
+        return true;
+      }
+      return false;
+    }
+
+    _isHoverable(x, y) {
+      return (x >= 700 && x <= 1220 && y >= 700 && y <= 830);
+    }
+
     _handleBack() {
       this.fireAncestors('$goHome');
     }

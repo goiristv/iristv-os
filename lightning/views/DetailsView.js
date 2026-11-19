@@ -283,4 +283,5 @@
 
   window.IrisViews = window.IrisViews || {};
   window.IrisViews.DetailsView = DetailsView;
+  window.IrisDetailsView = DetailsView;
 })();

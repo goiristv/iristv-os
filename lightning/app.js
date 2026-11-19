@@ -284,7 +284,7 @@
     } else if (code === 40) {
       if (focused && typeof focused._handleDown === 'function') focused._handleDown();
       else if (typeof app._handleDown === 'function') app._handleDown();
-    } else if (code === 13) {
+    } else if (code === 13 || code === 32) {
       if (focused && typeof focused._handleEnter === 'function') focused._handleEnter();
       else if (typeof app._handleEnter === 'function') app._handleEnter();
     } else if (code === 27 || code === 8 || code === 461 || code === 10009 || code === 4) {
@@ -294,18 +294,84 @@
     }
   });
 
+  // Mouse, Trackpad & Pointer Event Adapter for macOS & Desktop
+  function attachMouseHandlers(canvas, app) {
+    if (!canvas || !app) return;
+
+    function getStageCoords(e) {
+      var rect = canvas.getBoundingClientRect();
+      return {
+        x: (e.clientX - rect.left) * (1920 / rect.width),
+        y: (e.clientY - rect.top) * (1080 / rect.height)
+      };
+    }
+
+    canvas.addEventListener('click', function (e) {
+      var coords = getStageCoords(e);
+      var focused = (typeof app._getFocused === 'function') ? app._getFocused() : null;
+
+      var kb = app.tag('KeyboardOverlay');
+      if (kb && kb.visible && kb.alpha > 0.5) {
+        if (typeof kb._handleClick === 'function' && kb._handleClick(coords.x, coords.y)) return;
+      }
+
+      var player = app.tag('PlayerOverlay');
+      if (player && player.visible && player.alpha > 0.5) {
+        if (typeof player._handleClick === 'function' && player._handleClick(coords.x, coords.y)) return;
+      }
+
+      if (focused) {
+        if (typeof focused._handleClick === 'function') {
+          var handled = focused._handleClick(coords.x, coords.y);
+          if (handled) return;
+        }
+        if (typeof focused._handleEnter === 'function') {
+          focused._handleEnter();
+        }
+      }
+    });
+
+    canvas.addEventListener('mousemove', function (e) {
+      var coords = getStageCoords(e);
+      var focused = (typeof app._getFocused === 'function') ? app._getFocused() : null;
+      var hover = false;
+      if (focused && typeof focused._isHoverable === 'function') {
+        hover = focused._isHoverable(coords.x, coords.y);
+      }
+      canvas.style.cursor = hover ? 'pointer' : 'default';
+    });
+
+    var wheelTime = 0;
+    canvas.addEventListener('wheel', function (e) {
+      var now = Date.now();
+      if (now - wheelTime < 130) return;
+      wheelTime = now;
+      var focused = (typeof app._getFocused === 'function') ? app._getFocused() : null;
+      if (!focused) return;
+      if (Math.abs(e.deltaX) > Math.abs(e.deltaY)) {
+        if (e.deltaX > 15 && typeof focused._handleRight === 'function') focused._handleRight();
+        else if (e.deltaX < -15 && typeof focused._handleLeft === 'function') focused._handleLeft();
+      } else {
+        if (e.deltaY > 15 && typeof focused._handleDown === 'function') focused._handleDown();
+        else if (e.deltaY < -15 && typeof focused._handleUp === 'function') focused._handleUp();
+      }
+    }, { passive: true });
+  }
+
   // Launch Helper for HTML Shell
   window.launchIrisLightning = function (targetCanvas) {
+    var canvas = targetCanvas || document.getElementById('lightning-canvas');
     var app = new IrisLightningApp({
       stage: {
         w: 1920,
         h: 1080,
-        canvas: targetCanvas || document.getElementById('lightning-canvas'),
+        canvas: canvas,
         clearColor: 0x00000000,
         precision: 1
       }
     });
     window.irisLightningApp = app;
+    attachMouseHandlers(canvas, app);
     return app;
   };
 

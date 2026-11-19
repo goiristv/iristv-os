@@ -818,25 +818,35 @@
     else if (code === 38) window.irisLightningApp._handleUp();
     else if (code === 39) window.irisLightningApp._handleRight();
     else if (code === 40) window.irisLightningApp._handleDown();
-    else if (code === 13) window.irisLightningApp._handleEnter();
+    else if (code === 13 || code === 32) window.irisLightningApp._handleEnter();
     else if (code === 27 || code === 8 || code === 461) {
       e.preventDefault();
       window.irisLightningApp._handleBack();
     }
   });
 
-  // Exportar Launch Helper
+  // Exportar Launch Helper com Suporte a Mouse & Trackpad no Mac
   window.launchIrisLightning = function (targetCanvas) {
+    const canvas = targetCanvas || document.getElementById('lightning-canvas');
     const app = new IrisLightningApp({
       stage: {
         w: 1920,
         h: 1080,
-        canvas: targetCanvas || document.getElementById('lightning-canvas'),
+        canvas: canvas,
         clearColor: 0x00000000,
         precision: 1
       }
     });
     window.irisLightningApp = app;
+
+    if (canvas) {
+      canvas.addEventListener('click', (e) => {
+        if (!window.irisLightningApp) return;
+        window.irisLightningApp._handleEnter();
+      });
+      canvas.style.cursor = 'pointer';
+    }
+
     return app;
   };
 })();

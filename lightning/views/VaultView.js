@@ -190,4 +190,5 @@
 
   window.IrisViews = window.IrisViews || {};
   window.IrisViews.VaultView = VaultView;
+  window.IrisVaultView = VaultView;
 })();

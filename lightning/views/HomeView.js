@@ -591,6 +591,71 @@
         }
       }
     }
+
+    _handleClick(x, y) {
+      // 1. Hero Buttons
+      if (y >= 340 && y <= 400) {
+        if (x >= 120 && x <= 340) {
+          const topShow = this._shows[0];
+          this.fireAncestors('$playStream', {
+            title: topShow.title,
+            sub: topShow.genre,
+            stream: topShow.stream
+          });
+          return true;
+        } else if (x >= 360 && x <= 540) {
+          const topShow = this._shows[0];
+          this.fireAncestors('$openDetails', topShow);
+          return true;
+        }
+      }
+
+      // 2. Channels Shelf
+      if (y >= 460 && y <= 590) {
+        const shelfX = this.tag('ChannelsShelf').tag('List').tag('Items').x || 0;
+        const clickX = x - 80 - shelfX;
+        const chIdx = Math.floor(clickX / 240);
+        if (chIdx >= 0 && chIdx < this._channels.length) {
+          this._channelCol = chIdx;
+          this.fireAncestors('$openLiveTv', this._channels[chIdx]);
+          return true;
+        }
+      }
+
+      // 3. Shows Shelf
+      if (y >= 640 && y <= 950) {
+        const shelfX = this.tag('ShowsShelf').tag('List').tag('Items').x || 0;
+        const clickX = x - 80 - shelfX;
+        const shIdx = Math.floor(clickX / 240);
+        if (shIdx >= 0 && shIdx < this._shows.length) {
+          this._showCol = shIdx;
+          this.fireAncestors('$openDetails', this._shows[shIdx]);
+          return true;
+        }
+      }
+
+      // 4. Dock Apps Shelf
+      if (y >= 955 && y <= 1075) {
+        const shelfX = this.tag('DockShelf').tag('List').tag('Items').x || 0;
+        const clickX = x - 80 - shelfX;
+        const appIdx = Math.floor(clickX / 130);
+        if (appIdx >= 0 && appIdx < this._apps.length) {
+          this._dockCol = appIdx;
+          this.fireAncestors('$openApp', this._apps[appIdx]);
+          return true;
+        }
+      }
+
+      return false;
+    }
+
+    _isHoverable(x, y) {
+      if (y >= 340 && y <= 400 && ((x >= 120 && x <= 340) || (x >= 360 && x <= 540))) return true;
+      if (y >= 460 && y <= 590) return true;
+      if (y >= 640 && y <= 950) return true;
+      if (y >= 955 && y <= 1075) return true;
+      return false;
+    }
   }
 
   window.IrisHomeView = HomeView;
