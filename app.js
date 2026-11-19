@@ -2541,20 +2541,30 @@
     const step = () => {
       if (grid.__irisRenderToken !== token) return;
       const frag = document.createDocumentFragment();
+      const batchCards = [];
       const end = Math.min(total, renderedCount + batchSize);
       for (let i = renderedCount; i < end; i++) {
         const card = createCardFn(items[i], i);
         if (card) {
-          card.style.setProperty('--batch-i', String(i - renderedCount));
-          card.classList.add('iris-card-reveal');
+          card.style.transitionDelay = `${(i - renderedCount) * 32}ms`;
+          card.classList.add('iris-card-pre');
           totalImgs += enhanceProgressiveImages(card, () => {
             loadedImgs++;
             updateBar();
           });
+          batchCards.push(card);
           frag.appendChild(card);
         }
       }
       grid.appendChild(frag);
+      // Commit initial state and trigger smooth GPU rise-up transition on next frame
+      requestAnimationFrame(() => {
+        if (grid.__irisRenderToken !== token) return;
+        batchCards.forEach((c) => {
+          c.classList.remove('iris-card-pre');
+          c.classList.add('iris-card-in');
+        });
+      });
       renderedCount = end;
       updateBar();
 

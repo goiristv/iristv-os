@@ -1567,17 +1567,7 @@ body.theme-aurora .theme-swatch-dot {
 .apps-grid-layout .app-tile-item,
 .poster-grid-layout .poster-card,
 .news-split-list .news-list-item {
-  contain: layout style paint;
-  content-visibility: auto;
-  contain-intrinsic-size: 200px 280px;
-}
-
-.apps-grid-layout .app-tile-item {
-  contain-intrinsic-size: 150px 175px;
-}
-
-.news-split-list .news-list-item {
-  contain-intrinsic-size: 320px 130px;
+  contain: layout style;
 }
 
 /* =========================================
@@ -1635,23 +1625,24 @@ body.theme-aurora .theme-swatch-dot {
   100% { background-position: -200% 0; }
 }
 
-@keyframes irisCardReveal {
-  0% {
-    opacity: 0;
-    transform: translate3d(0, 24px, 0) scale(0.96);
-  }
-  100% {
-    opacity: 1;
-    transform: translate3d(0, 0, 0) scale(1);
-  }
+.iris-card-pre,
+.app-tile-item.iris-card-pre,
+.poster-card.iris-card-pre,
+.news-list-item.iris-card-pre {
+  animation: none !important;
+  opacity: 0 !important;
+  transform: translate3d(0, 28px, 0) scale(0.95) !important;
+  will-change: transform, opacity;
 }
 
-.iris-card-reveal,
-.app-tile-item.iris-card-reveal,
-.poster-card.iris-card-reveal,
-.news-list-item.iris-card-reveal {
-  opacity: 0;
-  animation: irisCardReveal 0.34s cubic-bezier(0.22, 1, 0.36, 1) calc(var(--batch-i, 0) * 24ms) forwards;
+.iris-card-in,
+.app-tile-item.iris-card-in,
+.poster-card.iris-card-in,
+.news-list-item.iris-card-in {
+  animation: none !important;
+  opacity: 1 !important;
+  transform: translate3d(0, 0, 0) scale(1) !important;
+  transition: opacity 0.32s ease-out, transform 0.4s cubic-bezier(0.22, 1, 0.36, 1) !important;
 }
 
 /* Shimmer placeholder while poster/icon/news image is loading */
