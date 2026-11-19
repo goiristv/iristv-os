@@ -289,6 +289,10 @@ if [ -x /usr/bin/waydroid ] && [ -f /var/lib/waydroid/waydroid.cfg ]; then
         (
           for _j in $(seq 1 12); do
             if waydroid shell getprop sys.boot_completed 2>/dev/null | grep -q "1"; then
+              # Desativa animações artificiais de transição do Android (-400ms no cold launch)
+              waydroid shell settings put global window_animation_scale 0 >/dev/null 2>&1 || true
+              waydroid shell settings put global transition_animation_scale 0 >/dev/null 2>&1 || true
+              waydroid shell settings put global animator_duration_scale 0 >/dev/null 2>&1 || true
               for pkg in com.netflix.ninja com.teamsmart.videomanager.tv com.amazon.amazonvideo.livingroom com.disney.disneyplus; do
                 if waydroid shell pm list packages 2>/dev/null | grep -q "$pkg"; then
                   waydroid shell cmd package compile -m speed "$pkg" >/dev/null 2>&1 &

@@ -3094,11 +3094,39 @@ function createAppServer() {
       });
     }
 
+    // Persistent IPC pipe to Waydroid Android shell (eliminates ~500ms Python CLI startup overhead per launch)
+    const sendFastWaydroidCmd = (cmdStr) => {
+      try {
+        if (!global.__irisWaydroidPipe || global.__irisWaydroidPipe.killed || !global.__irisWaydroidPipe.stdin.writable) {
+          const lxcBin = findExec(['lxc-attach']);
+          const waydroidBin = findExec(['waydroid']);
+          if (lxcBin) {
+            global.__irisWaydroidPipe = spawn(lxcBin, ['-n', 'waydroid', '--', '/system/bin/sh'], {
+              stdio: ['pipe', 'ignore', 'ignore'],
+              detached: true
+            });
+          } else if (waydroidBin) {
+            global.__irisWaydroidPipe = spawn(waydroidBin, ['shell'], {
+              stdio: ['pipe', 'ignore', 'ignore'],
+              detached: true
+            });
+          }
+          global.__irisWaydroidPipe?.on('exit', () => { global.__irisWaydroidPipe = null; });
+          global.__irisWaydroidPipe?.unref();
+        }
+        if (global.__irisWaydroidPipe && global.__irisWaydroidPipe.stdin.writable) {
+          global.__irisWaydroidPipe.stdin.write(cmdStr + '\n');
+          return true;
+        }
+      } catch (_) {}
+      return false;
+    };
+
     if (req.method === 'POST' && pathname === '/api/os/close-tv-app') {
       const waydroidBin = findExec(['waydroid']);
       if (process.platform === 'linux' && waydroidBin) {
         try {
-          const actOut = execSync("waydroid shell dumpsys activity activities 2>/dev/null | grep -E '(mResumedActivity|topResumedActivity)' | head -n 1", { timeout: 2500, encoding: 'utf8' });
+          const actOut = execSync("waydroid shell dumpsys activity activities 2>/dev/null | grep -E '(mResumedActivity|topResumedActivity)' | head -n 1", { timeout: 1500, encoding: 'utf8' });
           const m = actOut.match(/([a-zA-Z0-9_\.]+\/[a-zA-Z0-9_\.]+)/);
           if (m) {
             const comp = m[1];
@@ -3119,9 +3147,11 @@ function createAppServer() {
           }
         } catch (_) {}
 
-        try {
-          execSync("waydroid shell input keyevent KEYCODE_HOME 2>/dev/null", { timeout: 2000, stdio: 'ignore' });
-        } catch (_) {}
+        if (!sendFastWaydroidCmd('input keyevent KEYCODE_HOME')) {
+          try {
+            execSync("waydroid shell input keyevent KEYCODE_HOME 2>/dev/null", { timeout: 1500, stdio: 'ignore' });
+          } catch (_) {}
+        }
       }
 
       if (global.__irisActiveTvAppProc) {
@@ -3190,13 +3220,15 @@ function createAppServer() {
           };
 
           if (resumeActivity && resumeActivity.startsWith(androidPkg)) {
-            const proc = spawn(waydroidBin, ['session', 'action', `am start -W -n ${resumeActivity}`], {
-              env: envArgs,
-              detached: true,
-              stdio: 'ignore'
-            });
-            proc.unref();
-            global.__irisActiveTvAppProc = proc;
+            if (!sendFastWaydroidCmd(`cmd activity start-activity -W -n ${resumeActivity} || am start -n ${resumeActivity}`)) {
+              const proc = spawn(waydroidBin, ['session', 'action', `cmd activity start-activity -W -n ${resumeActivity}`], {
+                env: envArgs,
+                detached: true,
+                stdio: 'ignore'
+              });
+              proc.unref();
+              global.__irisActiveTvAppProc = proc;
+            }
             return sendJson(req, res, 200, {
               ok: true,
               launched: true,
@@ -3208,13 +3240,15 @@ function createAppServer() {
             });
           }
 
-          const proc = spawn(waydroidBin, ['app', 'launch', androidPkg], {
-            env: envArgs,
-            detached: true,
-            stdio: 'ignore'
-          });
-          proc.unref();
-          global.__irisActiveTvAppProc = proc;
+          if (!sendFastWaydroidCmd(`cmd activity start-activity -a android.intent.action.MAIN -c android.intent.category.LAUNCHER -p ${androidPkg} || monkey -p ${androidPkg} -c android.intent.category.LAUNCHER 1`)) {
+            const proc = spawn(waydroidBin, ['app', 'launch', androidPkg], {
+              env: envArgs,
+              detached: true,
+              stdio: 'ignore'
+            });
+            proc.unref();
+            global.__irisActiveTvAppProc = proc;
+          }
           return sendJson(req, res, 200, {
             ok: true,
             launched: true,
