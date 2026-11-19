@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>irisTV — Lightning Engine (60 FPS WebGL)</title>
+  <link rel="icon" type="image/svg+xml" href="../logo.svg" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      user-select: none;
+      -webkit-user-select: none;
+    }
+    html, body {
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      background: #070b13;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+    }
+    #tv-video-native {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      object-fit: cover;
+      background: #000000;
+      z-index: 0;
+      display: none;
+    }
+    #lightning-canvas {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      z-index: 1;
+      display: block;
+    }
+  </style>
+</head>
+<body>
+  <video id="tv-video-native" playsinline></video>
+  <canvas id="lightning-canvas" width="1920" height="1080"></canvas>
+
+  <!-- Core & Platform Bridges -->
+  <script src="../webos/polyfills.js"></script>
+  <script src="../vendor/lightning.es5.min.js"></script>
+  <script src="../webos/webos-bridge.js"></script>
+
+  <!-- Data Catalog -->
+  <script src="data/catalog.js"></script>
+
+  <!-- Reusable Components -->
+  <script src="components/VirtualKeyboard.js"></script>
+  <script src="components/VideoPlayer.js"></script>
+
+  <!-- Feature Views -->
+  <script src="views/DetailsView.js"></script>
+  <script src="views/NewsView.js"></script>
+  <script src="views/VaultView.js"></script>
+  <script src="views/DvrView.js"></script>
+  <script src="views/LiveTvView.js"></script>
+  <script src="views/MediaView.js"></script>
+  <script src="views/SettingsView.js"></script>
+  <script src="views/OnboardingView.js"></script>
+  <script src="views/HomeView.js"></script>
+
+  <!-- Master Application & Router -->
+  <script src="app.js"></script>
+
+  <script>
+    window.addEventListener('DOMContentLoaded', function () {
+      var canvas = document.getElementById('lightning-canvas');
+      if (window.launchIrisLightning) {
+        window.launchIrisLightning(canvas);
+      }
+    });
+  </script>
+</body>
+</html>

@@ -3362,8 +3362,9 @@ function createAppServer() {
     ]);
     const relPath = path.relative(ROOT_DIR, resolvedPath).replace(/\\/g, '/');
     const isSiteAsset = /^site\/[a-z0-9_.\/-]+\.(html|css|js|svg|png|jpg|webp)$/i.test(relPath);
+    const isLightningAsset = /^lightning\/[a-z0-9_.\/-]+\.(html|css|js|svg|png|jpg|webp|json|ttf|woff2)$/i.test(relPath);
     const isMediaAsset = /^(icons|media|sounds|vendor|public)\/[a-z0-9_.\/-]+\.(jpg|jpeg|png|mp3|svg|webp|json|ttf|woff2|js|map)$/i.test(relPath);
-    if (!allowedFiles.has(relPath) && !isMediaAsset && !isSiteAsset) {
+    if (!allowedFiles.has(relPath) && !isMediaAsset && !isSiteAsset && !isLightningAsset) {
       res.writeHead(404, { 'Content-Type': 'text/plain; charset=utf-8' });
       return res.end('404 Not Found');
     }

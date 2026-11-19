@@ -81,7 +81,7 @@ def build_ipk():
     ctrl_root.mkdir(parents=True, exist_ok=True)
 
     use_lightning = os.environ.get("IRISTV_ENGINE", "lightning") == "lightning" or "--lightning" in sys.argv
-    main_file = "lightning.html" if use_lightning else "index.html"
+    main_file = "lightning/index.html" if use_lightning else "index.html"
 
     # 1. appinfo.json oficial webOS com resolution 1920x1080 (evita render 4K que consome 4x VRAM)
     appinfo = {
@@ -152,11 +152,23 @@ def build_ipk():
         if jf.exists():
             transpile_js_esbuild(jf, app_root / js_name)
 
-    # 6. Vendor, icons, sounds e wallpapers essenciais
-    for folder in ("vendor", "icons", "sounds"):
+    # 6. Vendor, icons, sounds, public e wallpapers essenciais
+    for folder in ("vendor", "icons", "sounds", "public"):
         src_dir = ROOT_DIR / folder
         if src_dir.exists():
             shutil.copytree(src_dir, app_root / folder, dirs_exist_ok=True)
+
+    # 6.1 Pasta modular lightning/ (VanillaJS 100% Canvas WebGL)
+    lightning_dir = ROOT_DIR / "lightning"
+    if lightning_dir.exists():
+        print("  -> Transpilando pasta modular lightning/ para Chromium 53...")
+        (app_root / "lightning").mkdir(parents=True, exist_ok=True)
+        for js_file in lightning_dir.rglob("*.js"):
+            rel_js = js_file.relative_to(lightning_dir)
+            dst_js = app_root / "lightning" / rel_js
+            transpile_js_esbuild(js_file, dst_js)
+        for html_file in lightning_dir.glob("*.html"):
+            shutil.copy2(html_file, app_root / "lightning" / html_file.name)
 
     wp_src = ROOT_DIR / "media" / "wallpapers"
     if wp_src.exists():
