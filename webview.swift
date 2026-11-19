@@ -23,6 +23,8 @@ final class IrisAppDelegate: NSObject, NSApplicationDelegate, WKUIDelegate, WKNa
   private var currentAppKey: String? = nil
   private var snapshotImageView: NSImageView!
   private let maxWarmApps = 3
+  private var cachedTvNavScript: String?
+  private var cachedPwScript: String?
 
   func applyGpuPreference(_ pref: String) {
     let devices = MTLCopyAllDevices()
@@ -353,6 +355,7 @@ final class IrisAppDelegate: NSObject, NSApplicationDelegate, WKUIDelegate, WKNa
   private func buildWebConfig(withBridge: Bool, injectTvNav: Bool = false, injectPasswordManager: Bool = false) -> WKWebViewConfiguration {
     let config = WKWebViewConfiguration()
     config.websiteDataStore = WKWebsiteDataStore.default()
+    config.suppressesIncrementalRendering = false
     config.mediaTypesRequiringUserActionForPlayback = []
     config.allowsAirPlayForMediaPlayback = true
     config.preferences.setValue(true, forKey: "fullScreenEnabled")
@@ -362,26 +365,35 @@ final class IrisAppDelegate: NSObject, NSApplicationDelegate, WKUIDelegate, WKNa
     if withBridge {
       config.userContentController.add(self, name: "irisWebView")
     }
-    if injectTvNav, let scriptSource = loadTvSpatialNavScript() {
-      let userScript = WKUserScript(
-        source: scriptSource,
-        injectionTime: .atDocumentEnd,
-        forMainFrameOnly: true
-      )
-      config.userContentController.addUserScript(userScript)
+    if injectTvNav {
+      if cachedTvNavScript == nil { cachedTvNavScript = loadTvSpatialNavScript() }
+      if let scriptSource = cachedTvNavScript {
+        let userScript = WKUserScript(
+          source: scriptSource,
+          injectionTime: .atDocumentEnd,
+          forMainFrameOnly: true
+        )
+        config.userContentController.addUserScript(userScript)
+      }
     }
     if injectPasswordManager {
-      let pwScript = WKUserScript(
-        source: passwordManagerScriptSource(),
-        injectionTime: .atDocumentEnd,
-        forMainFrameOnly: false
-      )
-      config.userContentController.addUserScript(pwScript)
+      if cachedPwScript == nil { cachedPwScript = passwordManagerScriptSource() }
+      if let pwSource = cachedPwScript {
+        let pwScript = WKUserScript(
+          source: pwSource,
+          injectionTime: .atDocumentEnd,
+          forMainFrameOnly: false
+        )
+        config.userContentController.addUserScript(pwScript)
+      }
     }
     return config
   }
 
   func applicationDidFinishLaunching(_ notification: Notification) {
+    URLCache.shared = URLCache(memoryCapacity: 64 * 1024 * 1024, diskCapacity: 512 * 1024 * 1024, diskPath: "iris_url_cache")
+    if cachedTvNavScript == nil { cachedTvNavScript = loadTvSpatialNavScript() }
+    if cachedPwScript == nil { cachedPwScript = passwordManagerScriptSource() }
     setupMainMenu()
     if let iconPath = Bundle.main.path(forResource: "AppIcon", ofType: "icns"),
        let icon = NSImage(contentsOfFile: iconPath) {
@@ -635,9 +647,13 @@ final class IrisAppDelegate: NSObject, NSApplicationDelegate, WKUIDelegate, WKNa
     }
 
     // Cenário 2: Cold Start com Restauração de Sessão e Snapshot Instantâneo
+    let isNetflix = (url.host?.lowercased().contains("netflix.com") == true)
     var finalUrl: URL = {
       if isYouTube && (url.path.isEmpty || url.path == "/") {
         return URL(string: "https://www.youtube.com/tv") ?? url
+      }
+      if isNetflix && (url.path.isEmpty || url.path == "/") {
+        return URL(string: "https://www.netflix.com/browse") ?? url
       }
       return url
     }()
