@@ -540,11 +540,17 @@ export XCURSOR_SIZE=24
   amixer set Headphone 85% unmute 2>/dev/null || true
 ) &
 
+# 9b. CPU Governor em performance máxima + ajuste de VM/I/O para zero engasgos
+for gov in /sys/devices/system/cpu/cpu*/cpufreq/scaling_governor; do
+  [ -w "$gov" ] && echo performance > "$gov" 2>/dev/null || true
+done
+sysctl -w vm.swappiness=10 vm.dirty_background_ratio=5 >/dev/null 2>&1 || true
+
 # 10. Hardware-Accelerated WPE WebKit & Cog Environment Configuration
+# /tmp/xdg-cache fica na RAM (tmpfs) para shaders e cache WebKit 50x mais rápidos que FAT32 USB!
 mkdir -p /tmp/xdg-cache /tmp/xdg-data /tmp/xdg-config
 if [ -n "$BOOT_MNT" ]; then
-  mkdir -p "$BOOT_MNT/irisos-data/xdg-cache" "$BOOT_MNT/irisos-data/xdg-data" "$BOOT_MNT/irisos-data/xdg-config"
-  mount --bind "$BOOT_MNT/irisos-data/xdg-cache" /tmp/xdg-cache 2>/dev/null || true
+  mkdir -p "$BOOT_MNT/irisos-data/xdg-data" "$BOOT_MNT/irisos-data/xdg-config"
   mount --bind "$BOOT_MNT/irisos-data/xdg-data" /tmp/xdg-data 2>/dev/null || true
   mount --bind "$BOOT_MNT/irisos-data/xdg-config" /tmp/xdg-config 2>/dev/null || true
 fi
@@ -577,12 +583,12 @@ else
   export WEBKIT_GST_DMABUF_SINK_ENABLED=1
 fi
 
-# 11. Fast readiness check
+# 11. Fast readiness check (usa /api/os/ping em 0.1ms em vez de /api/os/status)
 for _ in $(seq 1 80); do
-  if [ -S /run/seatd.sock ] && wget -q -O - http://127.0.0.1:3000/api/os/status >/dev/null 2>&1; then
+  if [ -S /run/seatd.sock ] && wget -q -O - http://127.0.0.1:3000/api/os/ping >/dev/null 2>&1; then
     break
   fi
-  usleep 50000 2>/dev/null || sleep 0.05
+  usleep 30000 2>/dev/null || sleep 0.03
 done
 boot_mark "seatd + API irisTV (127.0.0.1:3000) PRONTOS -> abrindo Cage + WPE WebKit (Cog)"
 

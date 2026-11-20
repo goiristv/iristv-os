@@ -1612,7 +1612,7 @@
       bootScreen.classList.add('hidden');
       maybeOnboard();
       setTimeout(() => ensureScopeFocus(), 30);
-    }, 550);
+    }, 220);
   }
 
   function replayBoot() {

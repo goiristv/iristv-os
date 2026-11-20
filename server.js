@@ -2400,6 +2400,10 @@ function createAppServer() {
       return res.end('404 Not Found');
     }
 
+    if (pathname === '/api/os/ping') {
+      return sendJson(req, res, 200, { ok: true, uptime: process.uptime() });
+    }
+
     if (pathname === '/api/system' || pathname === '/api/os/status') {
       const status = await getRealOsStatus();
       return sendJson(req, res, 200, status);
