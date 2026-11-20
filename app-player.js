@@ -1783,6 +1783,8 @@
         const modal = document.createElement('div');
         modal.id = 'mp-lyrics-picker-modal';
         modal.className = 'mp-modal-backdrop';
+        modal.style.position = 'fixed';
+        modal.style.zIndex = '9999';
         const defaultQuery = [currentTrack.title, currentTrack.artist].filter(Boolean).join(' ').trim();
         modal.innerHTML = `
           <div class="mp-modal-card" style="width:min(620px, 92vw);max-height:82vh;display:flex;flex-direction:column;gap:14px;">
@@ -1797,7 +1799,7 @@
             <div id="mp-lp-results" style="flex:1;overflow-y:auto;display:flex;flex-direction:column;gap:8px;min-height:180px;max-height:46vh;padding-right:4px;"></div>
           </div>
         `;
-        document.body.appendChild(modal);
+        (shellEl || document.body).appendChild(modal);
 
         const resultsEl = modal.querySelector('#mp-lp-results');
         const queryInput = modal.querySelector('#mp-lp-query');

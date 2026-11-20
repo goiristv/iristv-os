@@ -9410,7 +9410,7 @@ body.theme-light .ambient-vignette {
 
       /* Inline Prompt Modal */
       .mp-modal-backdrop {
-        position: absolute;
+        position: fixed;
         top: 0;
         right: 0;
         bottom: 0;
@@ -9419,7 +9419,7 @@ body.theme-light .ambient-vignette {
         background: rgba(4, 7, 14, 0.65);
         display: grid;
         place-items: center;
-        z-index: 30;
+        z-index: 1200;
         animation: fadeIn 0.22s ease;
       }
 
