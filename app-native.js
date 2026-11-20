@@ -745,7 +745,6 @@
         sites: [
           { name: 'YouTube', url: 'https://www.youtube.com', icon: 'icons/youtube.jpg' },
           { name: 'Twitch', url: 'https://www.twitch.tv', icon: 'icons/twitch.jpg' },
-          { name: 'Spotify Web', url: 'https://open.spotify.com', icon: 'icons/spotify.jpg' },
           { name: 'IMDb', url: 'https://www.imdb.com', icon: 'icons/imdb.jpg' }
         ]
       },
@@ -787,68 +786,126 @@
       { id: nextTabId++, title: 'Início', url: 'about:home', history: ['about:home'], historyIdx: 0, isLoading: false }
     ];
     let activeTabId = tabs[0].id;
+    const prefetchedUrls = new Set();
+    const tabIframeMap = new Map(); // tabId -> { wrapEl, iframeEl, loadedUrl }
+    let shellMounted = false;
+
+    function prefetchUrl(url) {
+      if (!url || !url.startsWith('http') || prefetchedUrls.has(url)) return;
+      prefetchedUrls.add(url);
+      fetch(`/api/browser-proxy?url=${encodeURIComponent(url)}&prefetch=1`, { priority: 'low' }).catch(() => {});
+    }
+
+    function toProxyUrl(url, noCache = false) {
+      if (!url || !url.startsWith('http')) return url || '';
+      return `/api/browser-proxy?url=${encodeURIComponent(url)}${noCache ? '&nocache=1' : ''}`;
+    }
 
     function getActiveTab() {
       return tabs.find((t) => t.id === activeTabId) || tabs[0];
     }
 
-    function renderBrowserFrame() {
-      const curTab = getActiveTab();
-      const isHome = !curTab.url || curTab.url === 'about:home';
-      const userBms = getBookmarks();
-      const recentHist = getHistory();
-
+    function ensureShellMounted() {
+      if (shellMounted && appStageBody.querySelector('.iris-browser-container')) return;
+      shellMounted = true;
       appStageBody.innerHTML = `
         <div class="iris-browser-container">
-          <!-- Top Tabs Header -->
           <div class="browser-tabs-bar" role="tablist">
-            <div class="browser-tabs-scroll">
-              ${tabs.map((tab) => `
-                <div class="browser-tab ${tab.id === activeTabId ? 'active' : ''}" data-tab-id="${tab.id}">
-                  <span class="browser-tab-fav">${tab.url === 'about:home' ? '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>' : '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/></svg>'}</span>
-                  <span class="browser-tab-title" title="${escHtml(tab.title)}">${escHtml(tab.title || 'Guia')}</span>
-                  ${tabs.length > 1 ? `<button class="browser-tab-close" type="button" data-close-tab="${tab.id}" title="Fechar guia">&times;</button>` : ''}
-                </div>
-              `).join('')}
-            </div>
+            <div class="browser-tabs-scroll" id="browser-tabs-scroll"></div>
             <button id="browser-new-tab-btn" class="browser-new-tab-btn focusable" type="button" title="Abrir nova guia">＋</button>
           </div>
-
-          <!-- Browser Controls & Omnibox Bar -->
           <div class="browser-toolbar">
             <div class="browser-nav-group">
-              <button id="br-btn-back" class="br-tool-btn focusable" type="button" title="Voltar" ${curTab.historyIdx <= 0 ? 'disabled' : ''}>←</button>
-              <button id="br-btn-forward" class="br-tool-btn focusable" type="button" title="Avançar" ${curTab.historyIdx >= curTab.history.length - 1 ? 'disabled' : ''}>→</button>
+              <button id="br-btn-back" class="br-tool-btn focusable" type="button" title="Voltar">←</button>
+              <button id="br-btn-forward" class="br-tool-btn focusable" type="button" title="Avançar">→</button>
               <button id="br-btn-reload" class="br-tool-btn focusable" type="button" title="Recarregar">↻</button>
               <button id="br-btn-home" class="br-tool-btn focusable" type="button" title="Página Inicial"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg></button>
             </div>
-
-            <!-- Omnibox (Search & Address Bar) -->
             <form id="browser-omnibox-form" class="browser-omnibox-wrap">
               <span class="br-security-badge" title="Conexão Segura"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></span>
               <input id="browser-omnibox-input" class="browser-omnibox-input focusable" type="text"
                 placeholder="Pesquise ou digite uma URL (ex: wikipedia.org, duckduckgo.com)..."
-                value="${isHome ? '' : escHtml(curTab.url)}" spellcheck="false" autocomplete="off" />
+                spellcheck="false" autocomplete="off" />
               <button class="br-omnibox-go-btn" type="submit" title="Ir para a página">Ir</button>
             </form>
-
             <div class="browser-actions-group">
               <button id="br-btn-fav" class="br-tool-btn focusable" type="button" title="Salvar nos Favoritos"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg></button>
               <div class="browser-zoom-pill">
                 <button id="br-zoom-out" class="br-zoom-btn" type="button" title="Diminuir Zoom">A-</button>
-                <span class="br-zoom-label">${Math.round(zoomLevel * 100)}%</span>
+                <span class="br-zoom-label" id="br-zoom-label">${Math.round(zoomLevel * 100)}%</span>
                 <button id="br-zoom-in" class="br-zoom-btn" type="button" title="Aumentar Zoom">A+</button>
               </div>
               <button id="br-btn-popout" class="br-tool-btn focusable" type="button" title="Abrir em Nova Janela / WKWebView">↗</button>
             </div>
           </div>
+          <div id="browser-loading-bar" class="browser-loading-bar"></div>
+          <div class="browser-viewport-wrapper" id="browser-viewport-wrapper">
+            <div id="browser-start-page-slot"></div>
+            <div id="browser-iframe-pool" style="width:100%;height:100%;position:relative;"></div>
+          </div>
+        </div>
+      `;
+      bindStaticToolbarEvents();
+    }
 
-          <!-- Loading Indicator Strip -->
-          <div id="browser-loading-bar" class="browser-loading-bar ${curTab.isLoading ? 'loading' : ''}"></div>
+    function applyZoomToAllFrames() {
+      const label = document.getElementById('br-zoom-label');
+      if (label) label.textContent = `${Math.round(zoomLevel * 100)}%`;
+      tabIframeMap.forEach(({ wrapEl }) => {
+        wrapEl.style.transform = `scale(${zoomLevel})`;
+        wrapEl.style.transformOrigin = 'top left';
+        wrapEl.style.width = `calc(100% / ${zoomLevel})`;
+        wrapEl.style.height = `calc(100% / ${zoomLevel})`;
+      });
+    }
 
-          <!-- Viewport Stage -->
-          <div class="browser-viewport-wrapper">
-            ${isHome ? `
+    function renderBrowserFrame() {
+      ensureShellMounted();
+      const curTab = getActiveTab();
+      const isHome = !curTab.url || curTab.url === 'about:home';
+      const userBms = getBookmarks();
+      const recentHist = getHistory();
+
+      // Update tabs strip
+      const tabsScroll = document.getElementById('browser-tabs-scroll');
+      if (tabsScroll) {
+        tabsScroll.innerHTML = tabs.map((tab) => `
+          <div class="browser-tab ${tab.id === activeTabId ? 'active' : ''}" data-tab-id="${tab.id}">
+            <span class="browser-tab-fav">${tab.url === 'about:home' ? '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>' : '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/></svg>'}</span>
+            <span class="browser-tab-title" title="${escHtml(tab.title)}">${escHtml(tab.title || 'Guia')}</span>
+            ${tabs.length > 1 ? `<button class="browser-tab-close" type="button" data-close-tab="${tab.id}" title="Fechar guia">&times;</button>` : ''}
+          </div>
+        `).join('');
+        bindTabStripEvents();
+      }
+
+      // Update toolbar controls
+      const backBtn = document.getElementById('br-btn-back');
+      const fwdBtn = document.getElementById('br-btn-forward');
+      const omniInput = document.getElementById('browser-omnibox-input');
+      const loadBar = document.getElementById('browser-loading-bar');
+      if (backBtn) backBtn.disabled = curTab.historyIdx <= 0;
+      if (fwdBtn) fwdBtn.disabled = curTab.historyIdx >= curTab.history.length - 1;
+      if (omniInput) omniInput.value = isHome ? '' : curTab.url;
+      if (loadBar) loadBar.classList.toggle('loading', Boolean(curTab.isLoading));
+
+      // Prune closed tab iframes
+      const aliveIds = new Set(tabs.map((t) => t.id));
+      tabIframeMap.forEach((entry, tid) => {
+        if (!aliveIds.has(tid)) {
+          entry.wrapEl.remove();
+          tabIframeMap.delete(tid);
+        }
+      });
+
+      const startSlot = document.getElementById('browser-start-page-slot');
+      const iframePool = document.getElementById('browser-iframe-pool');
+
+      if (isHome) {
+        if (iframePool) iframePool.style.display = 'none';
+        if (startSlot) {
+          startSlot.style.display = 'block';
+          startSlot.innerHTML = `
               <!-- START PAGE / SPEED DIAL -->
               <div class="browser-start-page">
                 <div class="browser-brand-hero">
@@ -928,34 +985,49 @@
                   </div>
                 ` : ''}
               </div>
-            ` : `
-              <!-- LIVE IN-APP WEB VIEW -->
-              <div class="browser-iframe-container" style="transform: scale(${zoomLevel}); transform-origin: top left; width: calc(100% / ${zoomLevel}); height: calc(100% / ${zoomLevel});">
-                <iframe id="browser-active-iframe" class="browser-active-iframe"
-                  src="${curTab.url.startsWith("http") ? "/api/browser-proxy?url=" + encodeURIComponent(curTab.url) : escHtml(curTab.url)}"
-                  sandbox="allow-scripts allow-same-origin allow-forms allow-popups allow-modals allow-downloads"
-                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                  allowfullscreen>
-                </iframe>
-                <!-- Graceful Fallback Overlay for X-Frame-Options blocked domains -->
-                <div id="browser-xframe-fallback" class="browser-xframe-banner hidden">
-                  <div class="xframe-card">
-                    <div class="xframe-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></div>
-                    <h3>Proteção de Incorporação Ativa</h3>
-                    <p>O site <strong>${escHtml(curTab.url)}</strong> restringe exibição direta dentro de outros sistemas por política de segurança web (X-Frame-Options).</p>
-                    <div class="xframe-actions">
-                      <button id="xframe-open-native" class="btn-prism focusable" type="button">Abrir em Janela Destacada ↗</button>
-                      <button id="xframe-go-home" class="btn-glass focusable" type="button">Voltar ao Início</button>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            `}
-          </div>
-        </div>
-      `;
-
-      bindBrowserEvents();
+          `;
+          bindStartPageEvents();
+        }
+      } else {
+        if (startSlot) startSlot.style.display = 'none';
+        if (iframePool) {
+          iframePool.style.display = 'block';
+          tabIframeMap.forEach((entry, tid) => {
+            entry.wrapEl.style.display = tid === curTab.id ? 'block' : 'none';
+          });
+          let entry = tabIframeMap.get(curTab.id);
+          if (!entry) {
+            const wrapEl = document.createElement('div');
+            wrapEl.className = 'browser-iframe-container';
+            wrapEl.style.transform = `scale(${zoomLevel})`;
+            wrapEl.style.transformOrigin = 'top left';
+            wrapEl.style.width = `calc(100% / ${zoomLevel})`;
+            wrapEl.style.height = `calc(100% / ${zoomLevel})`;
+            const iframeEl = document.createElement('iframe');
+            iframeEl.className = 'browser-active-iframe';
+            iframeEl.setAttribute('sandbox', 'allow-scripts allow-same-origin allow-forms allow-popups allow-modals allow-downloads');
+            iframeEl.setAttribute('allow', 'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share');
+            iframeEl.allowFullscreen = true;
+            iframeEl.onload = () => {
+              curTab.isLoading = false;
+              if (getActiveTab().id === curTab.id) {
+                document.getElementById('browser-loading-bar')?.classList.remove('loading');
+              }
+            };
+            wrapEl.appendChild(iframeEl);
+            iframePool.appendChild(wrapEl);
+            entry = { wrapEl, iframeEl, loadedUrl: '' };
+            tabIframeMap.set(curTab.id, entry);
+          }
+          entry.wrapEl.style.display = 'block';
+          if (entry.loadedUrl !== curTab.url) {
+            entry.loadedUrl = curTab.url;
+            curTab.isLoading = true;
+            if (loadBar) loadBar.classList.add('loading');
+            entry.iframeEl.src = toProxyUrl(curTab.url);
+          }
+        }
+      }
     }
 
     function navigateTab(targetUrl, title = null) {
@@ -995,10 +1067,7 @@
       renderBrowserFrame();
     }
 
-    function bindBrowserEvents() {
-      const curTab = getActiveTab();
-
-      // Tab switching & close
+    function bindTabStripEvents() {
       appStageBody.querySelectorAll('.browser-tab').forEach((tabEl) => {
         tabEl.addEventListener('click', (e) => {
           if (e.target.closest('.browser-tab-close')) return;
@@ -1024,8 +1093,9 @@
           renderBrowserFrame();
         });
       });
+    }
 
-      // New tab button
+    function bindStaticToolbarEvents() {
       appStageBody.querySelector('#browser-new-tab-btn')?.addEventListener('click', () => {
         const newTab = { id: nextTabId++, title: 'Nova Guia', url: 'about:home', history: ['about:home'], historyIdx: 0, isLoading: false };
         tabs.push(newTab);
@@ -1034,8 +1104,8 @@
         renderBrowserFrame();
       });
 
-      // Toolbar Navigation buttons
       appStageBody.querySelector('#br-btn-back')?.addEventListener('click', () => {
+        const curTab = getActiveTab();
         if (curTab.historyIdx > 0) {
           curTab.historyIdx--;
           curTab.url = curTab.history[curTab.historyIdx];
@@ -1046,6 +1116,7 @@
       });
 
       appStageBody.querySelector('#br-btn-forward')?.addEventListener('click', () => {
+        const curTab = getActiveTab();
         if (curTab.historyIdx < curTab.history.length - 1) {
           curTab.historyIdx++;
           curTab.url = curTab.history[curTab.historyIdx];
@@ -1056,13 +1127,14 @@
       });
 
       appStageBody.querySelector('#br-btn-reload')?.addEventListener('click', () => {
+        const curTab = getActiveTab();
         playUiSound('select');
-        const iframe = document.getElementById('browser-active-iframe');
-        if (iframe) {
+        const entry = tabIframeMap.get(curTab.id);
+        if (entry && curTab.url && curTab.url !== 'about:home') {
           const bar = document.getElementById('browser-loading-bar');
           bar?.classList.add('loading');
-          iframe.src = curTab.url;
-          setTimeout(() => bar?.classList.remove('loading'), 1200);
+          curTab.isLoading = true;
+          entry.iframeEl.src = toProxyUrl(curTab.url, true);
         } else {
           renderBrowserFrame();
         }
@@ -1072,24 +1144,14 @@
         navigateTab('about:home');
       });
 
-      // Omnibox submit
       appStageBody.querySelector('#browser-omnibox-form')?.addEventListener('submit', (e) => {
         e.preventDefault();
         const raw = (document.getElementById('browser-omnibox-input')?.value || '').trim();
         if (raw) navigateTab(raw);
       });
 
-      // Start page search submit
-      appStageBody.querySelector('#startpage-search-form')?.addEventListener('submit', (e) => {
-        e.preventDefault();
-        const eng = document.getElementById('startpage-engine-select')?.value || 'duckduckgo';
-        searchEngine = eng;
-        const q = (document.getElementById('startpage-search-input')?.value || '').trim();
-        if (q) navigateTab(q);
-      });
-
-      // Add to favorites button
       appStageBody.querySelector('#br-btn-fav')?.addEventListener('click', () => {
+        const curTab = getActiveTab();
         const u = curTab.url;
         if (!u || u === 'about:home') return;
         const bms = getBookmarks();
@@ -1105,28 +1167,38 @@
         }
       });
 
-      // Zoom Controls
       appStageBody.querySelector('#br-zoom-out')?.addEventListener('click', () => {
         zoomLevel = Math.max(0.65, +(zoomLevel - 0.1).toFixed(2));
         playUiSound('move');
-        renderBrowserFrame();
+        applyZoomToAllFrames();
       });
       appStageBody.querySelector('#br-zoom-in')?.addEventListener('click', () => {
         zoomLevel = Math.min(1.5, +(zoomLevel + 0.1).toFixed(2));
         playUiSound('move');
-        renderBrowserFrame();
+        applyZoomToAllFrames();
       });
 
-      // Pop-out / Native view button
       appStageBody.querySelector('#br-btn-popout')?.addEventListener('click', () => {
+        const curTab = getActiveTab();
         if (curTab.url && curTab.url !== 'about:home') {
           playUiSound('open');
           openWebUrl(curTab.url, curTab.title);
         }
       });
+    }
 
-      // Speed dial card click
+    function bindStartPageEvents() {
+      appStageBody.querySelector('#startpage-search-form')?.addEventListener('submit', (e) => {
+        e.preventDefault();
+        const eng = document.getElementById('startpage-engine-select')?.value || 'duckduckgo';
+        searchEngine = eng;
+        const q = (document.getElementById('startpage-search-input')?.value || '').trim();
+        if (q) navigateTab(q);
+      });
+
       appStageBody.querySelectorAll('[data-nav-url]').forEach((btn) => {
+        btn.addEventListener('mouseenter', () => prefetchUrl(btn.dataset.navUrl));
+        btn.addEventListener('focus', () => prefetchUrl(btn.dataset.navUrl));
         btn.addEventListener('click', (e) => {
           if (e.target.closest('.bm-tile-del')) return;
           const url = btn.dataset.navUrl;
@@ -1135,7 +1207,6 @@
         });
       });
 
-      // Delete bookmark
       appStageBody.querySelectorAll('[data-del-bm]').forEach((btn) => {
         btn.addEventListener('click', (e) => {
           e.stopPropagation();
@@ -1148,7 +1219,6 @@
         });
       });
 
-      // Add Bookmark Dialog
       appStageBody.querySelector('#browser-add-bookmark-btn')?.addEventListener('click', () => {
         const u = prompt('Digite a URL do site (ex: https://notion.so):');
         if (!u) return;
@@ -1160,31 +1230,11 @@
         renderBrowserFrame();
       });
 
-      // Clear History
       appStageBody.querySelector('#browser-clear-history-btn')?.addEventListener('click', () => {
         try { localStorage.removeItem('iris_browser_history_v1'); } catch (_) {}
         playUiSound('back');
         renderBrowserFrame();
       });
-
-      // Iframe fallback handling
-      const iframe = document.getElementById('browser-active-iframe');
-      if (iframe) {
-        const loadBar = document.getElementById('browser-loading-bar');
-        iframe.onload = () => {
-          loadBar?.classList.remove('loading');
-          curTab.isLoading = false;
-        };
-        // Detect potential iframe blocking
-        const fallbackBanner = document.getElementById('browser-xframe-fallback');
-        document.getElementById('xframe-open-native')?.addEventListener('click', () => {
-          playUiSound('open');
-          openWebUrl(curTab.url, curTab.title);
-        });
-        document.getElementById('xframe-go-home')?.addEventListener('click', () => {
-          navigateTab('about:home');
-        });
-      }
     }
 
     renderBrowserFrame();

@@ -692,6 +692,15 @@ while true; do
       --disable-default-apps \
       --disable-background-networking \
       --autoplay-policy=no-user-gesture-required \
+      --enable-gpu-rasterization \
+      --enable-zero-copy \
+      --ignore-gpu-blocklist \
+      --enable-accelerated-2d-canvas \
+      --enable-quic \
+      --enable-parallel-downloading \
+      --disable-renderer-backgrounding \
+      --disk-cache-dir=/tmp/chromium-cache \
+      --disk-cache-size=268435456 \
       --load-extension="/opt/iristv/os/tv-nav-extension" \
       "http://127.0.0.1:3000" >/var/log/chromium.log 2>&1
     rc=$?

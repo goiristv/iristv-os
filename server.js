@@ -3449,6 +3449,15 @@ function createAppServer() {
             '--no-first-run',
             '--disable-infobars',
             '--force-device-scale-factor=1.15',
+            '--enable-gpu-rasterization',
+            '--enable-zero-copy',
+            '--ignore-gpu-blocklist',
+            '--enable-accelerated-2d-canvas',
+            '--enable-quic',
+            '--enable-parallel-downloading',
+            '--disable-renderer-backgrounding',
+            '--disk-cache-dir=/tmp/iristv-chromium-cache',
+            '--disk-cache-size=268435456',
             '--user-data-dir=/tmp/iristv-chromium-apps'
           ];
           if (extDir) args.push(`--load-extension=${extDir}`);
@@ -3632,6 +3641,8 @@ function createAppServer() {
 
     if (pathname === '/api/browser-proxy') {
       const target = reqUrl.searchParams.get('url');
+      const isPrefetch = reqUrl.searchParams.get('prefetch') === '1';
+      const noCache = reqUrl.searchParams.get('nocache') === '1';
       if (!target) {
         res.writeHead(400, { 'Content-Type': 'text/plain; charset=utf-8' });
         return res.end('Missing url');
@@ -3644,66 +3655,134 @@ function createAppServer() {
         return res.end('Invalid URL');
       }
 
-      const isHttps = parsedTarget.protocol === 'https:';
-      const client = isHttps ? https : http;
-      const proxyReq = client.get(
-        parsedTarget,
-        {
-          headers: {
-            'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36',
-            Accept: 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
-            'Accept-Language': 'pt-BR,pt;q=0.9,en-US;q=0.8,en;q=0.7'
+      if (!global.__irisBrowserHttpAgent) {
+        global.__irisBrowserHttpAgent = new http.Agent({ keepAlive: true, maxSockets: 48, keepAliveMsecs: 30000 });
+        global.__irisBrowserHttpsAgent = new https.Agent({ keepAlive: true, maxSockets: 48, keepAliveMsecs: 30000 });
+        global.__irisBrowserProxyCache = new Map();
+      }
+      const cache = global.__irisBrowserProxyCache;
+      const cacheKey = parsedTarget.toString();
+      const cached = !noCache ? cache.get(cacheKey) : null;
+      if (cached && Date.now() - cached.ts < 60000) {
+        // Refresh LRU order
+        cache.delete(cacheKey);
+        cache.set(cacheKey, cached);
+        if (isPrefetch) {
+          res.writeHead(204);
+          return res.end();
+        }
+        res.writeHead(cached.status, { ...cached.headers, 'X-Iris-Proxy-Cache': 'HIT' });
+        return res.end(cached.body);
+      }
+
+      const fetchProxyWithRedirects = (currentUrlObj, hopsLeft) => {
+        const isHttps = currentUrlObj.protocol === 'https:';
+        const client = isHttps ? https : http;
+        const agent = isHttps ? global.__irisBrowserHttpsAgent : global.__irisBrowserHttpAgent;
+        const proxyReq = client.get(
+          currentUrlObj,
+          {
+            agent,
+            headers: {
+              'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36',
+              Accept: 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
+              'Accept-Encoding': 'gzip, deflate, br',
+              'Accept-Language': 'pt-BR,pt;q=0.9,en-US;q=0.8,en;q=0.7',
+              Connection: 'keep-alive'
+            },
+            timeout: 8000
           },
-          timeout: 15000
-        },
-        (proxyRes) => {
-          const status = proxyRes.statusCode || 200;
-          if ([301, 302, 303, 307, 308].includes(status) && proxyRes.headers.location) {
-            const redirectUrl = new URL(proxyRes.headers.location, parsedTarget).toString();
-            res.writeHead(302, { Location: `/api/browser-proxy?url=${encodeURIComponent(redirectUrl)}` });
-            proxyRes.resume();
-            return res.end();
-          }
+          (proxyRes) => {
+            const status = proxyRes.statusCode || 200;
+            if ([301, 302, 303, 307, 308].includes(status) && proxyRes.headers.location && hopsLeft > 0) {
+              proxyRes.resume();
+              try {
+                const nextUrl = new URL(proxyRes.headers.location, currentUrlObj);
+                return fetchProxyWithRedirects(nextUrl, hopsLeft - 1);
+              } catch (_) { /* fall through */ }
+            }
 
-          const outHeaders = { ...proxyRes.headers };
-          delete outHeaders['x-frame-options'];
-          delete outHeaders['content-security-policy'];
-          delete outHeaders['content-security-policy-report-only'];
-          delete outHeaders['x-content-type-options'];
-          outHeaders['Access-Control-Allow-Origin'] = '*';
+            const outHeaders = { ...proxyRes.headers };
+            delete outHeaders['x-frame-options'];
+            delete outHeaders['content-security-policy'];
+            delete outHeaders['content-security-policy-report-only'];
+            delete outHeaders['x-content-type-options'];
+            outHeaders['Access-Control-Allow-Origin'] = '*';
 
-          const ctype = (outHeaders['content-type'] || '').toLowerCase();
-          if (ctype.includes('text/html')) {
-            const chunks = [];
-            proxyRes.on('data', (c) => chunks.push(c));
-            proxyRes.on('end', () => {
-              let html = Buffer.concat(chunks).toString('utf8');
-              const baseTag = `<base href="${parsedTarget.origin}${parsedTarget.pathname}">`;
-              if (html.includes('<head>')) {
-                html = html.replace('<head>', `<head>${baseTag}`);
-              } else if (html.includes('<head ')) {
-                html = html.replace(/<head[^>]*>/, `$&${baseTag}`);
-              } else {
-                html = `${baseTag}${html}`;
+            const ctype = (outHeaders['content-type'] || '').toLowerCase();
+            if (ctype.includes('text/html')) {
+              const chunks = [];
+              let totalLen = 0;
+              proxyRes.on('data', (c) => {
+                chunks.push(c);
+                totalLen += c.length;
+              });
+              proxyRes.on('end', () => {
+                let rawBuf = Buffer.concat(chunks, totalLen);
+                const cenc = (outHeaders['content-encoding'] || '').toLowerCase();
+                try {
+                  if (cenc.includes('gzip')) rawBuf = zlib.gunzipSync(rawBuf);
+                  else if (cenc.includes('br')) rawBuf = zlib.brotliDecompressSync(rawBuf);
+                  else if (cenc.includes('deflate')) rawBuf = zlib.inflateSync(rawBuf);
+                } catch (_) { /* keep raw if decompression fails */ }
+                let html = rawBuf.toString('utf8');
+                const baseTag = `<base href="${currentUrlObj.origin}${currentUrlObj.pathname}">`;
+                if (html.includes('<head>')) {
+                  html = html.replace('<head>', `<head>${baseTag}`);
+                } else if (html.includes('<head ')) {
+                  html = html.replace(/<head[^>]*>/, `$&${baseTag}`);
+                } else {
+                  html = `${baseTag}${html}`;
+                }
+                delete outHeaders['content-length'];
+                delete outHeaders['content-encoding'];
+                const finalBuf = Buffer.from(html, 'utf8');
+                if (status === 200 && finalBuf.length <= 2 * 1024 * 1024) {
+                  if (cache.size >= 48) {
+                    const oldestKey = cache.keys().next().value;
+                    if (oldestKey) cache.delete(oldestKey);
+                  }
+                  cache.set(cacheKey, { status, headers: { ...outHeaders }, body: finalBuf, ts: Date.now() });
+                }
+                if (isPrefetch) {
+                  if (!res.headersSent) {
+                    res.writeHead(204);
+                    res.end();
+                  }
+                  return;
+                }
+                if (!res.headersSent) {
+                  res.writeHead(status, { ...outHeaders, 'X-Iris-Proxy-Cache': 'MISS' });
+                  res.end(finalBuf);
+                }
+              });
+              return;
+            }
+
+            if (isPrefetch) {
+              proxyRes.resume();
+              if (!res.headersSent) {
+                res.writeHead(204);
+                res.end();
               }
-              delete outHeaders['content-length'];
-              delete outHeaders['content-encoding'];
-              res.writeHead(status, outHeaders);
-              res.end(html);
-            });
-            return;
+              return;
+            }
+            res.writeHead(status, outHeaders);
+            proxyRes.pipe(res);
           }
+        );
+        proxyReq.on('timeout', () => {
+          proxyReq.destroy(new Error('Tempo limite excedido (8s)'));
+        });
+        proxyReq.on('error', (err) => {
+          if (!res.headersSent) {
+            res.writeHead(isPrefetch ? 204 : 502, { 'Content-Type': 'text/plain; charset=utf-8' });
+            res.end(isPrefetch ? '' : `Erro ao carregar página: ${err.message}`);
+          }
+        });
+      };
 
-          res.writeHead(status, outHeaders);
-          proxyRes.pipe(res);
-        }
-      );
-      proxyReq.on('error', (err) => {
-        if (!res.headersSent) {
-          res.writeHead(502, { 'Content-Type': 'text/plain; charset=utf-8' });
-          res.end(`Erro ao carregar página: ${err.message}`);
-        }
-      });
+      fetchProxyWithRedirects(parsedTarget, 4);
       return;
     }
 
