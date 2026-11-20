@@ -678,6 +678,22 @@
     /* ----- Lyrics & Online Art ----- */
     async function fetchLyricsAndOnlineCover(track, durationSec, customQuery = null) {
       if (!track) return;
+      if (!customQuery?.forceLyrics && (track.customSyncedLyrics || track.customPlainLyrics)) {
+        if (track.customSyncedLyrics) {
+          lyricsCues = parseLrc(track.customSyncedLyrics);
+          lyricsStatus = lyricsCues.length ? 'synced' : 'plain';
+          plainLyricsText = track.customPlainLyrics || '';
+          lyricsMetaBadge = 'Letra selecionada';
+        } else {
+          lyricsCues = [];
+          lyricsStatus = 'plain';
+          plainLyricsText = track.customPlainLyrics;
+          lyricsMetaBadge = 'Letra manual';
+        }
+        renderLyricsPanel();
+        syncActiveLyric();
+        return;
+      }
       const mySeq = ++infoLookupSeq;
       const searchTitle = customQuery?.title ?? track.title;
       const searchArtist = customQuery?.artist ?? track.artist;
@@ -1734,29 +1750,104 @@
         vinylWrapEl.addEventListener('dblclick', triggerRefetchCover);
       }
 
-      document.getElementById('mp-edit-meta-btn')?.addEventListener('click', () => {
+      const openLyricsPickerModal = () => {
         if (!currentTrack) return;
-        openPromptModal({
-          title: 'Buscar Letra Sincronizada e Capa',
-          confirmLabel: 'Buscar',
-          fields: [
-            { name: 'title', label: 'Nome exato da música', value: currentTrack.title, required: true },
-            { name: 'artist', label: 'Artista (opcional)', value: currentTrack.artist || '', required: false }
-          ],
-          onConfirm: ({ title, artist }) => {
-            if (!title) return;
-            currentTrack.title = title;
-            currentTrack.artist = artist || '';
-            saveStore(store);
-            const dur = Number.isFinite(audioEl.duration) && audioEl.duration > 0 ? audioEl.duration : currentTrack.duration;
-            fetchLyricsAndOnlineCover(currentTrack, dur, { title: currentTrack.title, artist: currentTrack.artist });
-            const tNode = document.getElementById('mp-now-title');
-            const sNode = document.getElementById('mp-now-sub');
-            if (tNode) tNode.textContent = currentTrack.title;
-            if (sNode) sNode.textContent = currentTrack.artist || 'Áudio Local';
+        const existing = document.getElementById('mp-lyrics-picker-modal');
+        if (existing) existing.remove();
+
+        const modal = document.createElement('div');
+        modal.id = 'mp-lyrics-picker-modal';
+        modal.className = 'mp-modal-backdrop';
+        const defaultQuery = [currentTrack.title, currentTrack.artist].filter(Boolean).join(' ').trim();
+        modal.innerHTML = `
+          <div class="mp-modal-card" style="width:min(620px, 92vw);max-height:82vh;display:flex;flex-direction:column;gap:14px;">
+            <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;">
+              <h3 style="margin:0;">Escolher Outra Letra</h3>
+              <button id="mp-lp-close" class="mp-pill-btn mp-pill-sm" type="button">✕ Fechar</button>
+            </div>
+            <form id="mp-lp-form" style="display:flex;gap:10px;">
+              <input id="mp-lp-query" class="mp-input" type="text" value="${escHtml(defaultQuery)}" placeholder="Nome da música e artista..." style="flex:1;" />
+              <button class="mp-btn-primary" type="submit" style="white-space:nowrap;">Buscar</button>
+            </form>
+            <div id="mp-lp-results" style="flex:1;overflow-y:auto;display:flex;flex-direction:column;gap:8px;min-height:180px;max-height:46vh;padding-right:4px;"></div>
+          </div>
+        `;
+        document.body.appendChild(modal);
+
+        const resultsEl = modal.querySelector('#mp-lp-results');
+        const queryInput = modal.querySelector('#mp-lp-query');
+        const close = () => modal.remove();
+        modal.querySelector('#mp-lp-close')?.addEventListener('click', close);
+        modal.addEventListener('click', (ev) => { if (ev.target === modal) close(); });
+
+        const runSearch = async (qStr) => {
+          resultsEl.innerHTML = `<div style="padding:28px;text-align:center;color:rgba(255,255,255,0.65);">Buscando versões alternativas...</div>`;
+          try {
+            const qs = new URLSearchParams({ q: qStr.trim() });
+            const r = await fetch(`/api/media-player/lyrics-search?${qs.toString()}`);
+            const data = await r.json();
+            const items = data?.items || [];
+            if (!items.length) {
+              resultsEl.innerHTML = `<div style="padding:28px;text-align:center;color:rgba(255,255,255,0.6);">Nenhuma letra encontrada para "${escHtml(qStr)}". Tente outro termo.</div>`;
+              return;
+            }
+            resultsEl.innerHTML = items.map((it, idx) => `
+              <button type="button" class="mp-lp-item" data-lp-idx="${idx}" style="text-align:left;padding:12px 14px;border-radius:12px;border:1px solid rgba(255,255,255,0.12);background:rgba(255,255,255,0.05);color:#fff;cursor:pointer;display:flex;align-items:center;justify-content:space-between;gap:12px;">
+                <div style="min-width:0;flex:1;">
+                  <div style="font-weight:700;font-size:0.95rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${escHtml(it.trackName)}</div>
+                  <div style="font-size:0.82rem;color:rgba(255,255,255,0.68);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${escHtml([it.artistName, it.albumName].filter(Boolean).join(' • '))}</div>
+                </div>
+                <div style="display:flex;align-items:center;gap:8px;flex-shrink:0;">
+                  <span style="font-size:0.75rem;color:rgba(255,255,255,0.6);">${it.duration ? fmtTime(it.duration) : ''}</span>
+                  <span style="font-size:0.72rem;font-weight:700;padding:3px 8px;border-radius:999px;background:${it.syncedLyrics ? 'rgba(56,189,248,0.2)' : 'rgba(255,255,255,0.12)'};color:${it.syncedLyrics ? '#7dd3fc' : 'rgba(255,255,255,0.75)'};">
+                    ${it.syncedLyrics ? 'Sincronizada' : 'Texto'}
+                  </span>
+                </div>
+              </button>
+            `).join('');
+
+            resultsEl.querySelectorAll('[data-lp-idx]').forEach((btn) => {
+              btn.addEventListener('click', () => {
+                const chosen = items[Number(btn.dataset.lpIdx)];
+                if (!chosen || !currentTrack) return;
+                currentTrack.customSyncedLyrics = chosen.syncedLyrics || '';
+                currentTrack.customPlainLyrics = chosen.plainLyrics || '';
+                currentTrack.lyricsOffsetSec = 0;
+                saveStore(store);
+                if (chosen.syncedLyrics) {
+                  lyricsCues = parseLrc(chosen.syncedLyrics);
+                  lyricsStatus = lyricsCues.length ? 'synced' : 'plain';
+                  plainLyricsText = chosen.plainLyrics || '';
+                  lyricsMetaBadge = 'Letra selecionada';
+                } else {
+                  lyricsCues = [];
+                  lyricsStatus = 'plain';
+                  plainLyricsText = chosen.plainLyrics || '';
+                  lyricsMetaBadge = 'Letra selecionada';
+                }
+                activeLyricIdx = -1;
+                renderLyricsPanel();
+                syncActiveLyric();
+                showToast(`Letra atualizada: ${chosen.trackName}`);
+                close();
+              });
+            });
+          } catch (_) {
+            resultsEl.innerHTML = `<div style="padding:28px;text-align:center;color:#fca5a5;">Erro ao consultar letras alternativas.</div>`;
           }
+        };
+
+        modal.querySelector('#mp-lp-form')?.addEventListener('submit', (ev) => {
+          ev.preventDefault();
+          const val = (queryInput?.value || '').trim();
+          if (val) runSearch(val);
         });
-      });
+
+        runSearch(defaultQuery);
+        setTimeout(() => queryInput?.focus(), 40);
+      };
+
+      document.getElementById('mp-edit-meta-btn')?.addEventListener('click', openLyricsPickerModal);
     }
 
     /* ----- Cinema Series & Video Theater ----- */

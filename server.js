@@ -3729,6 +3729,42 @@ function createAppServer() {
       }
     }
 
+    if (pathname === '/api/media-player/lyrics-search') {
+      const q = (reqUrl.searchParams.get('q') || '').trim();
+      const title = (reqUrl.searchParams.get('title') || '').trim();
+      const artist = (reqUrl.searchParams.get('artist') || '').trim();
+      try {
+        const params = new URLSearchParams();
+        if (q) {
+          params.set('q', q);
+        } else {
+          if (title) params.set('track_name', title);
+          if (artist) params.set('artist_name', artist);
+        }
+        const apiRes = await fetch(`https://lrclib.net/api/search?${params.toString()}`, {
+          headers: { 'User-Agent': 'irisTV/2.0 (https://iristv.local)' },
+          signal: AbortSignal.timeout(9000)
+        });
+        const list = apiRes.ok ? await apiRes.json() : [];
+        const items = (Array.isArray(list) ? list : [])
+          .filter((it) => it && (it.syncedLyrics || it.plainLyrics))
+          .sort((a, b) => (b.syncedLyrics ? 1 : 0) - (a.syncedLyrics ? 1 : 0))
+          .slice(0, 15)
+          .map((it) => ({
+            id: it.id,
+            trackName: it.trackName || '',
+            artistName: it.artistName || '',
+            albumName: it.albumName || '',
+            duration: Number(it.duration) || 0,
+            syncedLyrics: it.syncedLyrics || '',
+            plainLyrics: it.plainLyrics || ''
+          }));
+        return sendJson(req, res, 200, { ok: true, items });
+      } catch (err) {
+        return sendJson(req, res, 500, { ok: false, error: err.message, items: [] });
+      }
+    }
+
     if (pathname === '/api/dvr/list') {
       const recDir = path.join(__dirname, 'recordings');
       try { fs.mkdirSync(recDir, { recursive: true }); } catch (_) {}
