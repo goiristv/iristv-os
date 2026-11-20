@@ -729,9 +729,21 @@
 
   let installedSet = loadInstalledIds();
 
+  function syncUiStateToServer(patch) {
+    try {
+      fetch('/api/os/ui-state', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(patch)
+      }).catch(() => {});
+    } catch (_) {}
+  }
+
   function saveInstalledIds() {
     CORE_SYSTEM_IDS.forEach((id) => installedSet.add(id));
-    localStorage.setItem(STORAGE_INSTALLED, JSON.stringify([...installedSet]));
+    const arr = [...installedSet];
+    localStorage.setItem(STORAGE_INSTALLED, JSON.stringify(arr));
+    syncUiStateToServer({ installedApps: arr });
   }
 
   function loadCustomApps() {
@@ -747,7 +759,42 @@
 
   function saveCustomApps() {
     localStorage.setItem(STORAGE_CUSTOM, JSON.stringify(customApps));
+    syncUiStateToServer({ customApps });
   }
+
+  // Hidrata apps instalados e customizados a partir do disco (/api/os/ui-state)
+  (function hydrateStoreFromDisk() {
+    try {
+      fetch('/api/os/ui-state', { cache: 'no-store' })
+        .then((r) => (r.ok ? r.json() : null))
+        .then((data) => {
+          const st = data?.state;
+          if (!st) return;
+          let changed = false;
+          if (Array.isArray(st.installedApps) && st.installedApps.length > 0) {
+            st.installedApps.forEach((id) => {
+              if (!installedSet.has(id)) {
+                installedSet.add(id);
+                changed = true;
+              }
+            });
+            if (changed) {
+              CORE_SYSTEM_IDS.forEach((id) => installedSet.add(id));
+              localStorage.setItem(STORAGE_INSTALLED, JSON.stringify([...installedSet]));
+            }
+          }
+          if (Array.isArray(st.customApps) && st.customApps.length > 0 && customApps.length === 0) {
+            customApps = st.customApps;
+            localStorage.setItem(STORAGE_CUSTOM, JSON.stringify(customApps));
+            changed = true;
+          }
+          if (changed && typeof window.syncInstalledApps === 'function') {
+            window.syncInstalledApps();
+          }
+        })
+        .catch(() => {});
+    } catch (_) {}
+  })();
 
   function getFullCatalog() {
     return [...STORE_CATALOG, ...customApps];

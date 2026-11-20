@@ -514,7 +514,6 @@ export LIBSEAT_BACKEND=seatd
 export SEATD_SOCK=/run/seatd.sock
 export LIBGL_DRIVERS_PATH=/usr/lib/dri:/usr/lib/xorg/modules/dri
 export WLR_LIBINPUT_NO_DEVICES=1
-export WLR_NO_HARDWARE_CURSORS=1
 export WLR_RENDERER=auto
 export XKB_DEFAULT_RULES=evdev
 export XKB_DEFAULT_MODEL=pc105
@@ -543,6 +542,12 @@ export XCURSOR_SIZE=24
 
 # 10. Hardware-Accelerated WPE WebKit & Cog Environment Configuration
 mkdir -p /tmp/xdg-cache /tmp/xdg-data /tmp/xdg-config
+if [ -n "$BOOT_MNT" ]; then
+  mkdir -p "$BOOT_MNT/irisos-data/xdg-cache" "$BOOT_MNT/irisos-data/xdg-data" "$BOOT_MNT/irisos-data/xdg-config"
+  mount --bind "$BOOT_MNT/irisos-data/xdg-cache" /tmp/xdg-cache 2>/dev/null || true
+  mount --bind "$BOOT_MNT/irisos-data/xdg-data" /tmp/xdg-data 2>/dev/null || true
+  mount --bind "$BOOT_MNT/irisos-data/xdg-config" /tmp/xdg-config 2>/dev/null || true
+fi
 export XDG_CACHE_HOME=/tmp/xdg-cache
 export XDG_DATA_HOME=/tmp/xdg-data
 export XDG_CONFIG_HOME=/tmp/xdg-config
@@ -555,7 +560,7 @@ export GST_VAAPI_ALL_DRIVERS=1
 export WEBKIT_GST_HOLE_PUNCH=0
 export WEBKIT_DISABLE_SANDBOX_THIS_IS_DANGEROUS=1
 export WEBKIT_FORCE_SANDBOX=0
-export WPE_SHELL_COOKIE_PATH=/tmp/wpe-cookies.txt
+export WPE_SHELL_COOKIE_PATH=/root/.iristv/wpe-cookies.txt
 
 # Sem nó DRM renderD128 (simpledrm / llvmpipe), o DMA-BUF renderer e compositing forçado do WebKit 2.44+ crasham WPEWebProcess
 if [ ! -e /dev/dri/renderD128 ]; then
@@ -563,8 +568,11 @@ if [ ! -e /dev/dri/renderD128 ]; then
   export GALLIUM_DRIVER=llvmpipe
   export WEBKIT_DISABLE_DMABUF_RENDERER=1
   export WEBKIT_GST_DMABUF_SINK_ENABLED=0
+  export WLR_NO_HARDWARE_CURSORS=1
   unset WEBKIT_FORCE_COMPOSITING_MODE
 else
+  # Com GPU real, ativa cursor de hardware nativo (60/120Hz zero lag)
+  export WLR_NO_HARDWARE_CURSORS=0
   export WEBKIT_FORCE_COMPOSITING_MODE=1
   export WEBKIT_GST_DMABUF_SINK_ENABLED=1
 fi
@@ -642,7 +650,7 @@ while true; do
   if [ -x /usr/bin/cog ]; then
     export COG_PLATFORM_WL_VIEW_FULLSCREEN=1
     boot_mark "Iniciando cage com cog (--platform=wl)..."
-    env WLR_LIBINPUT_NO_DEVICES=1 WLR_NO_HARDWARE_CURSORS=1 LIBSEAT_BACKEND=seatd cage -s -d -- cog \
+    env WLR_LIBINPUT_NO_DEVICES=1 LIBSEAT_BACKEND=seatd cage -s -d -- cog \
       --platform=wl \
       "http://127.0.0.1:3000" >/var/log/cog.log 2>&1
     rc=$?
@@ -652,7 +660,7 @@ while true; do
     tail -n 10 /var/log/cog.log > /dev/tty1 2>/dev/null || true
   else
     boot_mark "Iniciando cage com chromium..."
-    env WLR_LIBINPUT_NO_DEVICES=1 WLR_NO_HARDWARE_CURSORS=1 LIBSEAT_BACKEND=seatd cage -s -d -- chromium \
+    env WLR_LIBINPUT_NO_DEVICES=1 LIBSEAT_BACKEND=seatd cage -s -d -- chromium \
       --ozone-platform=wayland \
       --enable-features=OverlayScrollbar,UseOzonePlatform \
       --disable-features=Translate,PasswordManager,PasswordManagerOnboarding,AutofillServerCommunication,HardwareMediaKeyHandling,GlobalMediaControls,AudioServiceSandbox \

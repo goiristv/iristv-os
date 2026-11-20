@@ -2475,6 +2475,40 @@ function createAppServer() {
       }
     }
 
+    // Persistent UI state (onboarded flag, installed apps, custom apps) backed to disk/pendrive
+    if (pathname === '/api/os/ui-state') {
+      const uiStateFile = path.join(os.homedir(), '.iristv', 'ui-state.json');
+      const readUiState = () => {
+        try {
+          if (fs.existsSync(uiStateFile)) {
+            return JSON.parse(fs.readFileSync(uiStateFile, 'utf8'));
+          }
+        } catch (_) {}
+        return {};
+      };
+      const writeUiState = (data) => {
+        try {
+          fs.mkdirSync(path.dirname(uiStateFile), { recursive: true });
+          fs.writeFileSync(uiStateFile, JSON.stringify(data, null, 2), 'utf8');
+        } catch (_) {}
+      };
+
+      if (req.method === 'GET') {
+        return sendJson(req, res, 200, { ok: true, state: readUiState() });
+      }
+      if (req.method === 'POST') {
+        try {
+          const body = await readJsonBody(req);
+          const cur = readUiState();
+          const next = { ...cur, ...body, updatedAt: Date.now() };
+          writeUiState(next);
+          return sendJson(req, res, 200, { ok: true, state: next });
+        } catch (err) {
+          return sendJson(req, res, 400, { ok: false, error: err.message });
+        }
+      }
+    }
+
     if (pathname === '/api/wifi/status') {
       try {
         const doScan = reqUrl.searchParams.get('scan') === '1';

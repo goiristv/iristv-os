@@ -1581,10 +1581,20 @@
     if (bootFinished) return;
     if (typeof mountHomeNow === 'function') mountHomeNow();
     sessionStorage.setItem('irisos-booted', '1');
-    const maybeOnboard = () => {
-      if (localStorage.getItem('iristv-onboarded') !== '1') {
-        openOnboarding();
-      }
+    const maybeOnboard = async () => {
+      if (localStorage.getItem('iristv-onboarded') === '1') return;
+      try {
+        const r = await fetch('/api/os/ui-state', { cache: 'no-store' });
+        if (r.ok) {
+          const data = await r.json();
+          if (data?.state?.onboarded) {
+            localStorage.setItem('iristv-onboarded', '1');
+            applyUserPreferences();
+            return;
+          }
+        }
+      } catch (_) {}
+      openOnboarding();
     };
     if (instant) {
       bootFinished = true;
@@ -9237,6 +9247,11 @@
 
   function cinematicInterfaceAssembly() {
     localStorage.setItem('iristv-onboarded', '1');
+    fetch('/api/os/ui-state', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ onboarded: true })
+    }).catch(() => {});
     document.documentElement.classList.remove('reduce-motion');
     applyUserPreferences();
 
@@ -9831,17 +9846,21 @@
     }, 1000);
   }
 
+  window.syncInstalledApps = syncInstalledApps;
+
   /* Global Developer Debug Tools */
   window.IrisDev = {
     redoOnboarding: (reset = true) => openOnboarding(reset),
     resetOnboardingFlag: () => {
       localStorage.removeItem('iristv-onboarded');
+      fetch('/api/os/ui-state', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ onboarded: false }) }).catch(() => {});
       showToast('Flag de onboarding removida!');
     },
     testAssembly: () => cinematicInterfaceAssembly(),
     rebootClean: () => {
       localStorage.removeItem('iristv-onboarded');
       sessionStorage.removeItem('irisos-booted');
+      fetch('/api/os/ui-state', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ onboarded: false }) }).catch(() => {});
       window.location.reload();
     }
   };
