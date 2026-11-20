@@ -1258,15 +1258,35 @@
         lastAudioNativeMoveTs = performance.now();
         lastAudioClockTickTs = performance.now();
         musicPlayingWanted = true;
+        cancelFadeIn();
+        audioEl.volume = userMasterVolume;
         try { audioEl.currentTime = 0; } catch (_) { }
         audioEl.play().catch(() => { });
         syncMusicTransportUi();
         return;
       }
-      const pl = getActiveMusicPl();
-      const idx = pl?.tracks.findIndex((t) => t.id === currentTrack?.id) ?? -1;
-      if (pl && (idx + 1 < pl.tracks.length || repeatMode === 'all')) {
-        playNextMusic(1);
+      let pl = getActiveMusicPl();
+      let idx = pl?.tracks.findIndex((t) => t.id === currentTrack?.id) ?? -1;
+      if (idx === -1 && currentTrack) {
+        const ownerPl = (store.musicPlaylists || []).find((p) => (p.tracks || []).some((t) => t.id === currentTrack.id));
+        if (ownerPl) {
+          pl = ownerPl;
+          store.activeMusicPlId = ownerPl.id;
+          idx = ownerPl.tracks.findIndex((t) => t.id === currentTrack.id);
+        }
+      }
+      if (pl && pl.tracks.length > 0) {
+        if (shuffle && pl.tracks.length > 1) {
+          let nextIdx = Math.floor(Math.random() * pl.tracks.length);
+          if (nextIdx === idx) nextIdx = (idx + 1) % pl.tracks.length;
+          playMusicTrack(pl.tracks[nextIdx]);
+        } else if (pl.tracks.length > 1 || repeatMode === 'all') {
+          const nextIdx = idx === -1 ? 0 : (idx + 1) % pl.tracks.length;
+          playMusicTrack(pl.tracks[nextIdx]);
+        } else {
+          musicPlayingWanted = false;
+          syncMusicTransportUi();
+        }
       } else {
         musicPlayingWanted = false;
         syncMusicTransportUi();
