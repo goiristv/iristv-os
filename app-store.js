@@ -815,6 +815,20 @@
   const apkDownloadProgress = {};
   const activeApkPollers = {};
 
+  function updateApkProgressDom(appId, st) {
+    const pct = typeof st.progress === 'number' ? st.progress : 0;
+    const cardLabel = st.status === 'installing' ? '⚙ Instalando...' : `⬇ ${pct}%`;
+    const detailLabel = st.status === 'installing' ? '⚙ Instalando...' : `⬇ Baixando (${pct}%)...`;
+
+    document.querySelectorAll(`[data-store-busy="${CSS.escape(appId)}"]`).forEach((btn) => {
+      btn.textContent = cardLabel;
+    });
+    const detailBtn = document.querySelector(`#store-detail-install[data-detail-app="${CSS.escape(appId)}"]`);
+    if (detailBtn) {
+      detailBtn.textContent = detailLabel;
+    }
+  }
+
   async function triggerApkDownload(item, { onStateChange, playUiSound, showToast, onInstalledChanged } = {}) {
     if (!item) return;
     const appId = item.id;
@@ -822,7 +836,7 @@
       return;
     }
 
-    apkDownloadProgress[appId] = { status: 'downloading', progress: 5 };
+    apkDownloadProgress[appId] = { status: 'downloading', progress: 1 };
     if (onStateChange) onStateChange();
 
     try {
@@ -849,9 +863,11 @@
           if (!stRes.ok) return;
           const stData = await stRes.json();
           if (stData && stData.status) {
+            const prev = apkDownloadProgress[appId] || {};
+            const nextPct = typeof stData.progress === 'number' ? stData.progress : (prev.progress || 0);
             apkDownloadProgress[appId] = {
               status: stData.status,
-              progress: typeof stData.progress === 'number' ? stData.progress : 50,
+              progress: nextPct,
               error: stData.error
             };
             if (stData.status === 'installed') {
@@ -861,17 +877,21 @@
               if (playUiSound) playUiSound('chime');
               if (showToast) showToast(`${item.name} instalado!`);
               if (onInstalledChanged) onInstalledChanged();
+              if (onStateChange) onStateChange();
             } else if (stData.status === 'error') {
               clearInterval(activeApkPollers[appId]);
               delete activeApkPollers[appId];
               if (showToast) showToast(`Erro ao baixar ${item.name}: ${stData.error || 'Falha nos mirrors'}`);
+              if (onStateChange) onStateChange();
+            } else {
+              // Atualiza apenas o texto do botão in-place sem recarregar a página da loja
+              updateApkProgressDom(appId, apkDownloadProgress[appId]);
             }
-            if (onStateChange) onStateChange();
           }
         } catch (pollErr) {
           console.warn('Erro ao verificar status do APK:', pollErr);
         }
-      }, 1000);
+      }, 650);
     } catch (err) {
       console.error('Falha ao instalar APK:', err);
       apkDownloadProgress[appId] = { status: 'error', progress: 0, error: err.message };
@@ -929,7 +949,7 @@
           ctaButtonHtml = `<button class="store-btn-open" type="button" data-store-launch="${escHtml(item.id)}">Abrir</button>`;
         } else if (isApkBusy) {
           const label = apkSt.status === 'installing' ? '⚙ Instalando...' : `⬇ ${apkSt.progress || 0}%`;
-          ctaButtonHtml = `<button class="store-btn-get is-busy" type="button" disabled style="opacity:0.85;cursor:wait;">${label}</button>`;
+          ctaButtonHtml = `<button class="store-btn-get is-busy" type="button" data-store-busy="${escHtml(item.id)}" disabled style="opacity:0.85;cursor:wait;">${label}</button>`;
         } else {
           ctaButtonHtml = `<button class="store-btn-get" type="button" data-store-get="${escHtml(item.id)}">Obter</button>`;
         }
@@ -963,7 +983,7 @@
           `;
         } else if (isApkBusy) {
           const label = apkSt.status === 'installing' ? '⚙ Instalando...' : `⬇ Baixando (${apkSt.progress || 0}%)...`;
-          actionBtnHtml = `<button class="btn-prism" id="store-detail-install" type="button" disabled style="opacity:0.85;cursor:wait;">${label}</button>`;
+          actionBtnHtml = `<button class="btn-prism" id="store-detail-install" data-detail-app="${escHtml(d.id)}" type="button" disabled style="opacity:0.85;cursor:wait;">${label}</button>`;
         } else {
           actionBtnHtml = `<button class="btn-prism" id="store-detail-install" type="button">Instalar</button>`;
         }

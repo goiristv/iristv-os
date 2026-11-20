@@ -2997,54 +2997,77 @@ function createAppServer() {
 
           try {
             console.log(`[irisStore APK] Baixando ${appId} do mirror #${i + 1}: ${mirrorUrl}`);
+            const ctrl = new AbortController();
+            let stallTimer = setTimeout(() => ctrl.abort(new Error('Connection timeout')), 25000);
+            const resetStallTimer = () => {
+              clearTimeout(stallTimer);
+              stallTimer = setTimeout(() => ctrl.abort(new Error('Stream stall timeout')), 45000);
+            };
+
             const res = await fetch(mirrorUrl, {
               headers: { 'User-Agent': 'Mozilla/5.0 (Linux; Android 11; Smart TV) AppleWebKit/537.36' },
               redirect: 'follow',
-              signal: AbortSignal.timeout(90000)
+              signal: ctrl.signal
             });
 
             if (!res.ok) {
+              clearTimeout(stallTimer);
               console.warn(`[irisStore APK] Mirror #${i + 1} falhou com status ${res.status}`);
               continue;
             }
             const ctype = (res.headers.get('content-type') || '').toLowerCase();
             if (ctype.includes('text/html')) {
+              clearTimeout(stallTimer);
               console.warn(`[irisStore APK] Mirror #${i + 1} retornou HTML em vez de APK`);
               continue;
             }
 
+            fs.mkdirSync(path.dirname(targetFilePath), { recursive: true });
+            const partPath = `${targetFilePath}.part`;
             const contentLength = parseInt(res.headers.get('content-length') || '0', 10);
-            const fileStream = fs.createWriteStream(targetFilePath);
-            let received = 0;
+            const fileStream = fs.createWriteStream(partPath);
+            let streamErr = null;
+            fileStream.on('error', (err) => { streamErr = err; });
 
+            let received = 0;
             const reader = res.body.getReader();
-            while (true) {
-              const { done, value } = await reader.read();
-              if (done) break;
-              fileStream.write(Buffer.from(value));
-              received += value.length;
-              if (contentLength > 0) {
-                const pct = Math.min(95, Math.round((received / contentLength) * 100));
-                global.__irisApkState[appId].progress = pct;
+            try {
+              while (true) {
+                resetStallTimer();
+                const { done, value } = await reader.read();
+                if (done) break;
+                if (streamErr) throw streamErr;
+                fileStream.write(Buffer.from(value));
+                received += value.length;
+                if (contentLength > 0) {
+                  const pct = Math.min(95, Math.max(1, Math.round((received / contentLength) * 100)));
+                  global.__irisApkState[appId].progress = pct;
+                }
               }
+            } finally {
+              clearTimeout(stallTimer);
             }
+
             await new Promise((resolve, reject) => {
+              if (streamErr) return reject(streamErr);
               fileStream.end((err) => (err ? reject(err) : resolve()));
             });
 
-            if (fs.existsSync(targetFilePath) && fs.statSync(targetFilePath).size > 1024 * 100) {
-              const fd = fs.openSync(targetFilePath, 'r');
+            if (fs.existsSync(partPath) && fs.statSync(partPath).size > 1024 * 100) {
+              const fd = fs.openSync(partPath, 'r');
               const magic = Buffer.alloc(2);
               fs.readSync(fd, magic, 0, 2, 0);
               fs.closeSync(fd);
               if (magic[0] === 0x50 && magic[1] === 0x4b) {
+                fs.renameSync(partPath, targetFilePath);
                 return true;
               }
               console.warn(`[irisStore APK] Arquivo baixado do mirror #${i + 1} não é um APK válido (PK magic ausente)`);
-              try { fs.unlinkSync(targetFilePath); } catch (_) {}
+              try { fs.unlinkSync(partPath); } catch (_) {}
             }
           } catch (mErr) {
             console.warn(`[irisStore APK] Erro no mirror #${i + 1}: ${mErr.message}`);
+            try { fs.unlinkSync(`${targetFilePath}.part`); } catch (_) {}
           }
         }
         return false;
@@ -3082,6 +3105,10 @@ function createAppServer() {
 
         const apkDir = process.platform === 'linux' ? '/opt/iristv/apks' : path.join(ROOT_DIR, 'apks');
         const targetPath = path.join(apkDir, `${appId}.apk`);
+
+        if (global.__irisApkState[appId]?.status === 'downloading' || global.__irisApkState[appId]?.status === 'installing') {
+          return sendJson(req, res, 200, { ok: true, ...global.__irisApkState[appId] });
+        }
 
         // Responde de imediato ao cliente e processa o download em background
         sendJson(req, res, 200, { ok: true, status: 'downloading', message: `Download iniciado de mirrors reais para ${appName}` });
