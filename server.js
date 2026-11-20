@@ -5,7 +5,7 @@ const path = require('path');
 const os = require('os');
 const crypto = require('crypto');
 const zlib = require('zlib');
-const { execFile, spawn } = require('child_process');
+const { execFile, execFileSync, spawn } = require('child_process');
 
 const PORT = Number(process.env.PORT) || 3000;
 // Por padrão só aceita conexões da própria máquina. Para liberar a rede local: IRISTV_HOST=0.0.0.0
@@ -2932,6 +2932,8 @@ function createAppServer() {
         'https://dl.strem.io/android/v2.3.2-android/com.stremio.one-2.3.2-6097154-x86.apk'
       ],
       vlc: [
+        'https://get.videolan.org/vlc-android/3.5.4/VLC-Android-3.5.4-x86_64.apk',
+        'https://get.videolan.org/vlc-android/3.5.4/VLC-Android-3.5.4-x86.apk',
         'https://get.videolan.org/vlc-android/3.5.4/VLC-Android-3.5.4-arm64-v8a.apk',
         'https://get.videolan.org/vlc-android/3.5.4/VLC-Android-3.5.4-armeabi-v7a.apk'
       ],
@@ -2970,6 +2972,33 @@ function createAppServer() {
       return null;
     };
 
+    // macOS: APKs rodam em um Android (emulador AVD ou dispositivo) via adb
+    const findAdb = () => {
+      const home = os.homedir();
+      const cands = [
+        '/opt/homebrew/bin/adb', '/usr/local/bin/adb',
+        path.join(home, 'Library/Android/sdk/platform-tools/adb'),
+        path.join(process.env.ANDROID_HOME || '', 'platform-tools/adb'),
+        path.join(process.env.ANDROID_SDK_ROOT || '', 'platform-tools/adb')
+      ];
+      return cands.find((c) => c && fs.existsSync(c)) || null;
+    };
+    const adbRun = (adb, args, timeout = 60000) => execFileSync(adb, args, { timeout, encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'] });
+
+    function rankApkArchUrl(url) {
+      const u = String(url || '').toLowerCase();
+      if (u.includes('x86_64') || u.includes('x64')) return 0;
+      if (u.includes('universal') || (u.includes('nodpi') && !u.includes('arm'))) return 1;
+      if (u.includes('x86')) return 2;
+      if (u.includes('arm64')) return 3;
+      if (u.includes('armeabi')) return 4;
+      return 2;
+    }
+
+    function sortMirrorsByArch(urls) {
+      return [...(urls || [])].sort((a, b) => rankApkArchUrl(a) - rankApkArchUrl(b));
+    }
+
     // Resolve dynamic mirrors via Archive.org Search + Metadata API when needed
     async function resolveDynamicApkMirrors(appId, androidPkg) {
       const found = [];
@@ -2981,7 +3010,8 @@ function createAppServer() {
           });
           if (r.ok) {
             const rel = await r.json();
-            const asset = (rel.assets || []).find((a) => /universal.*\.apk$/i.test(a.name))
+            const asset = (rel.assets || []).find((a) => /x86_64.*\.apk$/i.test(a.name))
+              || (rel.assets || []).find((a) => /universal.*\.apk$/i.test(a.name))
               || (rel.assets || []).find((a) => /\.apk$/i.test(a.name));
             if (asset?.browser_download_url) found.push(asset.browser_download_url);
           }
@@ -2990,14 +3020,14 @@ function createAppServer() {
       const queryTerm = androidPkg || appId;
       if (queryTerm) {
         try {
-          const sr = await fetch(`https://archive.org/advancedsearch.php?q=${encodeURIComponent(queryTerm)}&fl[]=identifier&rows=5&output=json`, {
+          const sr = await fetch(`https://archive.org/advancedsearch.php?q=${encodeURIComponent(queryTerm)}&fl[]=identifier&rows=6&output=json`, {
             headers: { 'User-Agent': 'irisOS/1.0' },
             signal: AbortSignal.timeout(10000)
           });
           if (sr.ok) {
             const sJson = await sr.json();
             const docs = sJson?.response?.docs || [];
-            for (const doc of docs.slice(0, 3)) {
+            for (const doc of docs.slice(0, 4)) {
               if (!doc?.identifier) continue;
               const mr = await fetch(`https://archive.org/metadata/${encodeURIComponent(doc.identifier)}`, {
                 headers: { 'User-Agent': 'irisOS/1.0' },
@@ -3005,22 +3035,24 @@ function createAppServer() {
               });
               if (mr.ok) {
                 const mJson = await mr.json();
-                const apkFile = (mJson?.files || []).find((f) => f?.name && f.name.toLowerCase().endsWith('.apk'));
-                if (apkFile?.name) {
-                  found.push(`https://archive.org/download/${encodeURIComponent(doc.identifier)}/${encodeURIComponent(apkFile.name)}`);
-                }
+                const apkFiles = sortMirrorsByArch(
+                  (mJson?.files || [])
+                    .filter((f) => f?.name && f.name.toLowerCase().endsWith('.apk'))
+                    .map((f) => `https://archive.org/download/${encodeURIComponent(doc.identifier)}/${encodeURIComponent(f.name)}`)
+                );
+                found.push(...apkFiles.slice(0, 2));
               }
             }
           }
         } catch (_) {}
       }
-      return found;
+      return sortMirrorsByArch(Array.from(new Set(found)));
     }
 
     // Helper: Download a remote file from mirrors with progress tracking + ZIP/APK header verification
     async function downloadApkFromMirrors(appId, initialMirrors, targetFilePath, androidPkg = '') {
       fs.mkdirSync(path.dirname(targetFilePath), { recursive: true });
-      let mirrors = [...(initialMirrors || [])];
+      let mirrors = sortMirrorsByArch(initialMirrors || []);
       let downloaded = false;
 
       const tryDownloadList = async (urlList) => {
@@ -3161,6 +3193,19 @@ function createAppServer() {
 
             global.__irisApkState[appId] = { status: 'installing', progress: 98 };
 
+            if (process.platform === 'darwin') {
+              const adb = findAdb();
+              if (!adb) {
+                global.__irisApkState[appId] = { status: 'error', error: 'adb não encontrado. Instale o Android platform-tools (brew install --cask android-platform-tools).', progress: 0 };
+                return;
+              }
+              try {
+                adbRun(adb, ['install', '-r', '-g', targetPath], 180000);
+              } catch (instErr) {
+                global.__irisApkState[appId] = { status: 'error', error: 'Falha no adb install. Abra um emulador Android (AVD) ou conecte um dispositivo. ' + String(instErr.stderr || instErr.message).slice(0, 200), progress: 0 };
+                return;
+              }
+            }
             const waydroidBin = findExec(['waydroid']);
             if (process.platform === 'linux' && waydroidBin && fs.existsSync(targetPath)) {
               console.log(`[irisStore APK] Instalando APK no Waydroid: ${targetPath}`);
@@ -3275,6 +3320,16 @@ function createAppServer() {
         const rawUrl = String(body.url || '').trim();
         const androidPkg = String(body.androidPackage || TV_ANDROID_PACKAGES[appId] || '').trim();
 
+        if (process.platform === 'darwin' && androidPkg) {
+          const adb = findAdb();
+          if (!adb) return sendJson(req, res, 200, { ok: false, launched: false, error: 'adb não encontrado (instale android-platform-tools)' });
+          try {
+            adbRun(adb, ['shell', 'monkey', '-p', androidPkg, '-c', 'android.intent.category.LAUNCHER', '1'], 15000);
+            return sendJson(req, res, 200, { ok: true, launched: true, mode: 'adb', package: androidPkg, name: appName });
+          } catch (e) {
+            return sendJson(req, res, 200, { ok: false, launched: false, error: 'App não instalado ou emulador fechado' });
+          }
+        }
         if (process.platform !== 'linux') {
           return sendJson(req, res, 200, { ok: true, launched: false, mode: 'browser-fallback' });
         }

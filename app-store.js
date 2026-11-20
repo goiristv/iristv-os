@@ -1,15 +1,10 @@
 (() => {
   'use strict';
 
-  const STORAGE_INSTALLED = 'iristv_installed_apps_v1';
+  const STORAGE_INSTALLED = 'iristv_installed_apps_v2';
   const STORAGE_CUSTOM = 'iristv_custom_apps_v1';
 
-  const DEFAULT_INSTALLED_IDS = [
-    'appstore', 'mediaplayer',
-    'weather', 'calculator', 'clock', 'notes', 'browser', 'smarthome',
-    'snake', 'game2048', 'tetris', 'pong', 'memory',
-    'settings'
-  ];
+  const DEFAULT_INSTALLED_IDS = ['appstore', 'mediaplayer', 'settings'];
 
   const CORE_SYSTEM_IDS = new Set(['appstore', 'mediaplayer', 'settings']);
 
@@ -175,11 +170,12 @@
       rating: 4.9,
       kicker: 'SISTEMA',
       meta: 'Aparência • Som • Rede',
-      bg: 'linear-gradient(155deg, #2d334d 0%, #141828 100%)',
-      glow: 'rgba(160, 180, 255, 0.48)',
-      orbs: ['rgba(110, 130, 210, 0.5)', 'rgba(65, 135, 185, 0.45)', 'rgba(80, 70, 135, 0.4)'],
-      tagline: 'Personalize visual, som, rede e controles da sua TV.',
-      icon: `<svg viewBox="0 0 64 64" fill="none"><circle cx="32" cy="32" r="16" stroke="#FFFFFF" stroke-width="4" stroke-dasharray="6.5 4"/><circle cx="32" cy="32" r="7" fill="#00C2FF"/></svg>`
+      bg: 'linear-gradient(155deg, #273046 0%, #101422 100%)',
+      glow: 'rgba(56, 189, 248, 0.52)',
+      orbs: ['rgba(148, 163, 184, 0.48)', 'rgba(56, 189, 248, 0.35)'],
+      kicker: 'SISTEMA',
+      iconSrc: 'icons/settings.svg',
+      tagline: 'Personalize aparência, Wi-Fi, áudio, controles e opções de sistema do irisTV.'
     },
 
     /* === 5 JOGOS NATIVOS === */
@@ -380,7 +376,7 @@
         'https://github.com/yuliskov/SmartTube/releases/download/32.80s/SmartTube_stable_32.80_universal.apk'
       ],
       webUrl: 'https://www.youtube.com/tv',
-      iconSrc: 'icons/youtube.svg',
+      iconSrc: 'icons/smarttube.png',
       bg: '#b91c1c',
       glow: 'rgba(239, 68, 68, 0.65)',
       orbs: ['rgba(239, 68, 68, 0.55)', 'rgba(185, 28, 28, 0.5)'],
@@ -404,7 +400,7 @@
         'https://mirrors.kodi.tv/releases/android/arm64-v8a/kodi-21.1-Omega-arm64-v8a.apk'
       ],
       webUrl: 'https://kodi.tv',
-      iconSrc: 'icons/mediaplayer.svg',
+      iconSrc: 'icons/kodi.jpg',
       bg: '#0284c7',
       glow: 'rgba(2, 132, 199, 0.6)',
       orbs: ['rgba(2, 132, 199, 0.55)', 'rgba(14, 165, 233, 0.45)'],
@@ -428,7 +424,7 @@
         'https://dl.strem.io/android/v2.3.2-android/com.stremio.one-2.3.2-6097154-x86.apk'
       ],
       webUrl: 'https://web.stremio.com',
-      iconSrc: 'icons/mediaplayer.svg',
+      iconSrc: 'icons/stremio.jpg',
       bg: '#581c87',
       glow: 'rgba(139, 92, 246, 0.6)',
       orbs: ['rgba(139, 92, 246, 0.55)', 'rgba(168, 85, 247, 0.45)'],
@@ -447,11 +443,12 @@
       androidPackage: 'org.videolan.vlc',
       drm: 'Todos os Codecs • Aceleração de Hardware',
       apkMirrors: [
-        'https://get.videolan.org/vlc-android/3.5.4/VLC-Android-3.5.4-arm64-v8a.apk',
-        'https://download.videolan.org/pub/videolan/vlc-android/3.5.4/VLC-Android-3.5.4-arm64-v8a.apk'
+        'https://get.videolan.org/vlc-android/3.5.4/VLC-Android-3.5.4-x86_64.apk',
+        'https://get.videolan.org/vlc-android/3.5.4/VLC-Android-3.5.4-x86.apk',
+        'https://get.videolan.org/vlc-android/3.5.4/VLC-Android-3.5.4-arm64-v8a.apk'
       ],
       webUrl: 'https://www.videolan.org',
-      iconSrc: 'icons/mediaplayer.svg',
+      iconSrc: 'icons/vlc.jpg',
       bg: '#ea580c',
       glow: 'rgba(234, 88, 12, 0.6)',
       orbs: ['rgba(234, 88, 12, 0.55)', 'rgba(249, 115, 22, 0.45)'],
@@ -601,7 +598,7 @@
     },
     {
       id: 'spotify',
-      name: 'Spotify TV',
+      name: 'Spotify',
       category: 'music',
       storeCategory: 'music',
       featured: true,
@@ -652,7 +649,6 @@
     { id: 'record', name: 'PlayPlus', category: 'streaming', storeCategory: 'sports', rating: 4.4, developer: 'Record', webUrl: 'https://www.playplus.com', iconSrc: 'icons/record.jpg', bg: '#0b1929', glow: 'rgba(0, 140, 220, 0.54)', orbs: ['rgba(0, 140, 220, 0.52)', 'rgba(30, 60, 110, 0.45)'], kicker: 'TV & STREAMING', meta: 'Record Ao Vivo • Jornalismo', tagline: 'Sinal ao vivo da Record TV, realities e acervo jornalístico.' },
 
     /* === MÚSICA, ÁUDIO & PODCASTS === */
-    { id: 'spotify', name: 'Spotify', category: 'music', storeCategory: 'music', featured: true, rating: 4.9, developer: 'Spotify AB', webUrl: 'https://open.spotify.com', iconSrc: 'icons/spotify.jpg', bg: '#121212', glow: 'rgba(29, 185, 84, 0.6)', orbs: ['rgba(29, 185, 84, 0.55)', 'rgba(20, 120, 95, 0.48)'], kicker: 'MÚSICA & PODCASTS', meta: 'Playlists • Podcasts • Letras', tagline: 'Milhões de músicas, playlists personalizadas e podcasts na sua sala.' },
     { id: 'applemusic', name: 'Apple Music', category: 'music', storeCategory: 'music', rating: 4.8, developer: 'Apple Inc.', webUrl: 'https://music.apple.com', iconSrc: 'icons/applemusic.jpg', bg: '#fb233b', glow: 'rgba(250, 36, 60, 0.6)', orbs: ['rgba(240, 45, 75, 0.56)', 'rgba(170, 45, 95, 0.45)'], kicker: 'ÁUDIO ESPACIAL', meta: 'Lossless • Modo Karaokê', tagline: 'Áudio Lossless, rádio ao vivo e letras sincronizadas na tela.' },
     { id: 'youtubemusic', name: 'YouTube Music', category: 'music', storeCategory: 'music', rating: 4.8, developer: 'Google LLC', webUrl: 'https://music.youtube.com', iconSrc: 'icons/youtubemusic.jpg', bg: '#1e080a', glow: 'rgba(255, 0, 51, 0.58)', orbs: ['rgba(255, 0, 51, 0.55)', 'rgba(40, 40, 50, 0.45)'], kicker: 'MÚSICA & CLIPES', meta: 'Álbuns • Shows • Remixes', tagline: 'O catálogo musical oficial mais videoclipes e apresentações ao vivo.' },
     { id: 'deezer', name: 'Deezer', category: 'music', storeCategory: 'music', rating: 4.7, developer: 'Deezer', webUrl: 'https://www.deezer.com', iconSrc: 'icons/deezer.jpg', bg: '#160a24', glow: 'rgba(162, 56, 255, 0.6)', orbs: ['rgba(162, 56, 255, 0.58)', 'rgba(220, 50, 120, 0.45)'], kicker: 'HIFI FLAC', meta: 'Flow • Playlists', tagline: 'Flow infinito e qualidade de som FLAC sem perdas.' },
@@ -735,8 +731,8 @@
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(patch)
-      }).catch(() => {});
-    } catch (_) {}
+      }).catch(() => { });
+    } catch (_) { }
   }
 
   function saveInstalledIds() {
@@ -792,8 +788,8 @@
             window.syncInstalledApps();
           }
         })
-        .catch(() => {});
-    } catch (_) {}
+        .catch(() => { });
+    } catch (_) { }
   })();
 
   function getFullCatalog() {
@@ -965,6 +961,7 @@
     let query = '';
     let selectedDetailApp = null;
     let showCustomForm = false;
+    let heroApp = null;
 
     const iconMarkup = (a) => (
       a.iconSrc
@@ -990,28 +987,40 @@
         const inst = isAppInstalled(item.id);
         const apkSt = apkDownloadProgress[item.id];
         const isApkBusy = apkSt && (apkSt.status === 'downloading' || apkSt.status === 'installing');
-
-        let ctaButtonHtml = '';
-        if (inst) {
-          ctaButtonHtml = `<button class="store-btn-open" type="button" data-store-launch="${escHtml(item.id)}">Abrir</button>`;
-        } else if (isApkBusy) {
-          const label = apkSt.status === 'installing' ? '⚙ Instalando...' : `⬇ ${apkSt.progress || 0}%`;
-          ctaButtonHtml = `<button class="store-btn-get is-busy" type="button" data-store-busy="${escHtml(item.id)}" disabled style="opacity:0.85;cursor:wait;">${label}</button>`;
-        } else {
-          ctaButtonHtml = `<button class="store-btn-get" type="button" data-store-get="${escHtml(item.id)}">Obter</button>`;
-        }
-
+        const badge = isApkBusy
+          ? `<span class="nv-busy" data-store-busy="${escHtml(item.id)}">${apkSt.status === 'installing' ? '⚙' : `⬇ ${apkSt.progress || 0}%`}</span>`
+          : (inst ? '<i class="nv-check">✓</i>' : '');
         return `
-          <article class="store-app-card ${inst ? 'is-installed' : ''}" tabindex="0" data-store-card="${escHtml(item.id)}">
-            <div class="store-app-icon" style="background:${item.bg}">${iconMarkup(item)}</div>
-            <div class="store-app-info">
-              <strong class="store-app-name">${escHtml(item.name)}</strong>
-              <span class="store-app-sub">${escHtml(item.developer || 'Web')}</span>
-            </div>
-            <div class="store-app-cta">
-              ${ctaButtonHtml}
-            </div>
+          <article class="store-app-card nv-tile ${inst ? 'is-installed' : ''}" tabindex="0" data-store-card="${escHtml(item.id)}">
+            <span class="nv-icon" style="background:${item.bg}">${iconMarkup(item)}${badge}</span>
+            <span class="nv-name">${escHtml(item.name)}</span>
           </article>
+        `;
+      };
+
+      const heroMarkup = (d) => {
+        if (!d) return '';
+        const inst = isAppInstalled(d.id);
+        const apkSt = apkDownloadProgress[d.id];
+        const busy = apkSt && (apkSt.status === 'downloading' || apkSt.status === 'installing');
+        const label = busy ? (apkSt.status === 'installing' ? '⚙ Instalando...' : `⬇ ${apkSt.progress || 0}%`) : (inst ? 'Abrir' : 'Obter');
+        const catLabel = STORE_CATEGORIES.find((c) => c.id === d.storeCategory)?.label || 'App';
+        const typeBadge = d.isApk ? 'APK Android TV' : (d.isNative ? 'Nativo' : 'Web App');
+        return `
+          <div class="nv-hero-icon" style="background:${d.bg}">${iconMarkup(d)}</div>
+          <div class="nv-hero-copy">
+            <div class="nv-hero-badges">
+              <span class="nv-hero-kicker">${escHtml(catLabel)}</span>
+              <span class="nv-hero-pill">${escHtml(typeBadge)}</span>
+              ${inst ? '<span class="nv-hero-pill is-inst">✓ Instalado</span>' : ''}
+            </div>
+            <h2 class="nv-hero-title">${escHtml(d.name)}</h2>
+            <p class="nv-hero-sub">${escHtml(d.tagline || d.meta || d.developer || '')}</p>
+            <div class="nv-hero-actions">
+              <button type="button" class="nv-hero-btn ${inst ? 'is-open' : ''}" data-hero-action="${escHtml(d.id)}" ${busy ? 'disabled' : ''}>${label}</button>
+              <button type="button" class="nv-hero-more" data-hero-details="${escHtml(d.id)}">Detalhes</button>
+            </div>
+          </div>
         `;
       };
 
@@ -1064,67 +1073,111 @@
         </form>
       ` : '';
 
-      const groupedSectionsHtml = (!query && activeCat === 'all')
+      const showRows = (!query && activeCat === 'all');
+      const groupedSectionsHtml = showRows
         ? STORE_CATEGORIES
-            .filter((c) => c.id !== 'all' && c.id !== 'installed')
-            .map((cat) => {
-              const catItems = catalog.filter((a) => a.storeCategory === cat.id);
-              if (!catItems.length) return '';
-              return `
+          .filter((c) => c.id !== 'all' && c.id !== 'installed')
+          .map((cat) => {
+            const catItems = catalog.filter((a) => a.storeCategory === cat.id);
+            if (!catItems.length) return '';
+            return `
                 <section class="store-section">
-                  <h3 class="store-section-title">${escHtml(cat.label)}</h3>
-                  <div class="store-grid">
-                    ${catItems.map(cardMarkup).join('')}
-                  </div>
+                  <h3 class="store-section-title">${escHtml(cat.label)} <small>${catItems.length}</small></h3>
+                  <div class="nv-row">${catItems.map(cardMarkup).join('')}</div>
                 </section>
               `;
-            })
-            .join('')
-        : `<div class="store-grid">
+          })
+          .join('')
+        : `<div class="nv-row is-wrap">
             ${matches.length ? matches.map(cardMarkup).join('') : `<div class="shows-empty-state">Nenhum aplicativo encontrado para "${escHtml(query)}".</div>`}
            </div>`;
 
+      if (!heroApp || !catalog.includes(heroApp)) {
+        heroApp = (showRows ? catalog.find((a) => a.featured) : matches[0]) || catalog[0] || null;
+      }
+
       appStageBody.innerHTML = `
-        <div class="store-shell">
-          <aside class="store-sidebar" aria-label="Categorias da Loja">
-            <div class="store-cats-col">
-              ${STORE_CATEGORIES.map((c) => `
-                <button class="store-cat-btn ${activeCat === c.id ? 'active' : ''}" type="button" data-store-cat="${c.id}">
-                  ${escHtml(c.label)}
-                </button>
-              `).join('')}
+        <div class="store-shell nv-shell">
+          <header class="nv-head">
+            <div class="nv-head-title">irisStore <span>${catalog.length} apps · ${installedCount} instalados</span></div>
+            <div class="store-search-wrap">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+              <input id="store-search-input" class="store-search-input" type="search" value="${escHtml(query)}" placeholder="Buscar aplicativos..." />
             </div>
-            <div class="store-sidebar-actions">
-              <button id="store-add-custom-btn" class="btn-glass" type="button">+ Adicionar Site</button>
-              <button id="store-install-all-btn" class="btn-glass" type="button">Instalar Todos</button>
+            <div class="nv-head-actions">
+              <button id="store-add-custom-btn" class="nv-ghost" type="button">+ Site</button>
+              <button id="store-install-all-btn" class="nv-ghost" type="button">Instalar todos</button>
             </div>
-          </aside>
-
+          </header>
+          <nav class="nv-cats" aria-label="Categorias">
+            ${STORE_CATEGORIES.map((c) => `<button class="store-cat-btn ${activeCat === c.id ? 'active' : ''}" type="button" data-store-cat="${c.id}">${escHtml(c.label)}</button>`).join('')}
+          </nav>
           <div class="store-main">
-            <div class="store-topbar">
-              <div class="store-search-wrap">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
-                <input id="store-search-input" class="store-search-input" type="search" value="${escHtml(query)}" placeholder="Buscar aplicativos..." />
-              </div>
-              <span class="store-count-pill">${installedCount} instalados</span>
-            </div>
-
             ${customFormHtml}
-            ${detailHtml || groupedSectionsHtml}
+            ${detailHtml || `<section class="nv-hero" id="nv-hero">${heroMarkup(heroApp)}</section>${groupedSectionsHtml}`}
           </div>
         </div>
       `;
 
+      const heroEl = appStageBody.querySelector('#nv-hero');
+      const applyHeroAmbient = (it) => {
+        const amb = it?.orbs?.[0] || it?.glow || 'rgba(56, 189, 248, 0.24)';
+        appStageWindow.style.setProperty('--nv-ambient', amb);
+      };
+      if (heroApp) applyHeroAmbient(heroApp);
+      if (heroEl) {
+        const setHero = (id) => {
+          const it = catalog.find((a) => a.id === id);
+          if (!it || it === heroApp) return;
+          heroApp = it;
+          applyHeroAmbient(it);
+          heroEl.innerHTML = heroMarkup(it);
+        };
+        appStageBody.querySelectorAll('.nv-tile').forEach((t) => {
+          t.addEventListener('iris-focus', () => setHero(t.dataset.storeCard));
+          t.addEventListener('focus', () => setHero(t.dataset.storeCard));
+          t.addEventListener('mouseenter', () => setHero(t.dataset.storeCard));
+        });
+        heroEl.addEventListener('click', (e) => {
+          const detBtn = e.target.closest('[data-hero-details]');
+          if (detBtn && heroApp) {
+            playUiSound('select');
+            selectedDetailApp = heroApp;
+            renderStore();
+            return;
+          }
+          const btn = e.target.closest('[data-hero-action]');
+          if (!btn || !heroApp) return;
+          const target = heroApp;
+          if (isAppInstalled(target.id)) { launchApp(target); return; }
+          if (target.isApk || target.androidPackage || target.apkMirrors) {
+            playUiSound('select');
+            triggerApkDownload(target, { onStateChange: () => renderStore(), playUiSound, showToast, onInstalledChanged });
+            renderStore();
+          } else {
+            installAppById(target.id);
+            playUiSound('chime');
+            if (onInstalledChanged) onInstalledChanged();
+            showToast(`${target.name} instalado!`);
+            renderStore();
+          }
+        });
+      }
+
       const searchInput = appStageBody.querySelector('#store-search-input');
+      let searchDebounce = 0;
       searchInput?.addEventListener('input', (e) => {
         query = e.target.value;
-        selectedDetailApp = null;
-        renderStore();
-        const nextInput = document.getElementById('store-search-input');
-        if (nextInput) {
-          nextInput.focus();
-          nextInput.setSelectionRange(query.length, query.length);
-        }
+        clearTimeout(searchDebounce);
+        searchDebounce = setTimeout(() => {
+          selectedDetailApp = null;
+          renderStore();
+          const nextInput = document.getElementById('store-search-input');
+          if (nextInput) {
+            nextInput.focus();
+            nextInput.setSelectionRange(query.length, query.length);
+          }
+        }, 180);
       });
 
       appStageBody.querySelector('#store-add-custom-btn')?.addEventListener('click', () => {
