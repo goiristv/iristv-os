@@ -430,7 +430,7 @@
     glassTransparency: true,
     glassTransparencyLevel: 45,
     glassBrightness: 100,
-    glassBlur: 22,
+    glassBlur: 12,
     uiScale: 1,
     cardRadius: 18,
     soundEnabled: true,
@@ -1777,7 +1777,7 @@
     const level = Math.max(0, Math.min(90, Number(s.glassTransparencyLevel ?? 45))) / 100;
     const bgAlpha = +(1 - level * 0.82).toFixed(3);
     const surfAlpha = +(1 - level * 0.65).toFixed(3);
-    const autoBlur = Math.round((level / 0.9) * 36);
+    const autoBlur = Math.min(12, Math.round((level / 0.9) * 36)); // perf: blur alto custa muito de GPU
     const pillAlpha = state.theme === 'light'
       ? +(Math.max(0.28, Math.min(0.95, 0.68 * brightFactor))).toFixed(3)
       : +(Math.max(0.04, Math.min(0.42, 0.14 * Math.pow(brightFactor, 1.5)))).toFixed(3);
@@ -2222,7 +2222,7 @@
   async function openExternalAppUrl(url, name, appMeta = {}) {
     if (!url && !appMeta?.id) return;
     if (window.IrisWebOS?.isWebOS && window.IrisWebOS.launchApp(appMeta.id, url)) return;
-    if (postWebViewAction('openAppUrl', { url, name: name || 'App', id: appMeta?.id, iconSrc: appMeta?.iconSrc || '', bg: appMeta?.bg || '' })) return;
+    if (!(appMeta.isApk || appMeta.androidPackage) && postWebViewAction('openAppUrl', { url, name: name || 'App', id: appMeta?.id, iconSrc: appMeta?.iconSrc || '', bg: appMeta?.bg || '' })) return;
 
     const isLinux = /linux/i.test(state.systemInfo?.hostPlatform || '');
     if (isLinux || appMeta.isApk || appMeta.androidPackage) {
@@ -2243,6 +2243,9 @@
       if (r.ok) {
         const res = await r.json();
         if (res?.launched) {
+          if (res?.mode === 'waydroid-widevine-resumed') {
+            hideAppLaunchSplash();
+          }
           const onReturn = () => {
             hideAppLaunchSplash();
             window.removeEventListener('focus', onReturn);
@@ -3494,12 +3497,17 @@
     if (!autoHideTopbarBound && tvContentEl) {
       autoHideTopbarBound = true;
       let lastY = 0;
+      let scrollRafPending = false;
       tvContentEl.addEventListener('scroll', () => {
-        if (!state.settings.autoHideTopbar) return;
-        const y = tvContentEl.scrollTop;
-        if (y > 60 && y > lastY) topBarEl.classList.add('is-auto-hidden');
-        else if (y < lastY || y <= 40) topBarEl.classList.remove('is-auto-hidden');
-        lastY = y;
+        if (!state.settings.autoHideTopbar || scrollRafPending) return;
+        scrollRafPending = true;
+        requestAnimationFrame(() => {
+          scrollRafPending = false;
+          const y = tvContentEl.scrollTop;
+          if (y > 60 && y > lastY) topBarEl.classList.add('is-auto-hidden');
+          else if (y < lastY || y <= 40) topBarEl.classList.remove('is-auto-hidden');
+          lastY = y;
+        });
       }, { passive: true });
     }
   }
@@ -3771,51 +3779,30 @@
       const buildClockWidgetEl = (useLiquidGlass) => {
         const now = new Date();
         const ticks = [];
-        for (let i = 0; i < 60; i++) {
-          const isHour = i % 5 === 0;
-          const angle = i * 6;
-          const y1 = isHour ? 8 : 9.5;
-          const y2 = isHour ? 15 : 13;
-          ticks.push(
-            `<line x1="60" y1="${y1}" x2="60" y2="${y2}" transform="rotate(${angle} 60 60)" class="${isHour ? 'clock-tick-major' : 'clock-tick-minor'}" />`
-          );
+        for (let i = 0; i < 12; i++) {
+          ticks.push(`<line x1="60" y1="10" x2="60" y2="${i % 3 === 0 ? 19 : 15}" transform="rotate(${i * 30} 60 60)" class="clock-tick-major" />`);
         }
-
-        const dateLabel = now.toLocaleDateString('pt-BR', { weekday: 'short', day: '2-digit', month: 'short' }).replace('.', '');
-        const tzName = Intl.DateTimeFormat().resolvedOptions().timeZone?.split('/').pop()?.replace(/_/g, ' ') || 'Local';
+        const dateLabel = now.toLocaleDateString('pt-BR', { weekday: 'long', day: '2-digit', month: 'long' });
 
         const btn = document.createElement('button');
         btn.type = 'button';
         btn.id = 'home-clock-widget';
         btn.dataset.nav = 'row-widgets';
         btn.className = `home-widget-card clock-widget-card focusable ${useLiquidGlass ? 'is-liquid-glass' : 'is-solid-matte'}`;
-        btn.setAttribute('aria-label', 'Widget de Relógio Analógico');
+        btn.setAttribute('aria-label', 'Relógio');
         btn.innerHTML = `
-          <div class="weather-widget-specular" aria-hidden="true"></div>
           <div class="clock-widget-dial-wrap">
             <svg class="clock-widget-svg" viewBox="0 0 120 120" aria-hidden="true">
-              <circle cx="60" cy="60" r="56" class="clock-dial-ring" />
-              <circle cx="60" cy="60" r="52" class="clock-dial-face" />
+              <circle cx="60" cy="60" r="55" class="clock-dial-face" />
               ${ticks.join('')}
-              <text x="60" y="25" class="clock-num">12</text>
-              <text x="97" y="63.5" class="clock-num">3</text>
-              <text x="60" y="101" class="clock-num">6</text>
-              <text x="23" y="63.5" class="clock-num">9</text>
-              <line data-hand="hour" x1="60" y1="64" x2="60" y2="33" class="clock-hand-hour" />
-              <line data-hand="minute" x1="60" y1="66" x2="60" y2="21" class="clock-hand-minute" />
-              <g data-hand="second">
-                <line x1="60" y1="73" x2="60" y2="17" class="clock-hand-second" />
-                <circle cx="60" cy="73" r="2.2" class="clock-hand-second-tail" />
-              </g>
-              <circle cx="60" cy="60" r="4.2" class="clock-center-outer" />
-              <circle cx="60" cy="60" r="1.8" class="clock-center-inner" />
+              <line data-hand="hour" x1="60" y1="66" x2="60" y2="34" class="clock-hand-hour" />
+              <line data-hand="minute" x1="60" y1="68" x2="60" y2="20" class="clock-hand-minute" />
+              <line data-hand="second" x1="60" y1="70" x2="60" y2="16" class="clock-hand-second" />
+              <circle cx="60" cy="60" r="3.4" class="clock-center-outer" />
             </svg>
           </div>
           <div class="clock-widget-info">
-            <span class="weather-widget-badge">Relógio</span>
-            <div class="clock-widget-digital">--:--</div>
-            <div class="clock-widget-tz">${escHtml(tzName)}</div>
-            <span class="weather-widget-pill clock-widget-date-pill">${escHtml(dateLabel)}</span>
+            <div class="clock-widget-date">${escHtml(dateLabel)}</div>
           </div>
         `;
         updateAnalogClockWidget(btn);
@@ -3827,7 +3814,7 @@
             window.__irisAnalogClockTimer = null;
             return;
           }
-          updateAnalogClockWidget(el);
+          if (!document.hidden) updateAnalogClockWidget(el);
         }, 1000);
 
         btn.addEventListener('mouseenter', () => setFocus(btn, false));
@@ -6955,6 +6942,7 @@
     if (state.focusEl && state.focusEl !== el) state.focusEl.classList.remove('is-focused');
     state.focusEl = el;
     el.classList.add('is-focused');
+    el.dispatchEvent(new CustomEvent('iris-focus', { bubbles: true }));
     if (shouldScroll) {
       try {
         el.scrollIntoView({ behavior: 'auto', block: 'nearest', inline: 'nearest' });
@@ -7358,7 +7346,7 @@
       }
     }
     maybeRequestVodCaptionWindow(curT);
-    playerState.ccRenderTimer = setInterval(renderActiveCaption, 120);
+    playerState.ccRenderTimer = setInterval(() => { if (!document.hidden) renderActiveCaption(); }, 250);
   }
 
   function syncCcButtons() {
@@ -9864,4 +9852,36 @@
       window.location.reload();
     }
   };
+})();
+
+/* =========================================================
+   Perf: pausa animações infinitas de tudo que NÃO está visível
+   (fechado, display:none, fora da tela ou aba oculta)
+   ========================================================= */
+(() => {
+  const SEL = '.boot-glow,.browser-loading-bar,.eq-bar,.iris-app-splash-spinner,.iris-img-loading-box,.mini-iris-spin,.iris-ring-outer,.live-dot,.mp-disc-stage,.mp-header,.mp-vinyl-disc,.ob-bg-wallpaper,.ob-logo,.ob-prep-orb-core,.ob-prep-orb-glow,.osk-cursor,.player-bg-img,.spotlight-kicker,.spotlight-visual,.ss-wallpaper-bg,.tab-progress-fill,.wifi-rescan-btn';
+  if (!('IntersectionObserver' in window)) return;
+  const io = new IntersectionObserver((entries) => {
+    for (const e of entries) e.target.classList.toggle('iris-paused', !e.isIntersecting);
+  }, { rootMargin: '100px' });
+  const seen = new WeakSet();
+  const watch = (root) => {
+    if (root.nodeType !== 1) return;
+    const list = root.matches?.(SEL) ? [root] : [];
+    root.querySelectorAll?.(SEL).forEach((n) => list.push(n));
+    for (const n of list) if (!seen.has(n)) { seen.add(n); io.observe(n); }
+  };
+  watch(document.body);
+  let queue = [];
+  let scheduled = false;
+  new MutationObserver((muts) => {
+    for (const m of muts) m.addedNodes.forEach((n) => queue.push(n));
+    if (scheduled) return;
+    scheduled = true;
+    (window.requestIdleCallback || ((f) => setTimeout(f, 200)))(() => {
+      scheduled = false;
+      const q = queue; queue = [];
+      q.forEach((n) => { if (n.isConnected) watch(n); });
+    });
+  }).observe(document.body, { childList: true, subtree: true });
 })();

@@ -2431,17 +2431,20 @@ function createAppServer() {
     if (pathname === '/api/os/app-sessions') {
       const sessionsFile = path.join(os.homedir(), '.iristv', 'app-sessions.json');
       const readSessions = () => {
+        if (global.__irisSessionsMem) return global.__irisSessionsMem;
         try {
           if (fs.existsSync(sessionsFile)) {
-            return JSON.parse(fs.readFileSync(sessionsFile, 'utf8'));
+            global.__irisSessionsMem = JSON.parse(fs.readFileSync(sessionsFile, 'utf8'));
+            return global.__irisSessionsMem;
           }
         } catch (_) {}
         return {};
       };
       const writeSessions = (data) => {
+        global.__irisSessionsMem = data;
         try {
           fs.mkdirSync(path.dirname(sessionsFile), { recursive: true });
-          fs.writeFileSync(sessionsFile, JSON.stringify(data, null, 2), 'utf8');
+          fs.writeFile(sessionsFile, JSON.stringify(data, null, 2), 'utf8', () => {});
         } catch (_) {}
       };
 
@@ -3289,12 +3292,24 @@ function createAppServer() {
     if (req.method === 'POST' && pathname === '/api/os/close-tv-app') {
       const waydroidBin = findExec(['waydroid']);
       if (process.platform === 'linux' && waydroidBin) {
+        // Envia KEYCODE_HOME instantaneamente pelo pipe (0ms) antes de consultar dumpsys em background
+        if (!sendFastWaydroidCmd('input keyevent KEYCODE_HOME')) {
+          try {
+            execSync("waydroid shell input keyevent KEYCODE_HOME 2>/dev/null", { timeout: 1500, stdio: 'ignore' });
+          } catch (_) {}
+        }
         try {
-          const actOut = execSync("waydroid shell dumpsys activity activities 2>/dev/null | grep -E '(mResumedActivity|topResumedActivity)' | head -n 1", { timeout: 1500, encoding: 'utf8' });
-          const m = actOut.match(/([a-zA-Z0-9_\.]+\/[a-zA-Z0-9_\.]+)/);
-          if (m) {
+          exec("waydroid shell \"dumpsys activity activities 2>/dev/null | grep -E '(mResumedActivity|topResumedActivity|taskId=)' | head -n 6\"", { timeout: 1800, encoding: 'utf8' }, (err, actOut) => {
+            if (err || !actOut) return;
+            const m = actOut.match(/([a-zA-Z0-9_\.]+\/[a-zA-Z0-9_\.]+)/);
+            if (!m) return;
             const comp = m[1];
             const [pkg] = comp.split('/');
+            const taskMatch = actOut.match(/taskId=(\d+)/);
+            if (taskMatch) {
+              global.__irisAndroidTaskIds = global.__irisAndroidTaskIds || {};
+              global.__irisAndroidTaskIds[pkg] = taskMatch[1];
+            }
             const foundId = Object.keys(TV_ANDROID_PACKAGES).find((k) => TV_ANDROID_PACKAGES[k] === pkg) || pkg;
             const sessions = readSessions();
             sessions[foundId] = {
@@ -3302,20 +3317,15 @@ function createAppServer() {
               id: foundId,
               package: pkg,
               activity: comp,
+              taskId: taskMatch ? taskMatch[1] : sessions[foundId]?.taskId,
               isApk: true,
               savedAt: Date.now()
             };
             sessions[pkg] = sessions[foundId];
             writeSessions(sessions);
-            console.log(`[irisOS] Sessão persistente do APK salva: ${foundId} (${comp})`);
-          }
+            console.log(`[irisOS] Sessão persistente do APK salva: ${foundId} (${comp}${taskMatch ? ` task=${taskMatch[1]}` : ''})`);
+          });
         } catch (_) {}
-
-        if (!sendFastWaydroidCmd('input keyevent KEYCODE_HOME')) {
-          try {
-            execSync("waydroid shell input keyevent KEYCODE_HOME 2>/dev/null", { timeout: 1500, stdio: 'ignore' });
-          } catch (_) {}
-        }
       }
 
       if (global.__irisActiveTvAppProc) {
@@ -3393,9 +3403,16 @@ function createAppServer() {
             WAYDROID_DRM_LEVEL: 'L3'
           };
 
-          if (resumeActivity && resumeActivity.startsWith(androidPkg)) {
-            if (!sendFastWaydroidCmd(`cmd activity start-activity -W -n ${resumeActivity} || am start -n ${resumeActivity}`)) {
-              const proc = spawn(waydroidBin, ['session', 'action', `cmd activity start-activity -W -n ${resumeActivity}`], {
+          const cachedTaskId = (global.__irisAndroidTaskIds || {})[androidPkg] || savedSession?.taskId;
+          if (cachedTaskId || (resumeActivity && resumeActivity.startsWith(androidPkg))) {
+            const reorderCmd = resumeActivity && resumeActivity.startsWith(androidPkg)
+              ? `cmd activity start-activity --user 0 --activity-reorder-to-front -f 0x10200000 -n ${resumeActivity} || am start --activity-reorder-to-front -n ${resumeActivity}`
+              : `cmd activity start-activity --user 0 --activity-reorder-to-front -p ${androidPkg}`;
+            const instantCmd = cachedTaskId
+              ? `cmd activity move-task-to-front ${cachedTaskId} 2>/dev/null || ${reorderCmd}`
+              : reorderCmd;
+            if (!sendFastWaydroidCmd(instantCmd)) {
+              const proc = spawn(waydroidBin, ['session', 'action', instantCmd], {
                 env: envArgs,
                 detached: true,
                 stdio: 'ignore'
@@ -3408,7 +3425,8 @@ function createAppServer() {
               launched: true,
               mode: 'waydroid-widevine-resumed',
               package: androidPkg,
-              activity: resumeActivity,
+              activity: resumeActivity || null,
+              taskId: cachedTaskId || null,
               name: appName,
               drm: 'Widevine L3'
             });

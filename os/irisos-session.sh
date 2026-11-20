@@ -300,6 +300,7 @@ if [ -x /usr/bin/waydroid ] && [ -f /var/lib/waydroid/waydroid.cfg ]; then
         waydroid prop set dalvik.vm.usap_pool_enabled true 2>/dev/null || true
         waydroid prop set persist.device_config.runtime_native.usap_pool_enabled true 2>/dev/null || true
         waydroid prop set debug.hwui.renderer skiagl 2>/dev/null || true
+        waydroid prop set ro.sys.fw.bg_apps_limit 32 2>/dev/null || true
         sysctl -w vm.vfs_cache_pressure=50 >/dev/null 2>&1 || true
 
         # Pré-aquece a sessão Android (Zygote & Dalvik VM) para abertura instantânea dos apps
@@ -343,6 +344,7 @@ if [ -x /usr/bin/waydroid ] && [ -f /var/lib/waydroid/waydroid.cfg ]; then
 
               for pkg in com.netflix.ninja com.teamsmart.videomanager.tv com.amazon.amazonvideo.livingroom com.disney.disneyplus; do
                 if waydroid shell pm list packages 2>/dev/null | grep -q "$pkg"; then
+                  waydroid shell cmd activity set-standby-bucket "$pkg" active >/dev/null 2>&1 || true
                   waydroid shell cmd package compile -m speed --compile-layouts "$pkg" >/dev/null 2>&1 &
                 fi
               done
