@@ -3414,7 +3414,23 @@ function createAppServer() {
             });
           }
 
-          if (!sendFastWaydroidCmd(`cmd activity start-activity --user 0 -W -a android.intent.action.MAIN -c android.intent.category.LAUNCHER -p ${androidPkg} || monkey -p ${androidPkg} -c android.intent.category.LAUNCHER 1`)) {
+          const resolvedComp = (global.__irisResolvedActivities || {})[androidPkg];
+          if (!resolvedComp) {
+            // Resolve and cache main activity asynchronously for future instant -n launches
+            try {
+              exec(`waydroid shell cmd package resolve-activity --brief ${androidPkg} | tail -n 1`, { timeout: 2500 }, (err, out) => {
+                const comp = String(out || '').trim();
+                if (!err && comp && comp.includes('/')) {
+                  global.__irisResolvedActivities = global.__irisResolvedActivities || {};
+                  global.__irisResolvedActivities[androidPkg] = comp;
+                }
+              });
+            } catch (_) {}
+          }
+          const fastLaunchCmd = (resolvedComp && resolvedComp.startsWith(androidPkg))
+            ? `cmd activity start-activity --user 0 -W -n ${resolvedComp} || am start -W -n ${resolvedComp}`
+            : `cmd activity start-activity --user 0 -W -a android.intent.action.MAIN -c android.intent.category.LAUNCHER -p ${androidPkg} || monkey -p ${androidPkg} -c android.intent.category.LAUNCHER 1`;
+          if (!sendFastWaydroidCmd(fastLaunchCmd)) {
             const proc = spawn(waydroidBin, ['app', 'launch', androidPkg], {
               env: envArgs,
               detached: true,

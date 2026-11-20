@@ -293,11 +293,14 @@ if [ -x /usr/bin/waydroid ] && [ -f /var/lib/waydroid/waydroid.cfg ]; then
         waydroid prop set dalvik.vm.dex2oat-filter speed 2>/dev/null || true
         waydroid prop set dalvik.vm.image-dex2oat-filter speed 2>/dev/null || true
         waydroid prop set dalvik.vm.dex2oat-threads 4 2>/dev/null || true
+        waydroid prop set dalvik.vm.boot-dex2oat-threads 4 2>/dev/null || true
         waydroid prop set pm.dexopt.install speed 2>/dev/null || true
         waydroid prop set pm.dexopt.first-boot speed 2>/dev/null || true
         waydroid prop set pm.dexopt.boot-after-ota speed 2>/dev/null || true
         waydroid prop set dalvik.vm.usap_pool_enabled true 2>/dev/null || true
         waydroid prop set persist.device_config.runtime_native.usap_pool_enabled true 2>/dev/null || true
+        waydroid prop set debug.hwui.renderer skiagl 2>/dev/null || true
+        sysctl -w vm.vfs_cache_pressure=50 >/dev/null 2>&1 || true
 
         # Pré-aquece a sessão Android (Zygote & Dalvik VM) para abertura instantânea dos apps
         waydroid session start >> /var/log/waydroid-session.log 2>&1 &
@@ -325,8 +328,13 @@ if [ -x /usr/bin/waydroid ] && [ -f /var/lib/waydroid/waydroid.cfg ]; then
               waydroid shell settings put global transition_animation_scale 0 >/dev/null 2>&1 || true
               waydroid shell settings put global animator_duration_scale 0 >/dev/null 2>&1 || true
               waydroid shell settings put global low_power 0 >/dev/null 2>&1 || true
+              waydroid shell settings put global package_verifier_enable 0 >/dev/null 2>&1 || true
+              waydroid shell settings put global verifier_verify_adb_installs 0 >/dev/null 2>&1 || true
               waydroid shell dumpsys deviceidle disable >/dev/null 2>&1 || true
               waydroid shell cmd power set-fixed-performance-mode-enabled true >/dev/null 2>&1 || true
+
+              # Pré-aquece DNS da Netflix/streaming dentro do container Android
+              (waydroid shell "ping -c 1 -W 1 api-global.netflix.com >/dev/null 2>&1; ping -c 1 -W 1 uiboot.netflix.com >/dev/null 2>&1; ping -c 1 -W 1 www.netflix.com >/dev/null 2>&1" >/dev/null 2>&1 &)
 
               # Pré-carrega APKs, .odex, .vdex, .art e .so do pendrive para o Page Cache em RAM (elimina leitura lenta USB no cold launch)
               if [ -d /var/lib/waydroid/data ]; then
