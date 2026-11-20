@@ -846,47 +846,65 @@
     function autoFitVinylCover(img) {
       if (!img) return;
       img.style.transform = '';
-      const applySmartCrop = () => {
-        const nw = img.naturalWidth || 0;
-        const nh = img.naturalHeight || 0;
+      const src = img.getAttribute('src') || '';
+      if (!src) return;
+
+      const analyzeImage = (sourceImg) => {
+        const nw = sourceImg.naturalWidth || img.naturalWidth || 0;
+        const nh = sourceImg.naturalHeight || img.naturalHeight || 0;
         if (!nw || !nh) return;
         let scale = 1;
-        // Detecta barras pretas embutidas (letterbox/pillarbox) em capas locais (data:) ou mesma origem
         try {
           const s = 48;
           const c = document.createElement('canvas');
           c.width = s;
           c.height = s;
           const g = c.getContext('2d', { willReadFrequently: true });
-          g.drawImage(img, 0, 0, s, s);
+          g.drawImage(sourceImg, 0, 0, s, s);
           const px = g.getImageData(0, 0, s, s).data;
-          let minX = s, maxX = 0, minY = s, maxY = 0;
-          for (let y = 0; y < s; y++) {
-            for (let x = 0; x < s; x++) {
-              const i = (y * s + x) * 4;
-              if (px[i] > 24 || px[i + 1] > 24 || px[i + 2] > 24) {
-                if (x < minX) minX = x;
-                if (x > maxX) maxX = x;
-                if (y < minY) minY = y;
-                if (y > maxY) maxY = y;
+          // Compara contra a cor da borda (canto superior esquerdo) para detectar barras/molduras escuras de qualquer tom
+          const bR = px[0], bG = px[1], bB = px[2];
+          const isDarkBorder = (bR < 55 && bG < 55 && bB < 55);
+          if (isDarkBorder) {
+            let minX = s, maxX = 0, minY = s, maxY = 0;
+            for (let y = 0; y < s; y++) {
+              for (let x = 0; x < s; x++) {
+                const i = (y * s + x) * 4;
+                const diff = Math.abs(px[i] - bR) + Math.abs(px[i + 1] - bG) + Math.abs(px[i + 2] - bB);
+                if (diff > 36 || px[i] > 60 || px[i + 1] > 60 || px[i + 2] > 60) {
+                  if (x < minX) minX = x;
+                  if (x > maxX) maxX = x;
+                  if (y < minY) minY = y;
+                  if (y > maxY) maxY = y;
+                }
               }
             }
-          }
-          const spanX = Math.max(1, maxX - minX + 1) / s;
-          const spanY = Math.max(1, maxY - minY + 1) / s;
-          const minSpan = Math.min(spanX, spanY);
-          if (minSpan < 0.9 && minSpan > 0.35) {
-            scale = Math.min(2.1, 1.03 / minSpan);
+            const spanX = Math.max(1, maxX - minX + 1) / s;
+            const spanY = Math.max(1, maxY - minY + 1) / s;
+            const minSpan = Math.min(spanX, spanY);
+            if (minSpan < 0.9 && minSpan > 0.35) {
+              scale = Math.min(2.1, 1.04 / minSpan);
+            }
           }
         } catch (_) {
-          // Fallback para imagens externas com CORS: se for widescreen (ex: 16:9 com barras laterais)
           const ratio = Math.max(nw / nh, nh / nw);
           if (ratio > 1.2) scale = Math.min(1.5, ratio * 0.85);
         }
         img.style.transform = scale > 1.02 ? `scale(${scale.toFixed(3)})` : '';
       };
-      if (img.complete && img.naturalWidth > 0) applySmartCrop();
-      else img.onload = applySmartCrop;
+
+      if (src.startsWith('data:') || src.startsWith('blob:') || src.startsWith('/')) {
+        if (img.complete && img.naturalWidth > 0) analyzeImage(img);
+        else img.onload = () => analyzeImage(img);
+      } else {
+        const probe = new Image();
+        probe.crossOrigin = 'anonymous';
+        probe.onload = () => analyzeImage(probe);
+        probe.onerror = () => {
+          if (img.complete && img.naturalWidth > 0) analyzeImage(img);
+        };
+        probe.src = src;
+      }
     }
 
     function syncVinylCover() {
@@ -1504,6 +1522,7 @@
       `;
 
       syncAmbientArt();
+      autoFitVinylCover(document.getElementById('mp-vinyl-art'));
       renderLyricsPanel();
       syncMusicTransportUi();
 
