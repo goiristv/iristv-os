@@ -7481,14 +7481,23 @@ body.theme-light .ambient-vignette {
       }
 
       .app-stage-window.is-fullscreen-app .app-stage-topbar,
-      .app-stage-window.is-store-mode .app-stage-topbar,
-      .app-stage-window.is-mediaplayer-app .app-stage-topbar {
+      .app-stage-window.is-store-mode .app-stage-topbar {
         padding: 10px 24px;
         min-height: 54px;
         background: linear-gradient(180deg, rgba(20, 28, 48, 0.52) 0%, rgba(12, 17, 30, 0.42) 100%),
           radial-gradient(ellipse 120% 120% at 50% 0%, var(--wallpaper-glow, var(--accent-glow)) 0%, transparent 80%) !important;
         border-bottom: 1px solid rgba(255, 255, 255, 0.12) !important;
         box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.22), 0 8px 30px rgba(0, 0, 0, 0.25) !important;
+      }
+
+      .app-stage-window.is-mediaplayer-app .app-stage-topbar {
+        position: relative;
+        z-index: 8;
+        padding: 10px 24px;
+        min-height: 54px;
+        background: rgba(8, 12, 22, 0.14) !important;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.08) !important;
+        box-shadow: none !important;
       }
 
       .app-stage-window.is-fullscreen-app .app-stage-body,
@@ -8148,7 +8157,7 @@ body.theme-light .ambient-vignette {
       }
 
       .mp-ambient-bg {
-        position: absolute;
+        position: fixed;
         top: -40px;
         right: -40px;
         bottom: -40px;
@@ -8468,6 +8477,7 @@ body.theme-light .ambient-vignette {
         z-index: 2;
         width: 88%;
         height: 88%;
+        cursor: pointer;
         transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
       }
 
@@ -8505,13 +8515,15 @@ body.theme-light .ambient-vignette {
 
       .mp-vinyl-grooves {
         position: absolute;
-        top: 8px;
-        right: 8px;
-        bottom: 8px;
-        left: 8px;
-        inset: 8px;
+        top: 0;
+        right: 0;
+        bottom: 0;
+        left: 0;
+        inset: 0;
+        z-index: 2;
         border-radius: 50%;
-        background: repeating-radial-gradient(circle, rgba(255, 255, 255, 0.05) 0 1px, transparent 1px 6px);
+        background: repeating-radial-gradient(circle, rgba(255, 255, 255, 0.04) 0 1px, transparent 1px 7px);
+        opacity: 0.32;
         pointer-events: none;
       }
 
@@ -8522,18 +8534,20 @@ body.theme-light .ambient-vignette {
         bottom: 0;
         left: 0;
         inset: 0;
+        z-index: 3;
         border-radius: 50%;
-        background: conic-gradient(from 35deg, transparent 0deg, rgba(255, 255, 255, 0.12) 28deg, transparent 62deg, transparent 180deg, rgba(255, 255, 255, 0.1) 210deg, transparent 248deg);
+        background: conic-gradient(from 35deg, transparent 0deg, rgba(255, 255, 255, 0.14) 28deg, transparent 62deg, transparent 180deg, rgba(255, 255, 255, 0.1) 210deg, transparent 248deg);
         pointer-events: none;
       }
 
       .mp-vinyl-label {
         position: relative;
-        width: 56%;
-        height: 56%;
+        z-index: 1;
+        width: 100%;
+        height: 100%;
         border-radius: 50%;
         overflow: hidden;
-        border: 3px solid rgba(255, 255, 255, 0.28);
+        border: 2px solid rgba(255, 255, 255, 0.24);
         background: linear-gradient(135deg, #182033, #2a163e);
         display: grid;
         place-items: center;
@@ -8554,11 +8568,12 @@ body.theme-light .ambient-vignette {
 
       .mp-vinyl-spindle {
         position: absolute;
-        width: 14px;
-        height: 14px;
+        z-index: 4;
+        width: 12px;
+        height: 12px;
         border-radius: 50%;
-        background: #0a0d16;
-        border: 2px solid rgba(255, 255, 255, 0.6);
+        background: rgba(10, 13, 22, 0.85);
+        border: 2px solid rgba(255, 255, 255, 0.55);
         box-shadow: 0 2px 6px rgba(0, 0, 0, 0.6);
       }
 

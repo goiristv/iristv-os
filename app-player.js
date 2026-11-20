@@ -703,6 +703,7 @@
         if (mySeq !== infoLookupSeq || currentTrack?.id !== track.id) return;
 
         if (data.coverUrl && (!track.onlineCover || customQuery)) {
+          if (customQuery?.forceCover) track.embeddedCover = '';
           track.onlineCover = data.coverUrl;
           saveStore(store);
           syncVinylCover();
@@ -1536,6 +1537,48 @@
       document.getElementById('mp-vol-range')?.addEventListener('input', (e) => {
         audioEl.volume = Math.max(0, Math.min(1, Number(e.target.value) / 100));
       });
+      const triggerRefetchCover = (e) => {
+        if (e) e.preventDefault();
+        if (!currentTrack) return;
+        openPromptModal({
+          title: 'Rebuscar Capa da Música',
+          confirmLabel: 'Atualizar Capa',
+          fields: [
+            { name: 'title', label: 'Nome da música', value: currentTrack.title, required: true },
+            { name: 'artist', label: 'Artista', value: currentTrack.artist || '', required: false },
+            { name: 'customCoverUrl', label: 'URL da capa (opcional — deixe vazio para buscar online)', value: '', required: false }
+          ],
+          onConfirm: ({ title, artist, customCoverUrl }) => {
+            if (!title) return;
+            currentTrack.title = title.trim();
+            currentTrack.artist = (artist || '').trim();
+            currentTrack.embeddedCover = '';
+            const directUrl = (customCoverUrl || '').trim();
+            if (directUrl) {
+              currentTrack.onlineCover = directUrl;
+              saveStore(store);
+              syncVinylCover();
+              syncAmbientArt();
+            } else {
+              currentTrack.onlineCover = '';
+              saveStore(store);
+              syncVinylCover();
+              const dur = Number.isFinite(audioEl.duration) && audioEl.duration > 0 ? audioEl.duration : currentTrack.duration;
+              fetchLyricsAndOnlineCover(currentTrack, dur, { title: currentTrack.title, artist: currentTrack.artist, forceCover: true });
+            }
+            const tNode = document.getElementById('mp-now-title');
+            const sNode = document.getElementById('mp-now-sub');
+            if (tNode) tNode.textContent = currentTrack.title;
+            if (sNode) sNode.textContent = [currentTrack.artist, currentTrack.album].filter(Boolean).join(' • ') || 'Áudio Local';
+          }
+        });
+      };
+      const vinylWrapEl = document.getElementById('mp-vinyl-wrap');
+      if (vinylWrapEl) {
+        vinylWrapEl.addEventListener('contextmenu', triggerRefetchCover);
+        vinylWrapEl.addEventListener('dblclick', triggerRefetchCover);
+      }
+
       document.getElementById('mp-edit-meta-btn')?.addEventListener('click', () => {
         if (!currentTrack) return;
         openPromptModal({
