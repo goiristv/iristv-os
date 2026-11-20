@@ -293,6 +293,11 @@ if [ -x /usr/bin/waydroid ] && [ -f /var/lib/waydroid/waydroid.cfg ]; then
         waydroid prop set dalvik.vm.dex2oat-filter speed 2>/dev/null || true
         waydroid prop set dalvik.vm.image-dex2oat-filter speed 2>/dev/null || true
         waydroid prop set dalvik.vm.dex2oat-threads 4 2>/dev/null || true
+        waydroid prop set pm.dexopt.install speed 2>/dev/null || true
+        waydroid prop set pm.dexopt.first-boot speed 2>/dev/null || true
+        waydroid prop set pm.dexopt.boot-after-ota speed 2>/dev/null || true
+        waydroid prop set dalvik.vm.usap_pool_enabled true 2>/dev/null || true
+        waydroid prop set persist.device_config.runtime_native.usap_pool_enabled true 2>/dev/null || true
 
         # Pré-aquece a sessão Android (Zygote & Dalvik VM) para abertura instantânea dos apps
         waydroid session start >> /var/log/waydroid-session.log 2>&1 &
@@ -315,13 +320,22 @@ if [ -x /usr/bin/waydroid ] && [ -f /var/lib/waydroid/waydroid.cfg ]; then
               waydroid shell wm overscan 0,0,0,0 >/dev/null 2>&1 || true
               waydroid shell settings put global policy_control immersive.full=* >/dev/null 2>&1 || true
 
-              # Desativa animações artificiais de transição do Android (-400ms no cold launch)
+              # Desativa animações artificiais de transição e economia de energia do Android
               waydroid shell settings put global window_animation_scale 0 >/dev/null 2>&1 || true
               waydroid shell settings put global transition_animation_scale 0 >/dev/null 2>&1 || true
               waydroid shell settings put global animator_duration_scale 0 >/dev/null 2>&1 || true
+              waydroid shell settings put global low_power 0 >/dev/null 2>&1 || true
+              waydroid shell dumpsys deviceidle disable >/dev/null 2>&1 || true
+              waydroid shell cmd power set-fixed-performance-mode-enabled true >/dev/null 2>&1 || true
+
+              # Pré-carrega APKs, .odex, .vdex, .art e .so do pendrive para o Page Cache em RAM (elimina leitura lenta USB no cold launch)
+              if [ -d /var/lib/waydroid/data ]; then
+                find /var/lib/waydroid/data/app /var/lib/waydroid/data/dalvik-cache -type f \( -name "*.apk" -o -name "*.odex" -o -name "*.vdex" -o -name "*.art" -o -name "*.so" \) -exec cat {} + >/dev/null 2>&1 &
+              fi
+
               for pkg in com.netflix.ninja com.teamsmart.videomanager.tv com.amazon.amazonvideo.livingroom com.disney.disneyplus; do
                 if waydroid shell pm list packages 2>/dev/null | grep -q "$pkg"; then
-                  waydroid shell cmd package compile -m speed "$pkg" >/dev/null 2>&1 &
+                  waydroid shell cmd package compile -m speed --compile-layouts "$pkg" >/dev/null 2>&1 &
                 fi
               done
               break

@@ -3246,7 +3246,7 @@ function createAppServer() {
     }
 
     // Persistent IPC pipe to Waydroid Android shell (eliminates ~500ms Python CLI startup overhead per launch)
-    const sendFastWaydroidCmd = (cmdStr) => {
+    const ensureWaydroidPipe = () => {
       try {
         if (!global.__irisWaydroidPipe || global.__irisWaydroidPipe.killed || !global.__irisWaydroidPipe.stdin.writable) {
           const lxcBin = findExec(['lxc-attach']);
@@ -3265,13 +3265,26 @@ function createAppServer() {
           global.__irisWaydroidPipe?.on('exit', () => { global.__irisWaydroidPipe = null; });
           global.__irisWaydroidPipe?.unref();
         }
-        if (global.__irisWaydroidPipe && global.__irisWaydroidPipe.stdin.writable) {
+        return Boolean(global.__irisWaydroidPipe && global.__irisWaydroidPipe.stdin.writable);
+      } catch (_) {}
+      return false;
+    };
+
+    const sendFastWaydroidCmd = (cmdStr) => {
+      try {
+        if (ensureWaydroidPipe()) {
           global.__irisWaydroidPipe.stdin.write(cmdStr + '\n');
           return true;
         }
       } catch (_) {}
       return false;
     };
+
+    if (process.platform === 'linux' && !global.__irisWaydroidPipeWarmTimer) {
+      global.__irisWaydroidPipeWarmTimer = setTimeout(() => {
+        if (findExec(['waydroid'])) ensureWaydroidPipe();
+      }, 3000);
+    }
 
     if (req.method === 'POST' && pathname === '/api/os/close-tv-app') {
       const waydroidBin = findExec(['waydroid']);
@@ -3401,7 +3414,7 @@ function createAppServer() {
             });
           }
 
-          if (!sendFastWaydroidCmd(`cmd activity start-activity -a android.intent.action.MAIN -c android.intent.category.LAUNCHER -p ${androidPkg} || monkey -p ${androidPkg} -c android.intent.category.LAUNCHER 1`)) {
+          if (!sendFastWaydroidCmd(`cmd activity start-activity --user 0 -W -a android.intent.action.MAIN -c android.intent.category.LAUNCHER -p ${androidPkg} || monkey -p ${androidPkg} -c android.intent.category.LAUNCHER 1`)) {
             const proc = spawn(waydroidBin, ['app', 'launch', androidPkg], {
               env: envArgs,
               detached: true,
