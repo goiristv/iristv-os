@@ -491,6 +491,7 @@
     let infoLookupSeq = 0;
     let musicPlayingWanted = false;
     let musicSoftClockSec = 0;
+    let pausedResumeSec = null;
     let lastAudioNativeTime = 0;
     let lastAudioNativeMoveTs = 0;
     let lastAudioClockTickTs = 0;
@@ -1009,7 +1010,9 @@
         ? currentTrack.duration
         : (currentTrack?.duration > 0 ? currentTrack.duration : rawDur);
       const nativeCur = Number.isFinite(audioEl.currentTime) ? audioEl.currentTime : 0;
-      let cur = Math.max(nativeCur, musicSoftClockSec || 0);
+      let cur = (!musicPlayingWanted && pausedResumeSec !== null)
+        ? pausedResumeSec
+        : Math.max(nativeCur, musicSoftClockSec || 0);
       cur = dur > 0 ? Math.min(cur, dur) : cur;
       return { cur, dur, rawDur };
     }
@@ -1162,6 +1165,7 @@
       currentTrack = track;
       musicPlayingWanted = true;
       musicSoftClockSec = 0;
+      pausedResumeSec = null;
       lastAudioNativeTime = 0;
       lastAudioNativeMoveTs = performance.now();
       lastAudioClockTickTs = performance.now();
@@ -1270,6 +1274,7 @@
     function handleMusicTrackEnded() {
       if (repeatMode === 'one' && currentTrack) {
         musicSoftClockSec = 0;
+        pausedResumeSec = null;
         lastAudioNativeTime = 0;
         lastAudioNativeMoveTs = performance.now();
         lastAudioClockTickTs = performance.now();
@@ -1334,6 +1339,7 @@
     }, 200);
 
     audioEl.addEventListener('timeupdate', () => {
+      if (!musicPlayingWanted || audioEl.paused) return;
       const nativeCur = Number.isFinite(audioEl.currentTime) ? audioEl.currentTime : 0;
       if (Math.abs(nativeCur - lastAudioNativeTime) > 0.01) {
         lastAudioNativeTime = nativeCur;
@@ -1648,13 +1654,31 @@
         }
         const isPlayingNow = (!audioEl.paused && !audioEl.ended && Boolean(audioEl.src)) || musicPlayingWanted;
         if (!isPlayingNow) {
+          if (pausedResumeSec !== null) {
+            musicSoftClockSec = pausedResumeSec;
+            lastAudioNativeTime = pausedResumeSec;
+            if (Math.abs((audioEl.currentTime || 0) - pausedResumeSec) > 0.05) {
+              try { audioEl.currentTime = pausedResumeSec; } catch (_) { }
+            }
+            pausedResumeSec = null;
+          }
           musicPlayingWanted = true;
           lastAudioClockTickTs = performance.now();
           lastAudioNativeMoveTs = performance.now();
-          audioEl.play().catch(() => { });
+          audioEl.volume = userMasterVolume;
+          audioEl.play().then(() => {
+            applyPlaybackVolumeFade();
+          }).catch(() => { });
           syncMusicTransportUi();
         } else {
+          const snapTime = getEffectiveMusicTimes().cur;
+          pausedResumeSec = snapTime;
+          musicSoftClockSec = snapTime;
+          lastAudioNativeTime = snapTime;
           musicPlayingWanted = false;
+          cancelFadeIn();
+          // Mute immediately before pause() so buffered CoreAudio/WebKit audio cannot leak forward
+          audioEl.volume = 0;
           audioEl.pause();
           syncMusicTransportUi();
         }
@@ -1695,6 +1719,7 @@
         if (dur > 0) {
           const nextT = (Number(e.target.value) / 1000) * dur;
           musicSoftClockSec = nextT;
+          pausedResumeSec = !musicPlayingWanted ? nextT : null;
           lastAudioNativeTime = nextT;
           lastAudioNativeMoveTs = performance.now();
           lastAudioClockTickTs = performance.now();
