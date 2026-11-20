@@ -496,6 +496,12 @@
     let lastAudioClockTickTs = 0;
     let musicClockTimer = null;
     let videoClockTimer = null;
+    let userMasterVolume = audioEl.volume || 1;
+    let hasPlayedAnyTrack = false;
+    let fadeInRafId = null;
+    let isFadingIn = false;
+    const FADE_IN_MS = 1400;
+    const FADE_OUT_SEC = 3.0;
     let drawerOpen = (store.mode === 'music' && !store.musicPlaylists.some((p) => p.tracks?.length))
       || (store.mode === 'video' && !store.videoPlaylists.some((p) => p.episodes?.length));
 
@@ -1079,6 +1085,55 @@
       } catch (_) { }
     }
 
+    function cancelFadeIn() {
+      if (fadeInRafId) {
+        cancelAnimationFrame(fadeInRafId);
+        fadeInRafId = null;
+      }
+      isFadingIn = false;
+    }
+
+    function startTrackFadeIn() {
+      cancelFadeIn();
+      isFadingIn = true;
+      const startTs = performance.now();
+      audioEl.volume = 0;
+      const step = (now) => {
+        if (!isFadingIn || !musicPlayingWanted) {
+          isFadingIn = false;
+          fadeInRafId = null;
+          return;
+        }
+        const t = Math.min(1, (now - startTs) / FADE_IN_MS);
+        const gain = t * t;
+        audioEl.volume = Math.max(0, Math.min(1, userMasterVolume * gain));
+        if (t < 1) {
+          fadeInRafId = requestAnimationFrame(step);
+        } else {
+          audioEl.volume = userMasterVolume;
+          isFadingIn = false;
+          fadeInRafId = null;
+        }
+      };
+      fadeInRafId = requestAnimationFrame(step);
+    }
+
+    function applyPlaybackVolumeFade() {
+      if (isFadingIn || !currentTrack || audioEl.paused) return;
+      const { cur, dur } = getEffectiveMusicTimes();
+      if (dur > FADE_OUT_SEC + 1) {
+        const remaining = dur - cur;
+        if (remaining >= 0 && remaining <= FADE_OUT_SEC) {
+          const ratio = Math.max(0, Math.min(1, remaining / FADE_OUT_SEC));
+          audioEl.volume = Math.max(0, Math.min(1, userMasterVolume * ratio));
+          return;
+        }
+      }
+      if (Math.abs(audioEl.volume - userMasterVolume) > 0.01) {
+        audioEl.volume = userMasterVolume;
+      }
+    }
+
     async function playMusicTrack(track) {
       if (!track) return;
       const url = await resolvePlayableUrl(track);
@@ -1086,6 +1141,8 @@
         showToast('Selecione novamente este arquivo de áudio.');
         return;
       }
+      const isTrackSwitch = hasPlayedAnyTrack;
+      hasPlayedAnyTrack = true;
       currentTrack = track;
       musicPlayingWanted = true;
       musicSoftClockSec = 0;
@@ -1130,12 +1187,19 @@
 
       audioEl.src = url;
       try { audioEl.currentTime = 0; } catch (_) { }
+      if (isTrackSwitch) {
+        audioEl.volume = 0;
+      } else {
+        cancelFadeIn();
+        audioEl.volume = userMasterVolume;
+      }
 
       renderDrawer();
       renderMusicWorkspace();
       audioEl.play().then(() => {
         lastAudioNativeMoveTs = performance.now();
         lastAudioClockTickTs = performance.now();
+        if (isTrackSwitch) startTrackFadeIn();
         syncMusicTransportUi();
         triggerLookupOnce();
       }).catch(() => {
@@ -1228,6 +1292,7 @@
         handleMusicTrackEnded();
         return;
       }
+      applyPlaybackVolumeFade();
       syncMusicTransportUi();
       syncActiveLyric();
     }, 200);
@@ -1239,6 +1304,7 @@
         lastAudioNativeMoveTs = performance.now();
         musicSoftClockSec = Math.max(musicSoftClockSec, nativeCur);
       }
+      applyPlaybackVolumeFade();
       syncMusicTransportUi();
       syncActiveLyric();
     });
@@ -1496,7 +1562,7 @@
               <button id="mp-repeat-btn" class="mp-ctl ${repeatMode !== 'off' ? 'is-on' : ''}" type="button" title="Repetir">${SVG.repeat}${repeatMode === 'one' ? '<i class="mp-rep-one">1</i>' : ''}</button>
               <div class="mp-vol-dock">
                 ${SVG.vol}
-                <input id="mp-vol-range" class="mp-range" type="range" min="0" max="100" value="${Math.round(audioEl.volume * 100)}" />
+                <input id="mp-vol-range" class="mp-range" type="range" min="0" max="100" value="${Math.round(userMasterVolume * 100)}" />
               </div>
             </div>
           </div>
@@ -1602,7 +1668,9 @@
         }
       });
       document.getElementById('mp-vol-range')?.addEventListener('input', (e) => {
-        audioEl.volume = Math.max(0, Math.min(1, Number(e.target.value) / 100));
+        userMasterVolume = Math.max(0, Math.min(1, Number(e.target.value) / 100));
+        cancelFadeIn();
+        audioEl.volume = userMasterVolume;
       });
       const triggerRefetchCover = (e) => {
         if (e) e.preventDefault();
@@ -3621,6 +3689,7 @@
 
     activeCleanup = () => {
       window.removeEventListener('keydown', onKeyDown);
+      cancelFadeIn();
       stopVisualizerLoop();
       musicPlayingWanted = false;
       if (musicClockTimer) {
