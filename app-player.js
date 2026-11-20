@@ -1256,6 +1256,7 @@
       const totEl = document.getElementById('mp-tot-time');
       const seekEl = document.getElementById('mp-seek');
       const playing = Boolean(currentTrack && ((!audioEl.paused && !audioEl.ended && Boolean(audioEl.src)) || musicPlayingWanted));
+      window.__irisMusicPlaying = playing;
       if (disc) disc.classList.toggle('is-spinning', playing);
       if (playBtn) {
         const nextState = playing ? 'pause' : 'play';
@@ -1881,6 +1882,7 @@
     function renderVideoWorkspace(autoPlayCurrent = false) {
       stopVisualizerLoop();
       musicPlayingWanted = false;
+      window.__irisMusicPlaying = false;
       audioEl.pause();
       if (videoClockTimer) {
         clearInterval(videoClockTimer);
@@ -3830,6 +3832,7 @@
       cancelFadeIn();
       stopVisualizerLoop();
       musicPlayingWanted = false;
+      window.__irisMusicPlaying = false;
       if (musicClockTimer) {
         clearInterval(musicClockTimer);
         musicClockTimer = null;

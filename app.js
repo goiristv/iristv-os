@@ -1681,6 +1681,12 @@
     const mins = Number(state.settings.screensaverMinutes) || 0;
     if (mins <= 0) return;
     idleTimerId = setTimeout(() => {
+      const hasActiveMedia = Boolean(window.__irisMusicPlaying)
+        || Array.from(document.querySelectorAll('audio, video')).some((el) => !el.paused && !el.ended);
+      if (hasActiveMedia) {
+        resetIdleTimer();
+        return;
+      }
       if (cinemaPlayer && cinemaPlayer.classList.contains('hidden') && screensaverOverlay && screensaverOverlay.classList.contains('hidden')) {
         openScreensaver();
       }
