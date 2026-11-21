@@ -1723,7 +1723,7 @@
         if (!currLayer.classList.contains('is-active')) {
           currLayer.style.backgroundImage = 'none';
         }
-      }, 1250);
+      }, 3000);
     } else {
       const ambientWpEl = document.getElementById('ambient-wallpaper-bg');
       if (ambientWpEl) ambientWpEl.style.backgroundImage = `url("${url}")`;
@@ -3488,7 +3488,7 @@
         saveSettings();
         updateMainScreenWallpaper();
       }
-    }, 60000);
+    }, 300000);
   }
 
   let autoHideTopbarBound = false;
@@ -9032,7 +9032,7 @@
       applyScreensaverShow(ssShowIndex);
       ssWpRotateTimer = setInterval(() => {
         applyScreensaverShow(ssShowIndex + 1);
-      }, 60000);
+      }, 300000);
     } else {
       const activeId = state.settings.activeWallpaperId;
       const foundIdx = activeWallpapersList.findIndex((w) => w.id === activeId);
@@ -9043,7 +9043,7 @@
       if (state.settings.wallpaperAutoRotate !== false) {
         ssWpRotateTimer = setInterval(() => {
           applyWallpaper(ssCurrentWpIndex + 1);
-        }, 60000);
+        }, 300000);
       }
     }
 
@@ -9650,7 +9650,7 @@
         applyWallpaper(ssCurrentWpIndex - 1);
         if (state.settings.wallpaperAutoRotate !== false) {
           clearInterval(ssWpRotateTimer);
-          ssWpRotateTimer = setInterval(() => applyWallpaper(ssCurrentWpIndex + 1), 60000);
+          ssWpRotateTimer = setInterval(() => applyWallpaper(ssCurrentWpIndex + 1), 300000);
         }
         return;
       }
@@ -9659,7 +9659,7 @@
         applyWallpaper(ssCurrentWpIndex + 1);
         if (state.settings.wallpaperAutoRotate !== false) {
           clearInterval(ssWpRotateTimer);
-          ssWpRotateTimer = setInterval(() => applyWallpaper(ssCurrentWpIndex + 1), 60000);
+          ssWpRotateTimer = setInterval(() => applyWallpaper(ssCurrentWpIndex + 1), 300000);
         }
         return;
       }

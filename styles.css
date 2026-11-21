@@ -152,7 +152,7 @@ body {
   background-position: center;
   background-repeat: no-repeat;
   opacity: 0;
-  transition: opacity 1.15s cubic-bezier(0.22, 1, 0.36, 1);
+  transition: opacity 2.8s cubic-bezier(0.22, 1, 0.36, 1);
   will-change: opacity;
 }
 
@@ -161,7 +161,7 @@ body {
 }
 
 html.fast-wallpaper-fade .ambient-wp-layer {
-  transition: opacity 0.38s ease;
+  transition: opacity 1.2s ease;
 }
 
 .ambient-wallpaper-bg::after {
