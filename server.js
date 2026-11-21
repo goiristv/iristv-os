@@ -1374,6 +1374,7 @@ const MIME_TYPES = {
   '.svg': 'image/svg+xml',
   '.png': 'image/png',
   '.jpg': 'image/jpeg',
+  '.webp': 'image/webp',
   '.mp3': 'audio/mpeg',
   '.ico': 'image/x-icon',
   '.woff2': 'font/woff2'
@@ -2407,40 +2408,99 @@ function createAppServer() {
         const cpus = os.cpus() || [];
         const host = os.hostname() || 'irisOS';
         let productName = '';
+        let hwModel = '';
         let detectedCategory = 'computer';
         if (process.platform === 'darwin') {
           detectedCategory = 'computer';
-          productName = 'Mac / Apple Computer';
+          try {
+            const mRes = await runCmd('sysctl', ['-n', 'hw.model']);
+            if (mRes.ok) hwModel = mRes.stdout.trim();
+          } catch (_) {}
+          productName = hwModel || host;
         } else if (process.platform === 'linux') {
           try {
             productName = fs.readFileSync('/sys/class/dmi/id/product_name', 'utf8').trim();
+            hwModel = productName;
           } catch (_) {}
           const low = `${productName} ${host}`.toLowerCase();
           if (/tv|oled|qled|bravia|tizen|webos|androidtv/.test(low)) detectedCategory = 'tv';
           else if (/box|shield|stick|nuc|beelink|mecool|amlogic|rockchip|irisos/.test(low)) detectedCategory = 'tvbox';
           else detectedCategory = 'computer';
         }
+
+        const totalMemGb = Number((os.totalmem() / (1024 ** 3)).toFixed(1));
+        const freeMemGb = Number((os.freemem() / (1024 ** 3)).toFixed(1));
+        const usedMemGb = Number(Math.max(0, totalMemGb - freeMemGb).toFixed(1));
+        const memPercent = totalMemGb > 0 ? Math.round((usedMemGb / totalMemGb) * 100) : 0;
+
+        let diskTotalGb = null;
+        let diskFreeGb = null;
+        try {
+          const dfRes = await runCmd('df', ['-k', '/']);
+          if (dfRes.ok) {
+            const lines = dfRes.stdout.trim().split('\n');
+            const parts = (lines[1] || '').trim().split(/\s+/);
+            if (parts.length >= 4) {
+              diskTotalGb = Number(((Number(parts[1]) * 1024) / (1024 ** 3)).toFixed(1));
+              diskFreeGb = Number(((Number(parts[3]) * 1024) / (1024 ** 3)).toFixed(1));
+            }
+          }
+        } catch (_) {}
+
+        // Auto-match best Apple-style studio render from catalog
+        const matchStr = `${hwModel} ${productName} ${host}`.toLowerCase();
+        let matched = null;
+        if (/macbookpro|macbook-pro|macbook pro/i.test(matchStr)) {
+          matched = catalog.find((x) => x.id === 'macbookpro-16-2021-space-gray') || catalog.find((x) => x.id.includes('macbookpro'));
+        } else if (/macbookair|macbook air/i.test(matchStr)) {
+          matched = catalog.find((x) => x.id === 'macbookair-13-2022-space-gray') || catalog.find((x) => x.id.includes('macbookair'));
+        } else if (/imacpro/i.test(matchStr)) {
+          matched = catalog.find((x) => x.id.includes('imacpro'));
+        } else if (/imac/i.test(matchStr)) {
+          matched = catalog.find((x) => x.id === 'imac-2021-silver') || catalog.find((x) => x.id.includes('imac'));
+        } else if (/macmini|mac mini/i.test(matchStr)) {
+          matched = catalog.find((x) => x.id === 'macmini-2020') || catalog.find((x) => x.id.includes('macmini'));
+        } else if (/macstudio|mac studio/i.test(matchStr)) {
+          matched = catalog.find((x) => x.id === 'macstudio');
+        } else if (/macpro|mac pro/i.test(matchStr)) {
+          matched = catalog.find((x) => x.id === 'macpro-2019');
+        } else if (detectedCategory === 'tvbox') {
+          matched = catalog.find((x) => x.id === 'apple-tv') || catalog.find((x) => x.category === 'tvbox');
+        } else if (detectedCategory === 'tv') {
+          matched = catalog.find((x) => x.id === 'led-cinema-display-27') || catalog.find((x) => x.category === 'tv');
+        } else {
+          matched = catalog.find((x) => x.id === 'macbookpro-16-2021-space-gray') || catalog.find((x) => x.category === 'computer');
+        }
+
+        const upSec = Math.floor(os.uptime());
+        const upH = Math.floor(upSec / 3600);
+        const upM = Math.floor((upSec % 3600) / 60);
+
         return sendJson(req, res, 200, {
           ok: true,
-          total: catalog.length,
           detectedCategory,
+          matchedPhotoUrl: matched ? matched.url : `assets/devices/hero-${detectedCategory}.webp`,
+          matchedDeviceName: matched ? matched.name : (productName || host),
           hardware: {
             productName: productName || host,
+            hwModel: hwModel || `${process.platform}/${process.arch}`,
             hostname: host,
             platform: process.platform,
+            osRelease: os.release(),
             arch: process.arch,
+            nodeVersion: process.version,
             cpuModel: cpus[0]?.model || `${process.arch} CPU`,
             cpuCores: cpus.length || 1,
-            totalMemGb: Number((os.totalmem() / (1024 ** 3)).toFixed(1)),
-            freeMemGb: Number((os.freemem() / (1024 ** 3)).toFixed(1)),
-            uptimeHours: Number((os.uptime() / 3600).toFixed(1))
-          },
-          items: catalog.map((item) => ({
-            id: item.id,
-            category: item.category,
-            name: item.name,
-            thumbUrl: item.url
-          }))
+            cpuSpeedMhz: cpus[0]?.speed || null,
+            loadAvg: os.loadavg().map((n) => Number(n.toFixed(2))),
+            totalMemGb,
+            freeMemGb,
+            usedMemGb,
+            memPercent,
+            diskTotalGb,
+            diskFreeGb,
+            uptimeFormatted: `${upH}h ${upM}m`
+          }
         });
       } catch (e) {
         return sendJson(req, res, 500, { ok: false, error: e.message });

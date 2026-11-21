@@ -5204,7 +5204,7 @@
       {
         id: 'device',
         title: 'Sobre o Dispositivo',
-        sub: `Hardware • 250+ Fotos Reais`,
+        sub: 'Hardware • Sistema • Especificações',
         icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="12" rx="2"/><path d="M2 20h20"/></svg>'
       },
       {
@@ -5887,13 +5887,18 @@
         </div>
       `;
     } else if (sec === 'device') {
-      const savedDev = (() => { try { return JSON.parse(localStorage.getItem('iristv_device_photo_v1') || 'null'); } catch (_) { return null; } })();
       const isMacHost = /mac|darwin/i.test(info.hostPlatform || navigator.platform || '');
-      const defaultCat = savedDev?.category || (isMacHost ? 'computer' : 'tvbox');
-      const heroPhoto = savedDev?.thumbUrl || `assets/devices/hero-${defaultCat}.webp`;
-      const heroTitle = savedDev?.name || info.hostname || (defaultCat === 'computer' ? 'Computador irisTV' : defaultCat === 'tv' ? 'Smart TV irisOS' : 'TV Box irisOS');
+      const defaultCat = isMacHost ? 'computer' : 'tvbox';
+      const heroPhoto = `assets/devices/hero-${defaultCat}.webp`;
+      const heroTitle = info.hostname || (defaultCat === 'computer' ? 'Computador irisTV' : 'TV Box irisOS');
       const catLabel = defaultCat === 'computer' ? 'Computador' : defaultCat === 'tv' ? 'Smart TV' : 'TV Box';
-      const gpuName = (info.gpus && info.gpus[0]?.name) || info.gpu?.name || 'GPU Acelerada';
+      const primaryGpu = (info.gpus && info.gpus[0]) || info.gpu || {};
+      const gpuName = primaryGpu.name || 'GPU Acelerada';
+      const gpuExtra = [primaryGpu.vram, primaryGpu.metal].filter(Boolean).join(' • ') || 'Aceleração de Hardware 60 FPS';
+      const memTotal = info.memory?.totalGb || '--';
+      const memFree = info.memory?.freeGb || '--';
+      const osAudio = info.audio || {};
+      const osVolTxt = typeof osAudio.outputVolume === 'number' ? (osAudio.outputMuted ? 'Mudo' : `${osAudio.outputVolume}%`) : 'Padrão do Sistema';
       panelHtml = `
         <div class="device-hero-card">
           <div class="device-hero-photo-wrap">
@@ -5902,29 +5907,36 @@
           <div>
             <span id="stg-device-hero-badge" class="device-hero-badge">${catLabel}</span>
             <h3 id="stg-device-hero-title" class="device-hero-title">${escHtml(heroTitle)}</h3>
-            <p id="stg-device-hero-sub" class="device-hero-sub">${escHtml(info.osName || 'irisOS')} • ${escHtml(info.version || '2.0')}</p>
-            <div id="stg-device-specs-grid" class="device-specs-grid">
+            <p id="stg-device-hero-sub" class="device-hero-sub">${escHtml(info.osName || 'irisOS')} • Versão ${escHtml(info.version || '2.0')}</p>
+            <div class="device-specs-grid">
               <div class="device-spec-item"><span class="device-spec-label">Processador</span><span class="device-spec-val" id="spec-cpu">${escHtml(info.cpuModel || 'Detectando...')}</span></div>
-              <div class="device-spec-item"><span class="device-spec-label">Memória RAM</span><span class="device-spec-val" id="spec-ram">${escHtml(`${info.memory?.totalGb || '--'} GB (${info.memory?.freeGb || '--'} GB livres)`)}</span></div>
+              <div class="device-spec-item"><span class="device-spec-label">Memória RAM</span><span class="device-spec-val" id="spec-ram">${escHtml(`${memTotal} GB (${memFree} GB livres)`)}</span></div>
               <div class="device-spec-item"><span class="device-spec-label">Placa Gráfica</span><span class="device-spec-val" id="spec-gpu">${escHtml(gpuName)}</span></div>
-              <div class="device-spec-item"><span class="device-spec-label">Resolução &amp; Rede</span><span class="device-spec-val" id="spec-net">${window.screen?.width || 1920}x${window.screen?.height || 1080} • ${escHtml(info.network?.ip || '127.0.0.1')}</span></div>
+              <div class="device-spec-item"><span class="device-spec-label">Tela &amp; Rede</span><span class="device-spec-val" id="spec-net">${window.screen?.width || 1920}x${window.screen?.height || 1080} • ${escHtml(info.network?.ip || '127.0.0.1')}</span></div>
             </div>
           </div>
         </div>
+
         <div class="settings-group">
-          <div class="settings-group-title" id="stg-device-gallery-title">Galeria de Dispositivos Reais (Carregando...)</div>
-          <div class="device-gallery-toolbar">
-            <div style="display:flex;gap:8px;flex-wrap:wrap;" id="stg-device-cat-pills">
-              <button class="stg-btn primary" type="button" data-dev-cat="all">Todos</button>
-              <button class="stg-btn" type="button" data-dev-cat="computer">Computadores</button>
-              <button class="stg-btn" type="button" data-dev-cat="tvbox">TV Boxes</button>
-              <button class="stg-btn" type="button" data-dev-cat="tv">Smart TVs</button>
-            </div>
-            <input id="stg-device-search" class="stg-text-input" type="search" placeholder="Filtrar modelo (ex: MacBook, Apple TV, OLED)..." style="min-width:220px;" />
-          </div>
-          <div id="stg-device-gallery-grid" class="device-gallery-grid">
-            <span style="color:var(--text-secondary);font-size:0.88rem;">Carregando catálogo comprimido de dispositivos...</span>
-          </div>
+          <div class="settings-group-title">Processador &amp; Memória</div>
+          ${settingRowMarkup({ title: 'Modelo da CPU', desc: 'Arquitetura e núcleos físicos/lógicos', controlHtml: `<span class="stg-stat-pill" id="dev-cpu-detail">${escHtml(info.cpuModel || 'Carregando...')}</span>` })}
+          ${settingRowMarkup({ title: 'Uso de Memória RAM', desc: 'Capacidade total instalada e memória disponível', controlHtml: `<span class="stg-stat-pill" id="dev-ram-detail">${escHtml(`${memTotal} GB total • ${memFree} GB livres`)}</span>` })}
+          ${settingRowMarkup({ title: 'Carga do Sistema (Load Avg)', desc: 'Média de carga de CPU (1m / 5m / 15m)', controlHtml: `<span class="stg-stat-pill" id="dev-load-detail">Verificando...</span>` })}
+        </div>
+
+        <div class="settings-group">
+          <div class="settings-group-title">Gráficos, Tela &amp; Áudio</div>
+          ${settingRowMarkup({ title: 'GPU Ativa', desc: escHtml(gpuExtra), controlHtml: `<span class="stg-stat-pill">${escHtml(gpuName)}</span>` })}
+          ${settingRowMarkup({ title: 'Resolução &amp; Escala', desc: `Profundidade de cor ${window.screen?.colorDepth || 24}-bit • DPR ${window.devicePixelRatio || 1}x`, controlHtml: `<span class="stg-stat-pill">${window.screen?.width || 1920} × ${window.screen?.height || 1080}</span>` })}
+          ${settingRowMarkup({ title: 'Saída de Áudio', desc: 'Controle de volume integrado ao sistema operacional', controlHtml: `<span class="stg-stat-pill">${escHtml(osVolTxt)}</span>` })}
+        </div>
+
+        <div class="settings-group">
+          <div class="settings-group-title">Sistema, Armazenamento &amp; Rede</div>
+          ${settingRowMarkup({ title: 'Modelo de Hardware &amp; Kernel', desc: 'Identificação da placa / máquina e versão do núcleo', controlHtml: `<span class="stg-stat-pill" id="dev-hw-detail">${escHtml(info.hostPlatform || '--')}</span>` })}
+          ${settingRowMarkup({ title: 'Armazenamento Principal', desc: 'Espaço disponível no volume do sistema', controlHtml: `<span class="stg-stat-pill" id="dev-disk-detail">Verificando...</span>` })}
+          ${settingRowMarkup({ title: 'Rede &amp; Conectividade', desc: `Interface ${escHtml(info.network?.iface || 'en0')} • SSID ${escHtml(info.network?.ssid || 'Rede Local')}`, controlHtml: `<span class="stg-stat-pill">${escHtml(info.network?.ip || '127.0.0.1')}</span>` })}
+          ${settingRowMarkup({ title: 'Tempo Ligado (Uptime) &amp; Runtime', desc: `irisTV • Motor Node.js ${escHtml(info.nodeVersion || '')}`, controlHtml: `<span class="stg-stat-pill" id="dev-uptime-detail">Verificando...</span>` })}
         </div>
       `;
     } else if (sec === 'developer') {
@@ -6000,75 +6012,32 @@
           const r = await fetch('/api/os/device-catalog');
           if (!r.ok) return;
           const data = await r.json();
-          const items = data.items || [];
           const hw = data.hardware || {};
+          const heroImg = wrap.querySelector('#stg-device-hero-img');
+          const badge = wrap.querySelector('#stg-device-hero-badge');
+          const hTitle = wrap.querySelector('#stg-device-hero-title');
           const cpuEl = wrap.querySelector('#spec-cpu');
           const ramEl = wrap.querySelector('#spec-ram');
-          const titleEl = wrap.querySelector('#stg-device-gallery-title');
+          const cpuDetail = wrap.querySelector('#dev-cpu-detail');
+          const ramDetail = wrap.querySelector('#dev-ram-detail');
+          const loadDetail = wrap.querySelector('#dev-load-detail');
+          const hwDetail = wrap.querySelector('#dev-hw-detail');
+          const diskDetail = wrap.querySelector('#dev-disk-detail');
+          const uptimeDetail = wrap.querySelector('#dev-uptime-detail');
+
+          if (heroImg && data.matchedPhotoUrl) heroImg.src = data.matchedPhotoUrl;
+          if (badge && data.detectedCategory) {
+            badge.textContent = data.detectedCategory === 'computer' ? 'Computador' : data.detectedCategory === 'tv' ? 'Smart TV' : 'TV Box';
+          }
+          if (hTitle && (hw.hostname || hw.productName)) hTitle.textContent = hw.hostname || hw.productName;
           if (cpuEl && hw.cpuModel) cpuEl.textContent = `${hw.cpuModel} (${hw.cpuCores} núcleos)`;
           if (ramEl && hw.totalMemGb) ramEl.textContent = `${hw.totalMemGb} GB (${hw.freeMemGb} GB livres)`;
-          if (titleEl) titleEl.textContent = `Galeria de Dispositivos Reais (${items.length} modelos com compressão)`;
-
-          const savedDev = (() => { try { return JSON.parse(localStorage.getItem('iristv_device_photo_v1') || 'null'); } catch (_) { return null; } })();
-          if (!savedDev && data.detectedCategory) {
-            const heroImg = wrap.querySelector('#stg-device-hero-img');
-            const badge = wrap.querySelector('#stg-device-hero-badge');
-            const hTitle = wrap.querySelector('#stg-device-hero-title');
-            if (heroImg) heroImg.src = `assets/devices/hero-${data.detectedCategory}.webp`;
-            if (badge) badge.textContent = data.detectedCategory === 'computer' ? 'Computador' : data.detectedCategory === 'tv' ? 'Smart TV' : 'TV Box';
-            if (hTitle && hw.productName) hTitle.textContent = hw.productName;
-          }
-
-          let activeCat = 'all';
-          let searchTerm = '';
-          const grid = wrap.querySelector('#stg-device-gallery-grid');
-          const renderGallery = () => {
-            if (!grid) return;
-            const q = searchTerm.trim().toLowerCase();
-            const filtered = items.filter((it) => {
-              if (activeCat !== 'all' && it.category !== activeCat) return false;
-              if (q && !it.name.toLowerCase().includes(q)) return false;
-              return true;
-            });
-            const selectedId = (() => { try { return JSON.parse(localStorage.getItem('iristv_device_photo_v1') || 'null')?.id || ''; } catch (_) { return ''; } })();
-            grid.innerHTML = filtered.length ? filtered.map((it) => `
-              <button type="button" class="device-photo-card ${it.id === selectedId ? 'is-selected' : ''}" data-pick-dev="${escHtml(it.id)}">
-                <img src="${escHtml(it.thumbUrl)}" alt="${escHtml(it.name)}" loading="lazy" decoding="async" />
-                <span>${escHtml(it.name)}</span>
-              </button>
-            `).join('') : '<span style="color:var(--text-secondary);">Nenhum dispositivo encontrado para esse filtro.</span>';
-
-            grid.querySelectorAll('[data-pick-dev]').forEach((card) => {
-              card.addEventListener('click', () => {
-                const picked = items.find((x) => x.id === card.dataset.pickDev);
-                if (!picked) return;
-                localStorage.setItem('iristv_device_photo_v1', JSON.stringify(picked));
-                const heroImg = wrap.querySelector('#stg-device-hero-img');
-                const badge = wrap.querySelector('#stg-device-hero-badge');
-                const hTitle = wrap.querySelector('#stg-device-hero-title');
-                if (heroImg) heroImg.src = picked.thumbUrl;
-                if (badge) badge.textContent = picked.category === 'computer' ? 'Computador' : picked.category === 'tv' ? 'Smart TV' : 'TV Box';
-                if (hTitle) hTitle.textContent = picked.name;
-                playUiSound('select');
-                showToast(`Dispositivo selecionado: ${picked.name}`);
-                renderGallery();
-              });
-            });
-          };
-
-          wrap.querySelectorAll('[data-dev-cat]').forEach((pill) => {
-            pill.addEventListener('click', () => {
-              activeCat = pill.dataset.devCat || 'all';
-              wrap.querySelectorAll('[data-dev-cat]').forEach((p) => p.classList.toggle('primary', p === pill));
-              playUiSound('move');
-              renderGallery();
-            });
-          });
-          wrap.querySelector('#stg-device-search')?.addEventListener('input', (e) => {
-            searchTerm = e.target.value || '';
-            renderGallery();
-          });
-          renderGallery();
+          if (cpuDetail && hw.cpuModel) cpuDetail.textContent = `${hw.cpuCores} núcleos • ${hw.arch}${hw.cpuSpeedMhz ? ` • ${(hw.cpuSpeedMhz / 1000).toFixed(2)} GHz` : ''}`;
+          if (ramDetail && hw.totalMemGb) ramDetail.textContent = `${hw.usedMemGb} / ${hw.totalMemGb} GB (${hw.memPercent}% em uso)`;
+          if (loadDetail && Array.isArray(hw.loadAvg)) loadDetail.textContent = hw.loadAvg.join(' / ');
+          if (hwDetail) hwDetail.textContent = `${hw.hwModel || hw.platform} • Kernel ${hw.osRelease || '--'}`;
+          if (diskDetail) diskDetail.textContent = hw.diskTotalGb ? `${hw.diskFreeGb} GB livres de ${hw.diskTotalGb} GB` : 'Volume do sistema ativo';
+          if (uptimeDetail) uptimeDetail.textContent = `${hw.uptimeFormatted || '--'} • ${hw.nodeVersion || ''}`;
         } catch (_) {}
       })();
     }
