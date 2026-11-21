@@ -2400,6 +2400,124 @@ function createAppServer() {
       return res.end('404 Not Found');
     }
 
+    if (pathname === '/api/os/device-catalog') {
+      try {
+        const catPath = path.join(ROOT_DIR, 'device-catalog.json');
+        const catalog = fs.existsSync(catPath) ? JSON.parse(fs.readFileSync(catPath, 'utf8')) : [];
+        const cpus = os.cpus() || [];
+        const host = os.hostname() || 'irisOS';
+        let productName = '';
+        let detectedCategory = 'computer';
+        if (process.platform === 'darwin') {
+          detectedCategory = 'computer';
+          productName = 'Mac / Apple Computer';
+        } else if (process.platform === 'linux') {
+          try {
+            productName = fs.readFileSync('/sys/class/dmi/id/product_name', 'utf8').trim();
+          } catch (_) {}
+          const low = `${productName} ${host}`.toLowerCase();
+          if (/tv|oled|qled|bravia|tizen|webos|androidtv/.test(low)) detectedCategory = 'tv';
+          else if (/box|shield|stick|nuc|beelink|mecool|amlogic|rockchip|irisos/.test(low)) detectedCategory = 'tvbox';
+          else detectedCategory = 'computer';
+        }
+        return sendJson(req, res, 200, {
+          ok: true,
+          total: catalog.length,
+          detectedCategory,
+          hardware: {
+            productName: productName || host,
+            hostname: host,
+            platform: process.platform,
+            arch: process.arch,
+            cpuModel: cpus[0]?.model || `${process.arch} CPU`,
+            cpuCores: cpus.length || 1,
+            totalMemGb: Number((os.totalmem() / (1024 ** 3)).toFixed(1)),
+            freeMemGb: Number((os.freemem() / (1024 ** 3)).toFixed(1)),
+            uptimeHours: Number((os.uptime() / 3600).toFixed(1))
+          },
+          items: catalog.map((item) => ({
+            id: item.id,
+            category: item.category,
+            name: item.name,
+            thumbUrl: `/api/os/device-photo?id=${encodeURIComponent(item.id)}`
+          }))
+        });
+      } catch (e) {
+        return sendJson(req, res, 500, { ok: false, error: e.message });
+      }
+    }
+
+    if (pathname === '/api/os/device-photo') {
+      const id = String(reqUrl.searchParams.get('id') || '').trim();
+      const catPath = path.join(ROOT_DIR, 'device-catalog.json');
+      let item = null;
+      try {
+        if (!global.__irisDeviceCatalogMap && fs.existsSync(catPath)) {
+          const list = JSON.parse(fs.readFileSync(catPath, 'utf8'));
+          global.__irisDeviceCatalogMap = new Map(list.map((x) => [x.id, x]));
+        }
+        item = global.__irisDeviceCatalogMap?.get(id) || null;
+      } catch (_) {}
+      const fallbackHero = (cat) => path.join(ROOT_DIR, 'assets', 'devices', `hero-${cat === 'tvbox' ? 'tvbox' : (cat === 'tv' ? 'tv' : 'computer')}.jpg`);
+      if (!item) {
+        const fb = fallbackHero('computer');
+        if (fs.existsSync(fb)) {
+          res.writeHead(200, { 'Content-Type': 'image/jpeg', 'Cache-Control': 'public, max-age=86400' });
+          return fs.createReadStream(fb).pipe(res);
+        }
+        res.writeHead(404);
+        return res.end('Not found');
+      }
+
+      const cacheDir = path.join('/tmp', 'iristv-device-cache');
+      const safeId = id.replace(/[^a-zA-Z0-9_-]/g, '_');
+      const cachedJpg = path.join(cacheDir, `${safeId}.jpg`);
+      if (fs.existsSync(cachedJpg)) {
+        res.writeHead(200, { 'Content-Type': 'image/jpeg', 'Cache-Control': 'public, max-age=604800', 'X-Iris-Photo-Cache': 'HIT' });
+        return fs.createReadStream(cachedJpg).pipe(res);
+      }
+
+      try {
+        fs.mkdirSync(cacheDir, { recursive: true });
+        const upstream = await fetch(item.url, { headers: { 'User-Agent': 'irisOS-DeviceCatalog/1.0' } });
+        if (upstream.ok) {
+          const rawBuf = Buffer.from(await upstream.arrayBuffer());
+          const rawTmp = path.join(cacheDir, `${safeId}.raw`);
+          fs.writeFileSync(rawTmp, rawBuf);
+          const sipsBin = findExec(['sips']) || (fs.existsSync('/usr/bin/sips') ? '/usr/bin/sips' : null);
+          const ffmpegBin = findExec(['ffmpeg']);
+          let compressed = false;
+          if (sipsBin) {
+            try {
+              execSync(`"${sipsBin}" -Z 420 -s format jpeg -s formatOptions 70 "${rawTmp}" --out "${cachedJpg}"`, { timeout: 6000, stdio: 'ignore' });
+              compressed = fs.existsSync(cachedJpg);
+            } catch (_) {}
+          } else if (ffmpegBin) {
+            try {
+              execSync(`"${ffmpegBin}" -y -i "${rawTmp}" -vf "scale='min(420,iw)':-2" -q:v 6 "${cachedJpg}"`, { timeout: 6000, stdio: 'ignore' });
+              compressed = fs.existsSync(cachedJpg);
+            } catch (_) {}
+          }
+          try { fs.unlinkSync(rawTmp); } catch (_) {}
+          if (compressed) {
+            res.writeHead(200, { 'Content-Type': 'image/jpeg', 'Cache-Control': 'public, max-age=604800', 'X-Iris-Photo-Cache': 'MISS-COMPRESSED' });
+            return fs.createReadStream(cachedJpg).pipe(res);
+          }
+          fs.writeFileSync(cachedJpg, rawBuf);
+          res.writeHead(200, { 'Content-Type': upstream.headers.get('content-type') || 'image/jpeg', 'Cache-Control': 'public, max-age=604800' });
+          return res.end(rawBuf);
+        }
+      } catch (_) {}
+
+      const fb = fallbackHero(item.category);
+      if (fs.existsSync(fb)) {
+        res.writeHead(200, { 'Content-Type': 'image/jpeg', 'Cache-Control': 'public, max-age=3600' });
+        return fs.createReadStream(fb).pipe(res);
+      }
+      res.writeHead(404);
+      return res.end('Unavailable');
+    }
+
     if (pathname === '/api/os/ping') {
       return sendJson(req, res, 200, { ok: true, uptime: process.uptime() });
     }

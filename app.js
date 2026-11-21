@@ -5202,6 +5202,12 @@
         icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09a1.65 1.65 0 0 0-1-1.51 1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09a1.65 1.65 0 0 0 1.51-1 1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9c.26.6.85 1 1.51 1H21a2 2 0 1 1 0 4h-.09c-.66 0-1.25.4-1.51 1Z"/></svg>'
       },
       {
+        id: 'device',
+        title: 'Sobre o Dispositivo',
+        sub: `Hardware • 250+ Fotos Reais`,
+        icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="12" rx="2"/><path d="M2 20h20"/></svg>'
+      },
+      {
         id: 'developer',
         title: 'Desenvolvedor',
         sub: 'Testes • Onboarding • Depuração',
@@ -5544,6 +5550,7 @@
     } else if (sec === 'audio') {
       const osAudio = info.audio || {};
       const osVol = typeof osAudio.outputVolume === 'number' ? osAudio.outputVolume : 50;
+      const osMuted = Boolean(osAudio.outputMuted);
       panelHtml = `
         ${osAudio.supported ? `
         <div class="settings-group">
@@ -5879,6 +5886,47 @@
           </div>
         </div>
       `;
+    } else if (sec === 'device') {
+      const savedDev = (() => { try { return JSON.parse(localStorage.getItem('iristv_device_photo_v1') || 'null'); } catch (_) { return null; } })();
+      const isMacHost = /mac|darwin/i.test(info.hostPlatform || navigator.platform || '');
+      const defaultCat = savedDev?.category || (isMacHost ? 'computer' : 'tvbox');
+      const heroPhoto = savedDev?.thumbUrl || `assets/devices/hero-${defaultCat}.jpg`;
+      const heroTitle = savedDev?.name || info.hostname || (defaultCat === 'computer' ? 'Computador irisTV' : defaultCat === 'tv' ? 'Smart TV irisOS' : 'TV Box irisOS');
+      const catLabel = defaultCat === 'computer' ? 'Computador' : defaultCat === 'tv' ? 'Smart TV' : 'TV Box';
+      const gpuName = (info.gpus && info.gpus[0]?.name) || info.gpu?.name || 'GPU Acelerada';
+      panelHtml = `
+        <div class="device-hero-card">
+          <div class="device-hero-photo-wrap">
+            <img id="stg-device-hero-img" src="${escHtml(heroPhoto)}" alt="${escHtml(heroTitle)}" />
+          </div>
+          <div>
+            <span id="stg-device-hero-badge" class="device-hero-badge">${catLabel}</span>
+            <h3 id="stg-device-hero-title" class="device-hero-title">${escHtml(heroTitle)}</h3>
+            <p id="stg-device-hero-sub" class="device-hero-sub">${escHtml(info.osName || 'irisOS')} • ${escHtml(info.version || '2.0')}</p>
+            <div id="stg-device-specs-grid" class="device-specs-grid">
+              <div class="device-spec-item"><span class="device-spec-label">Processador</span><span class="device-spec-val" id="spec-cpu">${escHtml(info.cpuModel || 'Detectando...')}</span></div>
+              <div class="device-spec-item"><span class="device-spec-label">Memória RAM</span><span class="device-spec-val" id="spec-ram">${escHtml(`${info.memory?.totalGb || '--'} GB (${info.memory?.freeGb || '--'} GB livres)`)}</span></div>
+              <div class="device-spec-item"><span class="device-spec-label">Placa Gráfica</span><span class="device-spec-val" id="spec-gpu">${escHtml(gpuName)}</span></div>
+              <div class="device-spec-item"><span class="device-spec-label">Resolução &amp; Rede</span><span class="device-spec-val" id="spec-net">${window.screen?.width || 1920}x${window.screen?.height || 1080} • ${escHtml(info.network?.ip || '127.0.0.1')}</span></div>
+            </div>
+          </div>
+        </div>
+        <div class="settings-group">
+          <div class="settings-group-title" id="stg-device-gallery-title">Galeria de Dispositivos Reais (Carregando...)</div>
+          <div class="device-gallery-toolbar">
+            <div style="display:flex;gap:8px;flex-wrap:wrap;" id="stg-device-cat-pills">
+              <button class="stg-btn primary" type="button" data-dev-cat="all">Todos</button>
+              <button class="stg-btn" type="button" data-dev-cat="computer">Computadores</button>
+              <button class="stg-btn" type="button" data-dev-cat="tvbox">TV Boxes</button>
+              <button class="stg-btn" type="button" data-dev-cat="tv">Smart TVs</button>
+            </div>
+            <input id="stg-device-search" class="stg-text-input" type="search" placeholder="Filtrar modelo (ex: MacBook, Apple TV, OLED)..." style="min-width:220px;" />
+          </div>
+          <div id="stg-device-gallery-grid" class="device-gallery-grid">
+            <span style="color:var(--text-secondary);font-size:0.88rem;">Carregando catálogo comprimido de dispositivos...</span>
+          </div>
+        </div>
+      `;
     } else if (sec === 'developer') {
       panelHtml = `
         <div class="settings-group">
@@ -5937,7 +5985,7 @@
       <section class="settings-panel">${panelHtml}</section>
     `;
 
-    wrap.querySelectorAll('[data-sec]').forEach((btn) => {
+      wrap.querySelectorAll('[data-sec]').forEach((btn) => {
       btn.addEventListener('click', () => {
         playUiSound('move');
         state.activeSettingsSection = btn.dataset.sec;
@@ -5945,6 +5993,85 @@
         if (tvContentEl) tvContentEl.scrollTop = 0;
       });
     });
+
+    if (sec === 'device') {
+      (async () => {
+        try {
+          const r = await fetch('/api/os/device-catalog');
+          if (!r.ok) return;
+          const data = await r.json();
+          const items = data.items || [];
+          const hw = data.hardware || {};
+          const cpuEl = wrap.querySelector('#spec-cpu');
+          const ramEl = wrap.querySelector('#spec-ram');
+          const titleEl = wrap.querySelector('#stg-device-gallery-title');
+          if (cpuEl && hw.cpuModel) cpuEl.textContent = `${hw.cpuModel} (${hw.cpuCores} núcleos)`;
+          if (ramEl && hw.totalMemGb) ramEl.textContent = `${hw.totalMemGb} GB (${hw.freeMemGb} GB livres)`;
+          if (titleEl) titleEl.textContent = `Galeria de Dispositivos Reais (${items.length} modelos com compressão)`;
+
+          const savedDev = (() => { try { return JSON.parse(localStorage.getItem('iristv_device_photo_v1') || 'null'); } catch (_) { return null; } })();
+          if (!savedDev && data.detectedCategory) {
+            const heroImg = wrap.querySelector('#stg-device-hero-img');
+            const badge = wrap.querySelector('#stg-device-hero-badge');
+            const hTitle = wrap.querySelector('#stg-device-hero-title');
+            if (heroImg) heroImg.src = `assets/devices/hero-${data.detectedCategory}.jpg`;
+            if (badge) badge.textContent = data.detectedCategory === 'computer' ? 'Computador' : data.detectedCategory === 'tv' ? 'Smart TV' : 'TV Box';
+            if (hTitle && hw.productName) hTitle.textContent = hw.productName;
+          }
+
+          let activeCat = 'all';
+          let searchTerm = '';
+          const grid = wrap.querySelector('#stg-device-gallery-grid');
+          const renderGallery = () => {
+            if (!grid) return;
+            const q = searchTerm.trim().toLowerCase();
+            const filtered = items.filter((it) => {
+              if (activeCat !== 'all' && it.category !== activeCat) return false;
+              if (q && !it.name.toLowerCase().includes(q)) return false;
+              return true;
+            });
+            const selectedId = (() => { try { return JSON.parse(localStorage.getItem('iristv_device_photo_v1') || 'null')?.id || ''; } catch (_) { return ''; } })();
+            grid.innerHTML = filtered.length ? filtered.map((it) => `
+              <button type="button" class="device-photo-card ${it.id === selectedId ? 'is-selected' : ''}" data-pick-dev="${escHtml(it.id)}">
+                <img src="${escHtml(it.thumbUrl)}" alt="${escHtml(it.name)}" loading="lazy" decoding="async" />
+                <span>${escHtml(it.name)}</span>
+              </button>
+            `).join('') : '<span style="color:var(--text-secondary);">Nenhum dispositivo encontrado para esse filtro.</span>';
+
+            grid.querySelectorAll('[data-pick-dev]').forEach((card) => {
+              card.addEventListener('click', () => {
+                const picked = items.find((x) => x.id === card.dataset.pickDev);
+                if (!picked) return;
+                localStorage.setItem('iristv_device_photo_v1', JSON.stringify(picked));
+                const heroImg = wrap.querySelector('#stg-device-hero-img');
+                const badge = wrap.querySelector('#stg-device-hero-badge');
+                const hTitle = wrap.querySelector('#stg-device-hero-title');
+                if (heroImg) heroImg.src = picked.thumbUrl;
+                if (badge) badge.textContent = picked.category === 'computer' ? 'Computador' : picked.category === 'tv' ? 'Smart TV' : 'TV Box';
+                if (hTitle) hTitle.textContent = picked.name;
+                playUiSound('select');
+                showToast(`Dispositivo selecionado: ${picked.name}`);
+                renderGallery();
+              });
+            });
+          };
+
+          wrap.querySelectorAll('[data-dev-cat]').forEach((pill) => {
+            pill.addEventListener('click', () => {
+              activeCat = pill.dataset.devCat || 'all';
+              wrap.querySelectorAll('[data-dev-cat]').forEach((p) => p.classList.toggle('primary', p === pill));
+              playUiSound('move');
+              renderGallery();
+            });
+          });
+          wrap.querySelector('#stg-device-search')?.addEventListener('input', (e) => {
+            searchTerm = e.target.value || '';
+            renderGallery();
+          });
+          renderGallery();
+        } catch (_) {}
+      })();
+    }
 
     wrap.querySelectorAll('[data-accent-pick]').forEach((btn) => {
       btn.addEventListener('click', () => {

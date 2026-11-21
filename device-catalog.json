@@ -1,0 +1,1508 @@
+[
+  {
+    "id": "computer_1",
+    "category": "computer",
+    "name": "MacBook Pro 2016 (Unsplash)",
+    "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/c/c0/MacBook_Pro_2016_%28Unsplash%29.jpg/500px-MacBook_Pro_2016_%28Unsplash%29.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"
+  },
+  {
+    "id": "computer_2",
+    "category": "computer",
+    "name": "MacBook Pro and SurfaceBook",
+    "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/b/be/MacBook_Pro_and_SurfaceBook.jpg/500px-MacBook_Pro_and_SurfaceBook.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"
+  },
+  {
+    "id": "computer_3",
+    "category": "computer",
+    "name": "MacBook Pro and Surface Book",
+    "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/4/40/MacBook_Pro_and_Surface_Book.jpg/500px-MacBook_Pro_and_Surface_Book.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"
+  },
+  {
+    "id": "computer_4",
+    "category": "computer",
+    "name": "MacBook Pro and Surface Book 2",
+    "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/0/00/MacBook_Pro_and_Surface_Book_2.jpg/500px-MacBook_Pro_and_Surface_Book_2.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"
+  },
+  {
+    "id": "computer_5",
+    "category": "computer",
+    "name": "Apple MacBook Pro, model A1278-8106",
+    "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/3/37/Apple_MacBook_Pro%2C_model_A1278-8106.jpg/500px-Apple_MacBook_Pro%2C_model_A1278-8106.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"
+  },
+  {
+    "id": "computer_6",
+    "category": "computer",
+    "name": "Apple MacBook Pro, model A1278-8107",
+    "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/a/a1/Apple_MacBook_Pro%2C_model_A1278-8107.jpg/500px-Apple_MacBook_Pro%2C_model_A1278-8107.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"
+  },
+  {
+    "id": "computer_7",
+    "category": "computer",
+    "name": "Apple MacBook Pro, model A1278-8109",
+    "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/6/65/Apple_MacBook_Pro%2C_model_A1278-8109.jpg/500px-Apple_MacBook_Pro%2C_model_A1278-8109.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"
+  },
+  {
+    "id": "computer_8",
+    "category": "computer",
+    "name": "Apple MacBook Pro, model A1278-8111",
+    "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/0/0d/Apple_MacBook_Pro%2C_model_A1278-8111.jpg/500px-Apple_MacBook_Pro%2C_model_A1278-8111.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"
+  },
+  {
+    "id": "computer_9",
+    "category": "computer",
+    "name": "Apple MacBook Pro, model A1278-8112",
+    "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/4/4c/Apple_MacBook_Pro%2C_model_A1278-8112.jpg/500px-Apple_MacBook_Pro%2C_model_A1278-8112.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"
+  },
+  {
+    "id": "computer_10",
+    "category": "computer",
+    "name": "US keyboard on MacBook Pro 15-inch 2018",
+    "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/5/51/US_keyboard_on_MacBook_Pro_15-inch_2018.jpg/500px-US_keyboard_on_MacBook_Pro_15-inch_2018.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"
+  },
+  {
+    "id": "computer_11",
+    "category": "computer",
+    "name": "MacBook Pro 13 (M1, 2020)",
+    "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/7/73/MacBook_Pro_13_%28M1%2C_2020%29.jpg/500px-MacBook_Pro_13_%28M1%2C_2020%29.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"
+  },
+  {
+    "id": "computer_12",
+    "category": "computer",
+    "name": "MacBook Pro 2008 hinges",
+    "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/a/a5/MacBook_Pro_2008_hinges.png/500px-MacBook_Pro_2008_hinges.png?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"
+  },
+  {
+    "id": "computer_13",
+    "category": "computer",
+    "name": "Teardown of MacBook Pro 16 inch laptop",
+    "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/0/0e/Teardown_of_MacBook_Pro_16_inch_laptop.jpg/500px-Teardown_of_MacBook_Pro_16_inch_laptop.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"
+  },
+  {
+    "id": "computer_14",
+    "category": "computer",
+    "name": "MacBook Pro 16 (M1 Pro, 2021) - Wikipedia (2)",
+    "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/1/10/MacBook_Pro_16_%28M1_Pro%2C_2021%29_-_Wikipedia_%282%29.jpg/500px-MacBook_Pro_16_%28M1_Pro%2C_2021%29_-_Wikipedia_%282%29.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"
+  },
+  {
+    "id": "computer_15",
+    "category": "computer",
+    "name": "MacBook Pro 16 (M1 Pro, 2021) - Wikipedia",
+    "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/9/91/MacBook_Pro_16_%28M1_Pro%2C_2021%29_-_Wikipedia.jpg/500px-MacBook_Pro_16_%28M1_Pro%2C_2021%29_-_Wikipedia.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"
+  },
+  {
+    "id": "computer_16",
+    "category": "computer",
+    "name": "MacBook Pro 2019 13 inch",
+    "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/d/dd/MacBook_Pro_2019_13_inch.jpg/500px-MacBook_Pro_2019_13_inch.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"
+  },
+  {
+    "id": "computer_17",
+    "category": "computer",
+    "name": "Laptops Arena - MacBook Pro 2017",
+    "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/8/8b/Laptops_Arena_-_MacBook_Pro_2017.jpg/500px-Laptops_Arena_-_MacBook_Pro_2017.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"
+  },
+  {
+    "id": "computer_18",
+    "category": "computer",
+    "name": "Macbook Pro 13\" M1 2020",
+    "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/2/27/Macbook_Pro_13%22_M1_2020.jpg/500px-Macbook_Pro_13%22_M1_2020.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"
+  },
+  {
+    "id": "computer_19",
+    "category": "computer",
+    "name": "Backlit MacBook Pro keyboard",
+    "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/3/3c/Backlit_MacBook_Pro_keyboard.jpg/500px-Backlit_MacBook_Pro_keyboard.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"
+  },
+  {
+    "id": "computer_20",
+    "category": "computer",
+    "name": "MacBook Air black",
+    "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/0/0f/MacBook_Air_black.jpg/500px-MacBook_Air_black.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"
+  },
+  {
+    "id": "computer_21",
+    "category": "computer",
+    "name": "MacBook Air black",
+    "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/6/60/MacBook_Air_black.png/500px-MacBook_Air_black.png?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"
+  },
+  {
+    "id": "computer_22",
+    "category": "computer",
+    "name": "11\" MacBook Air compared to 13\" MacBook",
+    "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/f/f2/11%22_MacBook_Air_compared_to_13%22_MacBook.jpg/500px-11%22_MacBook_Air_compared_to_13%22_MacBook.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"
+  },
+  {
+    "id": "computer_23",
+    "category": "computer",
+    "name": "MacBook Air Mid 2012",
+    "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/d/d5/MacBook_Air_Mid_2012.png/500px-MacBook_Air_Mid_2012.png?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"
+  },
+  {
+    "id": "computer_24",
+    "category": "computer",
+    "name": "MacBook Air",
+    "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/a/a1/MacBook_Air.jpeg/500px-MacBook_Air.jpeg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"
+  },
+  {
+    "id": "computer_25",
+    "category": "computer",
+    "name": "MacBook Air 13\"",
+    "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/a/ad/MacBook_Air_13%22.JPG/500px-MacBook_Air_13%22.JPG?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"
+  },
+  {
+    "id": "computer_26",
+    "category": "computer",
+    "name": "MacBook Air (Early 2015)",
+    "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/b/b4/MacBook_Air_%28Early_2015%29.jpg/500px-MacBook_Air_%28Early_2015%29.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"
+  },
+  {
+    "id": "computer_27",
+    "category": "computer",
+    "name": "MacBook Air Station; May 2012",
+    "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/1/17/MacBook_Air_Station%3B_May_2012.jpg/500px-MacBook_Air_Station%3B_May_2012.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"
+  },
+  {
+    "id": "computer_28",
+    "category": "computer",
+    "name": "MacBook Air keyboard 3",
+    "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/8/8c/MacBook_Air_keyboard_3.jpg/500px-MacBook_Air_keyboard_3.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"
+  },
+  {
+    "id": "computer_29",
+    "category": "computer",
+    "name": "MacBook Air keyboard 2",
+    "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/0/09/MacBook_Air_keyboard_2.jpg/500px-MacBook_Air_keyboard_2.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"
+  },
+  {
+    "id": "computer_30",
+    "category": "computer",
+    "name": "MacBook Air keyboard 1",
+    "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/1/1e/MacBook_Air_keyboard_1.jpg/500px-MacBook_Air_keyboard_1.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"
+  },
+  {
+    "id": "computer_31",
+    "category": "computer",
+    "name": "MacBook Air keyboard 4",
+    "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/f/fe/MacBook_Air_keyboard_4.jpg/500px-MacBook_Air_keyboard_4.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"
+  },
+  {
+    "id": "computer_32",
+    "category": "computer",
+    "name": "Time Machine recovering on MacBook Air 20191017",
+    "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/6/61/Time_Machine_recovering_on_MacBook_Air_20191017.jpg/500px-Time_Machine_recovering_on_MacBook_Air_20191017.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"
+  },
+  {
+    "id": "computer_33",
+    "category": "computer",
+    "name": "MacBook Air Touch ID",
+    "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/9/9d/MacBook_Air_Touch_ID.jpg/500px-MacBook_Air_Touch_ID.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"
+  },
+  {
+    "id": "computer_34",
+    "category": "computer",
+    "name": "Macbook Air",
+    "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/5/55/Macbook_Air.jpeg/500px-Macbook_Air.jpeg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"
+  },
+  {
+    "id": "computer_35",
+    "category": "computer",
+    "name": "MacBook Air in the air",
+    "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/0/0c/MacBook_Air_in_the_air.jpg/500px-MacBook_Air_in_the_air.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"
+  },
+  {
+    "id": "computer_36",
+    "category": "computer",
+    "name": "MacBook Air M1",
+    "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/2/20/MacBook_Air_M1.png/500px-MacBook_Air_M1.png?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"
+  },
+  {
+    "id": "computer_37",
+    "category": "computer",
+    "name": "M2 Macbook Air Midnight model - 1",
+    "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/2/25/M2_Macbook_Air_Midnight_model_-_1.jpg/500px-M2_Macbook_Air_Midnight_model_-_1.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"
+  },
+  {
+    "id": "computer_38",
+    "category": "computer",
+    "name": "MacBook Air display at Apple Covent Garden, November 2012",
+    "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/a/af/MacBook_Air_display_at_Apple_Covent_Garden%2C_November_2012.jpg/500px-MacBook_Air_display_at_Apple_Covent_Garden%2C_November_2012.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"
+  },
+  {
+    "id": "computer_39",
+    "category": "computer",
+    "name": "Imac 16-9",
+    "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/e/e8/Imac_16-9.png/500px-Imac_16-9.png?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"
+  },
+  {
+    "id": "computer_40",
+    "category": "computer",
+    "name": "IMac Pro (2017)",
+    "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/8/88/IMac_Pro_%282017%29.jpg/500px-IMac_Pro_%282017%29.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"
+  },
+  {
+    "id": "computer_41",
+    "category": "computer",
+    "name": "Apple iMac Desktop Computer (41330379330)",
+    "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/4/43/Apple_iMac_Desktop_Computer_%2841330379330%29.jpg/500px-Apple_iMac_Desktop_Computer_%2841330379330%29.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"
+  },
+  {
+    "id": "computer_42",
+    "category": "computer",
+    "name": "IMac aluminium2",
+    "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/1/16/IMac_aluminium2.png/500px-IMac_aluminium2.png?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"
+  },
+  {
+    "id": "computer_43",
+    "category": "computer",
+    "name": "IMac Pro par Mac4Ever",
+    "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/2/24/IMac_Pro_par_Mac4Ever.png/500px-IMac_Pro_par_Mac4Ever.png?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"
+  },
+  {
+    "id": "computer_44",
+    "category": "computer",
+    "name": "IMac G3 Bondi Blue, three-quarters view",
+    "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/d/db/IMac_G3_Bondi_Blue%2C_three-quarters_view.png/500px-IMac_G3_Bondi_Blue%2C_three-quarters_view.png?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"
+  },
+  {
+    "id": "computer_45",
+    "category": "computer",
+    "name": "IMac G4 and keyboard",
+    "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/f/f4/IMac_G4_and_keyboard.jpg/500px-IMac_G4_and_keyboard.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"
+  },
+  {
+    "id": "computer_46",
+    "category": "computer",
+    "name": "White Apple iMac. (51332544173)",
+    "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/a/ad/White_Apple_iMac._%2851332544173%29.jpg/500px-White_Apple_iMac._%2851332544173%29.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"
+  },
+  {
+    "id": "computer_47",
+    "category": "computer",
+    "name": "Apple iMac 3G (32871141127)",
+    "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/0/04/Apple_iMac_3G_%2832871141127%29.jpg/500px-Apple_iMac_3G_%2832871141127%29.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"
+  },
+  {
+    "id": "computer_48",
+    "category": "computer",
+    "name": "Apple iMac 4G (33937792088)",
+    "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/f/fc/Apple_iMac_4G_%2833937792088%29.jpg/500px-Apple_iMac_4G_%2833937792088%29.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"
+  },
+  {
+    "id": "computer_49",
+    "category": "computer",
+    "name": "Apple iMac G3 (cropped)",
+    "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/0/0f/Apple_iMac_G3_%28cropped%29.jpg/500px-Apple_iMac_G3_%28cropped%29.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"
+  },
+  {
+    "id": "computer_50",
+    "category": "computer",
+    "name": "Imac g3, macintosh se, apple keyboard and desktop bus mouse at N",
+    "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/e/e8/Imac_g3%2C_macintosh_se%2C_apple_keyboard_and_desktop_bus_mouse_at_NDC_ICT_lab.jpg/500px-Imac_g3%2C_macintosh_se%2C_apple_keyboard_and_desktop_bus_mouse_at_NDC_ICT_lab.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"
+  },
+  {
+    "id": "computer_51",
+    "category": "computer",
+    "name": "Anglepoise Apple iMac and Windows",
+    "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/3/30/Anglepoise_Apple_iMac_and_Windows.jpg/500px-Anglepoise_Apple_iMac_and_Windows.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"
+  },
+  {
+    "id": "computer_52",
+    "category": "computer",
+    "name": "IMac M4 2024 2 (cropped)",
+    "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/b/bf/IMac_M4_2024_2_%28cropped%29.jpg/500px-IMac_M4_2024_2_%28cropped%29.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"
+  },
+  {
+    "id": "computer_53",
+    "category": "computer",
+    "name": "Apple iMac G4 (32871160027)",
+    "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/e/e7/Apple_iMac_G4_%2832871160027%29.jpg/500px-Apple_iMac_G4_%2832871160027%29.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"
+  },
+  {
+    "id": "computer_54",
+    "category": "computer",
+    "name": "EFTA00000925 - Sleek Apple iMac displays the macOS desktop featu",
+    "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/b/b6/EFTA00000925_-_Sleek_Apple_iMac_displays_the_macOS_desktop_featuring_a_mountain_landscape_wallpaper_and_open_system_preferences_window_on_a_wooden_desk.jpg/500px-EFTA00000925_-_Sleek_Apple_iMac_displays_the_macOS_desktop_featuring_a_mountain_landscape_wallpaper_and_open_system_preferences_window_on_a_wooden_desk.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"
+  },
+  {
+    "id": "computer_55",
+    "category": "computer",
+    "name": "IMac G3 and iMac G4",
+    "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/7/7d/IMac_G3_and_iMac_G4.png/500px-IMac_G3_and_iMac_G4.png?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"
+  },
+  {
+    "id": "computer_56",
+    "category": "computer",
+    "name": "Apple Mac mini - fourth generation-ar 16to10 PNr°0277",
+    "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/f/f8/Apple_Mac_mini_-_fourth_generation-ar_16to10_PNr%C2%B00277.jpg/500px-Apple_Mac_mini_-_fourth_generation-ar_16to10_PNr%C2%B00277.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"
+  },
+  {
+    "id": "computer_57",
+    "category": "computer",
+    "name": "Apple Mac mini - fourth generation-ar 16to9 PNr°0278",
+    "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/d/d2/Apple_Mac_mini_-_fourth_generation-ar_16to9_PNr%C2%B00278.jpg/500px-Apple_Mac_mini_-_fourth_generation-ar_16to9_PNr%C2%B00278.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"
+  },
+  {
+    "id": "computer_58",
+    "category": "computer",
+    "name": "Apple Mac Mini (March 2009) 02",
+    "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/d/d2/Apple_Mac_Mini_%28March_2009%29_02.jpg/500px-Apple_Mac_Mini_%28March_2009%29_02.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"
+  },
+  {
+    "id": "computer_59",
+    "category": "computer",
+    "name": "Apple Mac Mini Server 9654",
+    "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/c/c3/Apple_Mac_Mini_Server_9654.jpg/500px-Apple_Mac_Mini_Server_9654.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"
+  },
+  {
+    "id": "computer_60",
+    "category": "computer",
+    "name": "Apple Mac Mini Server Rear view 9658",
+    "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/1/1b/Apple_Mac_Mini_Server_Rear_view_9658.jpg/500px-Apple_Mac_Mini_Server_Rear_view_9658.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"
+  },
+  {
+    "id": "computer_61",
+    "category": "computer",
+    "name": "Mac mini power lead",
+    "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/5/55/Mac_mini_power_lead.jpg/500px-Mac_mini_power_lead.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"
+  },
+  {
+    "id": "computer_62",
+    "category": "computer",
+    "name": "Mac mini 2018",
+    "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/5/52/Mac_mini_2018.jpg/500px-Mac_mini_2018.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"
+  },
+  {
+    "id": "computer_63",
+    "category": "computer",
+    "name": "Mac mini 2020 (A1) rear view",
+    "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/1/14/Mac_mini_2020_%28A1%29_rear_view.jpg/500px-Mac_mini_2020_%28A1%29_rear_view.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"
+  },
+  {
+    "id": "computer_64",
+    "category": "computer",
+    "name": "Mac mini 2020 (M1) Anschlüsse",
+    "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/8/80/Mac_mini_2020_%28M1%29_Anschl%C3%BCsse.jpg/500px-Mac_mini_2020_%28M1%29_Anschl%C3%BCsse.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"
+  },
+  {
+    "id": "computer_65",
+    "category": "computer",
+    "name": "Mac Mini G4 Tech specs",
+    "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/1/1b/Mac_Mini_G4_Tech_specs.jpg/500px-Mac_Mini_G4_Tech_specs.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"
+  },
+  {
+    "id": "computer_66",
+    "category": "computer",
+    "name": "Mac Mini 3",
+    "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/e/ec/Mac_Mini_3.jpg/500px-Mac_Mini_3.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"
+  },
+  {
+    "id": "computer_67",
+    "category": "computer",
+    "name": "Apple Mac Mini 2",
+    "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/7/71/Apple_Mac_Mini_2.jpg/500px-Apple_Mac_Mini_2.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"
+  },
+  {
+    "id": "computer_68",
+    "category": "computer",
+    "name": "Mac mini 2024",
+    "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/d/df/Mac_mini_2024.jpg/500px-Mac_mini_2024.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"
+  },
+  {
+    "id": "computer_69",
+    "category": "computer",
+    "name": "Mac mini 2024 (cropped)",
+    "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/4/47/Mac_mini_2024_%28cropped%29.jpg/500px-Mac_mini_2024_%28cropped%29.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"
+  },
+  {
+    "id": "computer_70",
+    "category": "computer",
+    "name": "Mac mini (M4, 2024) - Backside",
+    "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/0/0d/Mac_mini_%28M4%2C_2024%29_-_Backside.jpg/500px-Mac_mini_%28M4%2C_2024%29_-_Backside.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"
+  },
+  {
+    "id": "computer_71",
+    "category": "computer",
+    "name": "Mac Pro Tower",
+    "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/c/ca/Mac_Pro_Tower.jpg/500px-Mac_Pro_Tower.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"
+  },
+  {
+    "id": "computer_72",
+    "category": "computer",
+    "name": "Origami Animation Designed on Apple Mac Pro, Rendered in the Clo",
+    "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/b/b3/Origami_Animation_Designed_on_Apple_Mac_Pro%2C_Rendered_in_the_Cloud.jpg/500px-Origami_Animation_Designed_on_Apple_Mac_Pro%2C_Rendered_in_the_Cloud.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"
+  },
+  {
+    "id": "computer_73",
+    "category": "computer",
+    "name": "Origami Animation Designed on Apple Mac Pro, Rendered in the Clo",
+    "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/0/00/Origami_Animation_Designed_on_Apple_Mac_Pro%2C_Rendered_in_the_Cloud_%282%29.jpg/500px-Origami_Animation_Designed_on_Apple_Mac_Pro%2C_Rendered_in_the_Cloud_%282%29.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"
+  },
+  {
+    "id": "computer_74",
+    "category": "computer",
+    "name": "AppleMacPros",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/b/b9/AppleMacPros.png?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail_unscaled"
+  },
+  {
+    "id": "computer_75",
+    "category": "computer",
+    "name": "Mac OS X Leopard Install Disc in a Mac Pro (2485906184)",
+    "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/b/bd/Mac_OS_X_Leopard_Install_Disc_in_a_Mac_Pro_%282485906184%29.jpg/500px-Mac_OS_X_Leopard_Install_Disc_in_a_Mac_Pro_%282485906184%29.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"
+  },
+  {
+    "id": "computer_76",
+    "category": "computer",
+    "name": "Mac-pro-2013",
+    "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/4/4b/Mac-pro-2013.jpg/500px-Mac-pro-2013.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"
+  },
+  {
+    "id": "computer_77",
+    "category": "computer",
+    "name": "Apple Mac Pro (12431112295)",
+    "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/d/d2/Apple_Mac_Pro_%2812431112295%29.jpg/500px-Apple_Mac_Pro_%2812431112295%29.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"
+  },
+  {
+    "id": "computer_78",
+    "category": "computer",
+    "name": "Apple Mac Pro stickers (12431114825)",
+    "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/a/a1/Apple_Mac_Pro_stickers_%2812431114825%29.jpg/500px-Apple_Mac_Pro_stickers_%2812431114825%29.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"
+  },
+  {
+    "id": "computer_79",
+    "category": "computer",
+    "name": "Apple Mac Pro (12431604744)",
+    "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/9/90/Apple_Mac_Pro_%2812431604744%29.jpg/500px-Apple_Mac_Pro_%2812431604744%29.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"
+  },
+  {
+    "id": "computer_80",
+    "category": "computer",
+    "name": "Apple Mac Pro (12431111795)",
+    "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/5/52/Apple_Mac_Pro_%2812431111795%29.jpg/500px-Apple_Mac_Pro_%2812431111795%29.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"
+  },
+  {
+    "id": "computer_81",
+    "category": "computer",
+    "name": "Apple Mac Pro stickers (12431114405)",
+    "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/d/d7/Apple_Mac_Pro_stickers_%2812431114405%29.jpg/500px-Apple_Mac_Pro_stickers_%2812431114405%29.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"
+  },
+  {
+    "id": "computer_82",
+    "category": "computer",
+    "name": "Apple Mac Pro (12431267953)",
+    "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/f/f5/Apple_Mac_Pro_%2812431267953%29.jpg/500px-Apple_Mac_Pro_%2812431267953%29.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"
+  },
+  {
+    "id": "computer_83",
+    "category": "computer",
+    "name": "Apple Mac Pro (12431115195)",
+    "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/e/e1/Apple_Mac_Pro_%2812431115195%29.jpg/500px-Apple_Mac_Pro_%2812431115195%29.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"
+  },
+  {
+    "id": "computer_84",
+    "category": "computer",
+    "name": "Apple Mac Pro (12431268903)",
+    "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/9/93/Apple_Mac_Pro_%2812431268903%29.jpg/500px-Apple_Mac_Pro_%2812431268903%29.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"
+  },
+  {
+    "id": "computer_85",
+    "category": "computer",
+    "name": "Recording studio console for DAW work (2016-03-23 15.01.29 by Da",
+    "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/7/7d/Recording_studio_console_for_DAW_work_%282016-03-23_15.01.29_by_DayronV_%40pixabay_1290087%29.jpg/500px-Recording_studio_console_for_DAW_work_%282016-03-23_15.01.29_by_DayronV_%40pixabay_1290087%29.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"
+  },
+  {
+    "id": "computer_86",
+    "category": "computer",
+    "name": "Apple Studio Display 2024",
+    "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/e/ec/Apple_Studio_Display_2024.jpg/500px-Apple_Studio_Display_2024.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"
+  },
+  {
+    "id": "computer_87",
+    "category": "computer",
+    "name": "Back of a Mac Studio",
+    "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/5/53/Back_of_a_Mac_Studio.jpg/500px-Back_of_a_Mac_Studio.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"
+  },
+  {
+    "id": "computer_88",
+    "category": "computer",
+    "name": "Top down view of the Mac Studio",
+    "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/1/18/Top_down_view_of_the_Mac_Studio.jpg/500px-Top_down_view_of_the_Mac_Studio.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"
+  },
+  {
+    "id": "computer_89",
+    "category": "computer",
+    "name": "IBM Thinkpad R51",
+    "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/0/0e/IBM_Thinkpad_R51.jpg/500px-IBM_Thinkpad_R51.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"
+  },
+  {
+    "id": "computer_90",
+    "category": "computer",
+    "name": "Dell XPS L401X",
+    "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/9/91/Dell_XPS_L401X.JPG/500px-Dell_XPS_L401X.JPG?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"
+  },
+  {
+    "id": "computer_91",
+    "category": "computer",
+    "name": "DELL XPS 13 and 15 (37080596413)",
+    "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/2/21/DELL_XPS_13_and_15_%2837080596413%29.jpg/500px-DELL_XPS_13_and_15_%2837080596413%29.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"
+  },
+  {
+    "id": "computer_92",
+    "category": "computer",
+    "name": "Dell XPS replacement keyboard with broken \"C\" key",
+    "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/d/d9/Dell_XPS_replacement_keyboard_with_broken_%22C%22_key.jpg/500px-Dell_XPS_replacement_keyboard_with_broken_%22C%22_key.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"
+  },
+  {
+    "id": "computer_93",
+    "category": "computer",
+    "name": "Dell XPS 15 (2017)",
+    "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/d/df/Dell_XPS_15_%282017%29.png/500px-Dell_XPS_15_%282017%29.png?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"
+  },
+  {
+    "id": "computer_94",
+    "category": "computer",
+    "name": "Dell XPS 15 (2015)",
+    "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/1/18/Dell_XPS_15_%282015%29.png/500px-Dell_XPS_15_%282015%29.png?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"
+  },
+  {
+    "id": "computer_95",
+    "category": "computer",
+    "name": "Dell XPS 14Z",
+    "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/9/95/Dell_XPS_14Z.png/500px-Dell_XPS_14Z.png?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"
+  },
+  {
+    "id": "computer_96",
+    "category": "computer",
+    "name": "Dell XPS 13 (2017)",
+    "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/d/d2/Dell_XPS_13_%282017%29.png/500px-Dell_XPS_13_%282017%29.png?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"
+  },
+  {
+    "id": "computer_97",
+    "category": "computer",
+    "name": "Dell XPS 13 (2018)",
+    "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/8/8f/Dell_XPS_13_%282018%29.png/500px-Dell_XPS_13_%282018%29.png?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"
+  },
+  {
+    "id": "computer_98",
+    "category": "computer",
+    "name": "Laptop collage",
+    "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/6/68/Laptop_collage.jpg/500px-Laptop_collage.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"
+  },
+  {
+    "id": "computer_99",
+    "category": "computer",
+    "name": "Dell XPS 8950",
+    "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/5/57/Dell_XPS_8950.jpg/500px-Dell_XPS_8950.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"
+  },
+  {
+    "id": "computer_100",
+    "category": "computer",
+    "name": "Lenovo ThinkPad X220 7-row keyboard US International layout",
+    "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/c/c3/Lenovo_ThinkPad_X220_7-row_keyboard_US_International_layout.jpg/500px-Lenovo_ThinkPad_X220_7-row_keyboard_US_International_layout.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"
+  },
+  {
+    "id": "computer_101",
+    "category": "computer",
+    "name": "Back of Lenovo ThinkPad X220 keyboard FRU 45N2171",
+    "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/f/ff/Back_of_Lenovo_ThinkPad_X220_keyboard_FRU_45N2171.jpg/500px-Back_of_Lenovo_ThinkPad_X220_keyboard_FRU_45N2171.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"
+  },
+  {
+    "id": "computer_102",
+    "category": "computer",
+    "name": "Top view of Lenovo ThinkPad X220 keyboard bezel",
+    "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/1/18/Top_view_of_Lenovo_ThinkPad_X220_keyboard_bezel.jpg/500px-Top_view_of_Lenovo_ThinkPad_X220_keyboard_bezel.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"
+  },
+  {
+    "id": "computer_103",
+    "category": "computer",
+    "name": "Lenovo ThinkPad Battery 29++ (FRU 42T4866) for X220 (top view)",
+    "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/8/82/Lenovo_ThinkPad_Battery_29%2B%2B_%28FRU_42T4866%29_for_X220_%28top_view%29.jpg/500px-Lenovo_ThinkPad_Battery_29%2B%2B_%28FRU_42T4866%29_for_X220_%28top_view%29.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"
+  },
+  {
+    "id": "computer_104",
+    "category": "computer",
+    "name": "Lenovo ThinkPad Battery 29++ (FRU 42T4866) for X220 (bottom view",
+    "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/0/0a/Lenovo_ThinkPad_Battery_29%2B%2B_%28FRU_42T4866%29_for_X220_%28bottom_view%29.jpg/500px-Lenovo_ThinkPad_Battery_29%2B%2B_%28FRU_42T4866%29_for_X220_%28bottom_view%29.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"
+  },
+  {
+    "id": "computer_105",
+    "category": "computer",
+    "name": "Top cover of a closed Lenovo ThinkPad X220 laptop",
+    "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/9/97/Top_cover_of_a_closed_Lenovo_ThinkPad_X220_laptop.jpg/500px-Top_cover_of_a_closed_Lenovo_ThinkPad_X220_laptop.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"
+  },
+  {
+    "id": "computer_106",
+    "category": "computer",
+    "name": "Bottom view of a closed Lenovo ThinkPad X220 laptop",
+    "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/8/8f/Bottom_view_of_a_closed_Lenovo_ThinkPad_X220_laptop.jpg/500px-Bottom_view_of_a_closed_Lenovo_ThinkPad_X220_laptop.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"
+  },
+  {
+    "id": "computer_107",
+    "category": "computer",
+    "name": "Intel NUC Haswell (case rear panel)",
+    "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/6/60/Intel_NUC_Haswell_%28case_rear_panel%29.jpg/500px-Intel_NUC_Haswell_%28case_rear_panel%29.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"
+  },
+  {
+    "id": "computer_108",
+    "category": "computer",
+    "name": "Installed 8 intel NUC mini pc rack mount rack shelf",
+    "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/b/b4/Installed_8_intel_NUC_mini_pc_rack_mount_rack_shelf.jpg/500px-Installed_8_intel_NUC_mini_pc_rack_mount_rack_shelf.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"
+  },
+  {
+    "id": "computer_109",
+    "category": "computer",
+    "name": "8 intel NUC mini pc rack mount rack shelf",
+    "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/d/d1/8_intel_NUC_mini_pc_rack_mount_rack_shelf.jpg/500px-8_intel_NUC_mini_pc_rack_mount_rack_shelf.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"
+  },
+  {
+    "id": "computer_110",
+    "category": "computer",
+    "name": "3 intel NUC mini pc rack mount rack shelf",
+    "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/2/23/3_intel_NUC_mini_pc_rack_mount_rack_shelf.jpg/500px-3_intel_NUC_mini_pc_rack_mount_rack_shelf.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"
+  },
+  {
+    "id": "computer_111",
+    "category": "computer",
+    "name": "Installed 3 intel NUC mini pc rack mount rack shelf",
+    "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/7/7e/Installed_3_intel_NUC_mini_pc_rack_mount_rack_shelf.jpg/500px-Installed_3_intel_NUC_mini_pc_rack_mount_rack_shelf.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"
+  },
+  {
+    "id": "computer_112",
+    "category": "computer",
+    "name": "Intel NUC8",
+    "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/4/45/Intel_NUC8.jpg/500px-Intel_NUC8.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"
+  },
+  {
+    "id": "computer_113",
+    "category": "computer",
+    "name": "Intel nuc boards",
+    "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/e/e2/Intel_nuc_boards.jpg/500px-Intel_nuc_boards.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"
+  },
+  {
+    "id": "computer_114",
+    "category": "computer",
+    "name": "Intel NUC Mini PC",
+    "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/2/26/Intel_NUC_Mini_PC.jpg/500px-Intel_NUC_Mini_PC.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"
+  },
+  {
+    "id": "computer_115",
+    "category": "computer",
+    "name": "Intel NUC",
+    "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/0/09/Intel_NUC.jpg/500px-Intel_NUC.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"
+  },
+  {
+    "id": "computer_116",
+    "category": "computer",
+    "name": "Intel NUC DCCP847DYE",
+    "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/4/48/Intel_NUC_DCCP847DYE.jpg/500px-Intel_NUC_DCCP847DYE.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"
+  },
+  {
+    "id": "computer_117",
+    "category": "computer",
+    "name": "Intel NUC Connectors",
+    "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/6/6f/Intel_NUC_Connectors.jpg/500px-Intel_NUC_Connectors.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"
+  },
+  {
+    "id": "computer_118",
+    "category": "computer",
+    "name": "Intel NUC and 3G modem",
+    "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/6/6e/Intel_NUC_and_3G_modem.jpg/500px-Intel_NUC_and_3G_modem.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"
+  },
+  {
+    "id": "computer_119",
+    "category": "computer",
+    "name": "2 Intel NUC",
+    "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/9/9f/2_Intel_NUC.jpg/500px-2_Intel_NUC.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"
+  },
+  {
+    "id": "computer_120",
+    "category": "computer",
+    "name": "Intel NUC as Asterisk-based PBX",
+    "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/9/9f/Intel_NUC_as_Asterisk-based_PBX.jpg/500px-Intel_NUC_as_Asterisk-based_PBX.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"
+  },
+  {
+    "id": "computer_121",
+    "category": "computer",
+    "name": "Intel NUC & Cisco 7911",
+    "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/d/dd/Intel_NUC_%26_Cisco_7911.jpg/500px-Intel_NUC_%26_Cisco_7911.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"
+  },
+  {
+    "id": "computer_122",
+    "category": "computer",
+    "name": "Intel NUC as Asterisk-based PBX & Ggrandstream GXP1620",
+    "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/0/0d/Intel_NUC_as_Asterisk-based_PBX_%26_Ggrandstream_GXP1620.jpg/500px-Intel_NUC_as_Asterisk-based_PBX_%26_Ggrandstream_GXP1620.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"
+  },
+  {
+    "id": "computer_123",
+    "category": "computer",
+    "name": "Intel NUC 2820FYKH - Front",
+    "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/1/13/Intel_NUC_2820FYKH_-_Front.jpg/500px-Intel_NUC_2820FYKH_-_Front.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"
+  },
+  {
+    "id": "computer_124",
+    "category": "computer",
+    "name": "Intel NUC 2820FYKH - Back",
+    "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/3/3b/Intel_NUC_2820FYKH_-_Back.jpg/500px-Intel_NUC_2820FYKH_-_Back.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"
+  },
+  {
+    "id": "computer_125",
+    "category": "computer",
+    "name": "Intel NUC (53191952124)",
+    "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/3/38/Intel_NUC_%2853191952124%29.jpg/500px-Intel_NUC_%2853191952124%29.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"
+  },
+  {
+    "id": "tvbox_126",
+    "category": "tvbox",
+    "name": "Apple TV 2nd Generation",
+    "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/7/72/Apple_TV_2nd_Generation.jpg/500px-Apple_TV_2nd_Generation.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"
+  },
+  {
+    "id": "tvbox_127",
+    "category": "tvbox",
+    "name": "Apple TV 2nd Generation back",
+    "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/7/7c/Apple_TV_2nd_Generation_back.jpg/500px-Apple_TV_2nd_Generation_back.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"
+  },
+  {
+    "id": "tvbox_128",
+    "category": "tvbox",
+    "name": "Apple TV (Nov 3, 2011)",
+    "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/0/02/Apple_TV_%28Nov_3%2C_2011%29.jpg/500px-Apple_TV_%28Nov_3%2C_2011%29.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"
+  },
+  {
+    "id": "tvbox_129",
+    "category": "tvbox",
+    "name": "Apple TV Remote",
+    "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/a/a9/Apple_TV_Remote.jpg/500px-Apple_TV_Remote.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"
+  },
+  {
+    "id": "tvbox_130",
+    "category": "tvbox",
+    "name": "Apple TV 3rd gen front view",
+    "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/a/a3/Apple_TV_3rd_gen_front_view.jpg/500px-Apple_TV_3rd_gen_front_view.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"
+  },
+  {
+    "id": "tvbox_131",
+    "category": "tvbox",
+    "name": "Apple TV 3rd gen rear view",
+    "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/3/38/Apple_TV_3rd_gen_rear_view.jpg/500px-Apple_TV_3rd_gen_rear_view.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"
+  },
+  {
+    "id": "tvbox_132",
+    "category": "tvbox",
+    "name": "Apple TV 4K 4gen 64gb",
+    "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/8/81/Apple_TV_4K_4gen_64gb.jpg/500px-Apple_TV_4K_4gen_64gb.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"
+  },
+  {
+    "id": "tvbox_133",
+    "category": "tvbox",
+    "name": "Apple TV 4K 3gen 64gb",
+    "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/4/4f/Apple_TV_4K_3gen_64gb.png/500px-Apple_TV_4K_3gen_64gb.png?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"
+  },
+  {
+    "id": "tvbox_134",
+    "category": "tvbox",
+    "name": "Apple TV 4K (4th Gen) with Touch Remote Control (51268991317)",
+    "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/7/76/Apple_TV_4K_%284th_Gen%29_with_Touch_Remote_Control_%2851268991317%29.jpg/500px-Apple_TV_4K_%284th_Gen%29_with_Touch_Remote_Control_%2851268991317%29.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"
+  },
+  {
+    "id": "tvbox_135",
+    "category": "tvbox",
+    "name": "Apple TV 4K (4th Gen) with Touch Remote Control (51269916173)",
+    "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/3/31/Apple_TV_4K_%284th_Gen%29_with_Touch_Remote_Control_%2851269916173%29.jpg/500px-Apple_TV_4K_%284th_Gen%29_with_Touch_Remote_Control_%2851269916173%29.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"
+  },
+  {
+    "id": "tvbox_136",
+    "category": "tvbox",
+    "name": "Apple TV 4K (4th Gen) with Touch Remote Control (51268992377)",
+    "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/2/2f/Apple_TV_4K_%284th_Gen%29_with_Touch_Remote_Control_%2851268992377%29.jpg/500px-Apple_TV_4K_%284th_Gen%29_with_Touch_Remote_Control_%2851268992377%29.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"
+  },
+  {
+    "id": "tvbox_137",
+    "category": "tvbox",
+    "name": "Apple TV 4K (4th Gen) with Touch Remote Control (51268992247)",
+    "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/4/44/Apple_TV_4K_%284th_Gen%29_with_Touch_Remote_Control_%2851268992247%29.jpg/500px-Apple_TV_4K_%284th_Gen%29_with_Touch_Remote_Control_%2851268992247%29.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"
+  },
+  {
+    "id": "tvbox_138",
+    "category": "tvbox",
+    "name": "A1842",
+    "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/8/8e/A1842.png/500px-A1842.png?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"
+  },
+  {
+    "id": "tvbox_139",
+    "category": "tvbox",
+    "name": "A2843",
+    "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/2/28/A2843.png/500px-A2843.png?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"
+  },
+  {
+    "id": "tvbox_140",
+    "category": "tvbox",
+    "name": "A2169",
+    "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/b/b2/A2169.png/500px-A2169.png?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"
+  },
+  {
+    "id": "tvbox_141",
+    "category": "tvbox",
+    "name": "Apple TV Apple ID Login Screen",
+    "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/c/c8/Apple_TV_Apple_ID_Login_Screen.jpg/500px-Apple_TV_Apple_ID_Login_Screen.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"
+  },
+  {
+    "id": "tvbox_142",
+    "category": "tvbox",
+    "name": "Apple TV 4K (3rd Generation, 2022) with Siri Remote",
+    "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/5/54/Apple_TV_4K_%283rd_Generation%2C_2022%29_with_Siri_Remote.jpg/500px-Apple_TV_4K_%283rd_Generation%2C_2022%29_with_Siri_Remote.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"
+  },
+  {
+    "id": "tvbox_143",
+    "category": "tvbox",
+    "name": "Apple TV 4K (3rd Generation, 2022) with Siri Remote (cropped)",
+    "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/a/af/Apple_TV_4K_%283rd_Generation%2C_2022%29_with_Siri_Remote_%28cropped%29.jpg/500px-Apple_TV_4K_%283rd_Generation%2C_2022%29_with_Siri_Remote_%28cropped%29.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"
+  },
+  {
+    "id": "tvbox_144",
+    "category": "tvbox",
+    "name": "Apple TV 4K and Siri Remote",
+    "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/c/c6/Apple_TV_4K_and_Siri_Remote.jpg/500px-Apple_TV_4K_and_Siri_Remote.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"
+  },
+  {
+    "id": "tvbox_145",
+    "category": "tvbox",
+    "name": "NVIDIA SHIELD TV Gamepad and DS4",
+    "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/f/f4/NVIDIA_SHIELD_TV_Gamepad_and_DS4.jpg/500px-NVIDIA_SHIELD_TV_Gamepad_and_DS4.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"
+  },
+  {
+    "id": "tvbox_146",
+    "category": "tvbox",
+    "name": "NVIDIA SHIELD TV power on",
+    "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/c/c4/NVIDIA_SHIELD_TV_power_on.jpg/500px-NVIDIA_SHIELD_TV_power_on.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"
+  },
+  {
+    "id": "tvbox_147",
+    "category": "tvbox",
+    "name": "NVIDIA SHIELD TV main console",
+    "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/e/e2/NVIDIA_SHIELD_TV_main_console.jpg/500px-NVIDIA_SHIELD_TV_main_console.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"
+  },
+  {
+    "id": "tvbox_148",
+    "category": "tvbox",
+    "name": "NVIDIA SHIELD TV 2017ver backpanel",
+    "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/f/ff/NVIDIA_SHIELD_TV_2017ver_backpanel.jpg/500px-NVIDIA_SHIELD_TV_2017ver_backpanel.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"
+  },
+  {
+    "id": "tvbox_149",
+    "category": "tvbox",
+    "name": "NVIDIA SHIELD TV 2017ver Remote",
+    "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/d/d6/NVIDIA_SHIELD_TV_2017ver_Remote.jpg/500px-NVIDIA_SHIELD_TV_2017ver_Remote.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"
+  },
+  {
+    "id": "tvbox_150",
+    "category": "tvbox",
+    "name": "NVIDIA SHIELD TV 2017ver console",
+    "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/6/68/NVIDIA_SHIELD_TV_2017ver_console.jpg/500px-NVIDIA_SHIELD_TV_2017ver_console.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"
+  },
+  {
+    "id": "tvbox_151",
+    "category": "tvbox",
+    "name": "NVIDIA Headquarters",
+    "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/0/0f/NVIDIA_Headquarters.jpg/500px-NVIDIA_Headquarters.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"
+  },
+  {
+    "id": "tvbox_152",
+    "category": "tvbox",
+    "name": "Xiaomi Mi Box S remote",
+    "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/5/55/Xiaomi_Mi_Box_S_remote.jpg/500px-Xiaomi_Mi_Box_S_remote.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"
+  },
+  {
+    "id": "tvbox_153",
+    "category": "tvbox",
+    "name": "Xiaomi Mi Box S",
+    "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/d/d1/Xiaomi_Mi_Box_S.jpg/500px-Xiaomi_Mi_Box_S.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"
+  },
+  {
+    "id": "tvbox_154",
+    "category": "tvbox",
+    "name": "Nvidia Shield",
+    "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/3/35/Nvidia_Shield.jpg/500px-Nvidia_Shield.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"
+  },
+  {
+    "id": "tvbox_155",
+    "category": "tvbox",
+    "name": "CeBIT 2005 Nvidia Stand",
+    "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/1/1d/CeBIT_2005_Nvidia_Stand.jpg/500px-CeBIT_2005_Nvidia_Stand.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"
+  },
+  {
+    "id": "tvbox_156",
+    "category": "tvbox",
+    "name": "Nvidia SLI GTX280",
+    "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/3/37/Nvidia_SLI_GTX280.jpg/500px-Nvidia_SLI_GTX280.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"
+  },
+  {
+    "id": "tvbox_157",
+    "category": "tvbox",
+    "name": "NVidia Shield Android TV",
+    "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/5/54/NVidia_Shield_Android_TV.jpg/500px-NVidia_Shield_Android_TV.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"
+  },
+  {
+    "id": "tvbox_158",
+    "category": "tvbox",
+    "name": "NVIDIA SHIELD TV 2017 with controller",
+    "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/1/11/NVIDIA_SHIELD_TV_2017_with_controller.jpg/500px-NVIDIA_SHIELD_TV_2017_with_controller.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"
+  },
+  {
+    "id": "tvbox_159",
+    "category": "tvbox",
+    "name": "NVIDIA SHIELD TV 2017 backplate",
+    "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/a/af/NVIDIA_SHIELD_TV_2017_backplate.jpg/500px-NVIDIA_SHIELD_TV_2017_backplate.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"
+  },
+  {
+    "id": "tvbox_160",
+    "category": "tvbox",
+    "name": "Android TV-based Tracer set top box",
+    "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/d/d8/Android_TV-based_Tracer_set_top_box.jpg/500px-Android_TV-based_Tracer_set_top_box.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"
+  },
+  {
+    "id": "tvbox_161",
+    "category": "tvbox",
+    "name": "Amazon Fire TV with remote",
+    "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/f/f8/Amazon_Fire_TV_with_remote.JPG/500px-Amazon_Fire_TV_with_remote.JPG?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"
+  },
+  {
+    "id": "tvbox_162",
+    "category": "tvbox",
+    "name": "Amazon Fire TV Stick HDMI",
+    "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/1/17/Amazon_Fire_TV_Stick_HDMI.jpg/500px-Amazon_Fire_TV_Stick_HDMI.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"
+  },
+  {
+    "id": "tvbox_163",
+    "category": "tvbox",
+    "name": "Chromecast-2015",
+    "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/c/ce/Chromecast-2015.jpg/500px-Chromecast-2015.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"
+  },
+  {
+    "id": "tvbox_164",
+    "category": "tvbox",
+    "name": "Roku 1 2017-02-23",
+    "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/6/64/Roku_1_2017-02-23.jpg/500px-Roku_1_2017-02-23.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"
+  },
+  {
+    "id": "tvbox_165",
+    "category": "tvbox",
+    "name": "Google Chromecast Ultra",
+    "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/0/08/Google_Chromecast_Ultra.jpg/500px-Google_Chromecast_Ultra.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"
+  },
+  {
+    "id": "tvbox_166",
+    "category": "tvbox",
+    "name": "Chromecast-with-Google-TV-snow-color-on-wood-table",
+    "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/8/89/Chromecast-with-Google-TV-snow-color-on-wood-table.jpg/500px-Chromecast-with-Google-TV-snow-color-on-wood-table.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"
+  },
+  {
+    "id": "tvbox_167",
+    "category": "tvbox",
+    "name": "Chromecast-Ultra-from-Stadia-Premiere-Edition-bundle",
+    "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/5/54/Chromecast-Ultra-from-Stadia-Premiere-Edition-bundle.jpg/500px-Chromecast-Ultra-from-Stadia-Premiere-Edition-bundle.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"
+  },
+  {
+    "id": "tvbox_168",
+    "category": "tvbox",
+    "name": "Stadia-controller-and-Chromecast-Ultra-from-Premiere-Edition",
+    "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/7/76/Stadia-controller-and-Chromecast-Ultra-from-Premiere-Edition.jpg/500px-Stadia-controller-and-Chromecast-Ultra-from-Premiere-Edition.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"
+  },
+  {
+    "id": "tvbox_169",
+    "category": "tvbox",
+    "name": "Collection of Chromecast devices",
+    "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/7/7f/Collection_of_Chromecast_devices.jpg/500px-Collection_of_Chromecast_devices.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"
+  },
+  {
+    "id": "tvbox_170",
+    "category": "tvbox",
+    "name": "Chromecast-with-Google-TV-snow-color-on-wood-table2",
+    "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/b/b7/Chromecast-with-Google-TV-snow-color-on-wood-table2.jpg/500px-Chromecast-with-Google-TV-snow-color-on-wood-table2.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"
+  },
+  {
+    "id": "tvbox_171",
+    "category": "tvbox",
+    "name": "Google Chromecast with Google TV",
+    "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/8/87/Google_Chromecast_with_Google_TV.jpg/500px-Google_Chromecast_with_Google_TV.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"
+  },
+  {
+    "id": "tvbox_172",
+    "category": "tvbox",
+    "name": "Chromecast (1st generation)-0866",
+    "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/9/99/Chromecast_%281st_generation%29-0866.jpg/500px-Chromecast_%281st_generation%29-0866.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"
+  },
+  {
+    "id": "tvbox_173",
+    "category": "tvbox",
+    "name": "Chromecast (1st generation)-0867",
+    "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/b/b4/Chromecast_%281st_generation%29-0867.jpg/500px-Chromecast_%281st_generation%29-0867.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"
+  },
+  {
+    "id": "tvbox_174",
+    "category": "tvbox",
+    "name": "Chromecast (1st generation)-0869",
+    "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/d/da/Chromecast_%281st_generation%29-0869.jpg/500px-Chromecast_%281st_generation%29-0869.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"
+  },
+  {
+    "id": "tvbox_175",
+    "category": "tvbox",
+    "name": "FireTV Stick 3rd Gen",
+    "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/2/21/FireTV_Stick_3rd_Gen.jpg/500px-FireTV_Stick_3rd_Gen.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"
+  },
+  {
+    "id": "tvbox_176",
+    "category": "tvbox",
+    "name": "Chromecast behind a flatscreen",
+    "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/1/1b/Chromecast_behind_a_flatscreen.jpg/500px-Chromecast_behind_a_flatscreen.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"
+  },
+  {
+    "id": "tvbox_177",
+    "category": "tvbox",
+    "name": "Google Cast wordmark (new)",
+    "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/5/55/Google_Cast_wordmark_%28new%29.png/500px-Google_Cast_wordmark_%28new%29.png?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"
+  },
+  {
+    "id": "tvbox_178",
+    "category": "tvbox",
+    "name": "Daewoo DT-2008 DVB Terestrial set-top box",
+    "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/9/95/Daewoo_DT-2008_DVB_Terestrial_set-top_box.jpg/500px-Daewoo_DT-2008_DVB_Terestrial_set-top_box.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"
+  },
+  {
+    "id": "tvbox_179",
+    "category": "tvbox",
+    "name": "Set-top Box, 2013",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/5/56/Set-top_Box%2C_2013.png?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail_unscaled"
+  },
+  {
+    "id": "tvbox_180",
+    "category": "tvbox",
+    "name": "Set-top box firmware being updated",
+    "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/b/bd/Set-top_box_firmware_being_updated.jpg/500px-Set-top_box_firmware_being_updated.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"
+  },
+  {
+    "id": "tvbox_181",
+    "category": "tvbox",
+    "name": "Daewoo DS608P Freeview DVB-T set top box (underside and rear)",
+    "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/b/b0/Daewoo_DS608P_Freeview_DVB-T_set_top_box_%28underside_and_rear%29.jpg/500px-Daewoo_DS608P_Freeview_DVB-T_set_top_box_%28underside_and_rear%29.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"
+  },
+  {
+    "id": "tvbox_182",
+    "category": "tvbox",
+    "name": "Daewoo DS608P Freeview DVB-T set top box (front and top)",
+    "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/4/47/Daewoo_DS608P_Freeview_DVB-T_set_top_box_%28front_and_top%29.jpg/500px-Daewoo_DS608P_Freeview_DVB-T_set_top_box_%28front_and_top%29.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"
+  },
+  {
+    "id": "tvbox_183",
+    "category": "tvbox",
+    "name": "Set-top box of Shanghai OCN",
+    "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/9/9b/Set-top_box_of_Shanghai_OCN.jpg/500px-Set-top_box_of_Shanghai_OCN.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"
+  },
+  {
+    "id": "tvbox_184",
+    "category": "tvbox",
+    "name": "Set-top box of JSCN, Suzhou",
+    "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/9/9f/Set-top_box_of_JSCN%2C_Suzhou.jpg/500px-Set-top_box_of_JSCN%2C_Suzhou.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"
+  },
+  {
+    "id": "tvbox_185",
+    "category": "tvbox",
+    "name": "A DTMB set-top box",
+    "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/1/1b/A_DTMB_set-top_box.jpg/500px-A_DTMB_set-top_box.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"
+  },
+  {
+    "id": "tvbox_186",
+    "category": "tvbox",
+    "name": "CeBIT 2005 Digital Convergence Set Top Box",
+    "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/2/29/CeBIT_2005_Digital_Convergence_Set_Top_Box.jpg/500px-CeBIT_2005_Digital_Convergence_Set_Top_Box.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"
+  },
+  {
+    "id": "tvbox_187",
+    "category": "tvbox",
+    "name": "Verizon Fios Set-Top Box",
+    "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/f/f0/Verizon_Fios_Set-Top_Box.jpg/500px-Verizon_Fios_Set-Top_Box.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"
+  },
+  {
+    "id": "tvbox_188",
+    "category": "tvbox",
+    "name": "Raspberry Pi 4B digital media player (2026-01-16)",
+    "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/c/cf/Raspberry_Pi_4B_digital_media_player_%282026-01-16%29.jpg/500px-Raspberry_Pi_4B_digital_media_player_%282026-01-16%29.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"
+  },
+  {
+    "id": "tvbox_189",
+    "category": "tvbox",
+    "name": "Raspberry Pi 4B digital media player (2026-01-16) 2",
+    "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/7/75/Raspberry_Pi_4B_digital_media_player_%282026-01-16%29_2.jpg/500px-Raspberry_Pi_4B_digital_media_player_%282026-01-16%29_2.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"
+  },
+  {
+    "id": "tvbox_190",
+    "category": "tvbox",
+    "name": "Raspberry Pi 4B digital media player (2026-01-16) 4",
+    "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/8/86/Raspberry_Pi_4B_digital_media_player_%282026-01-16%29_4.jpg/500px-Raspberry_Pi_4B_digital_media_player_%282026-01-16%29_4.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"
+  },
+  {
+    "id": "tv_191",
+    "category": "tv",
+    "name": "LG전자, 깜빡임 없는 55인치 3D OLED TV 공개",
+    "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/7/7f/LG%EC%A0%84%EC%9E%90%2C_%EA%B9%9C%EB%B9%A1%EC%9E%84_%EC%97%86%EB%8A%94_55%EC%9D%B8%EC%B9%98_3D_OLED_TV_%EA%B3%B5%EA%B0%9C.jpg/500px-LG%EC%A0%84%EC%9E%90%2C_%EA%B9%9C%EB%B9%A1%EC%9E%84_%EC%97%86%EB%8A%94_55%EC%9D%B8%EC%B9%98_3D_OLED_TV_%EA%B3%B5%EA%B0%9C.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"
+  },
+  {
+    "id": "tv_192",
+    "category": "tv",
+    "name": "LG전자, 깜빡임 없는 55인치 3D OLED TV 공개(2)",
+    "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/3/3c/LG%EC%A0%84%EC%9E%90%2C_%EA%B9%9C%EB%B9%A1%EC%9E%84_%EC%97%86%EB%8A%94_55%EC%9D%B8%EC%B9%98_3D_OLED_TV_%EA%B3%B5%EA%B0%9C%282%29.jpg/500px-LG%EC%A0%84%EC%9E%90%2C_%EA%B9%9C%EB%B9%A1%EC%9E%84_%EC%97%86%EB%8A%94_55%EC%9D%B8%EC%B9%98_3D_OLED_TV_%EA%B3%B5%EA%B0%9C%282%29.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"
+  },
+  {
+    "id": "tv_193",
+    "category": "tv",
+    "name": "LG전자 CES2012 - 3D OLED TV",
+    "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/7/7d/LG%EC%A0%84%EC%9E%90_CES2012_-_3D_OLED_TV.jpg/500px-LG%EC%A0%84%EC%9E%90_CES2012_-_3D_OLED_TV.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"
+  },
+  {
+    "id": "tv_194",
+    "category": "tv",
+    "name": "IFA 2012 LG전자 OLED TV (1)",
+    "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/e/e5/IFA_2012_LG%EC%A0%84%EC%9E%90_OLED_TV_%281%29.jpg/500px-IFA_2012_LG%EC%A0%84%EC%9E%90_OLED_TV_%281%29.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"
+  },
+  {
+    "id": "tv_195",
+    "category": "tv",
+    "name": "IFA 2012 LG전자 OLED TV (2)",
+    "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/8/81/IFA_2012_LG%EC%A0%84%EC%9E%90_OLED_TV_%282%29.jpg/500px-IFA_2012_LG%EC%A0%84%EC%9E%90_OLED_TV_%282%29.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"
+  },
+  {
+    "id": "tv_196",
+    "category": "tv",
+    "name": "Samsung OLED TV",
+    "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/d/d0/Samsung_OLED_TV.jpg/500px-Samsung_OLED_TV.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"
+  },
+  {
+    "id": "tv_197",
+    "category": "tv",
+    "name": "CES 2012 - LG world's largest OLED TV 55\" (6764014593)",
+    "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/4/45/CES_2012_-_LG_world%27s_largest_OLED_TV_55%22_%286764014593%29.jpg/500px-CES_2012_-_LG_world%27s_largest_OLED_TV_55%22_%286764014593%29.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"
+  },
+  {
+    "id": "tv_198",
+    "category": "tv",
+    "name": "LG OLED TV",
+    "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/f/f1/LG_OLED_TV.jpg/500px-LG_OLED_TV.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"
+  },
+  {
+    "id": "tv_199",
+    "category": "tv",
+    "name": "Haier 55” OLED Tv (16675923100)",
+    "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/8/87/Haier_55%E2%80%9D_OLED_Tv_%2816675923100%29.jpg/500px-Haier_55%E2%80%9D_OLED_Tv_%2816675923100%29.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"
+  },
+  {
+    "id": "tv_200",
+    "category": "tv",
+    "name": "LG 4K Curved OLED TV (15021278560)",
+    "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/2/29/LG_4K_Curved_OLED_TV_%2815021278560%29.jpg/500px-LG_4K_Curved_OLED_TV_%2815021278560%29.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"
+  },
+  {
+    "id": "tv_201",
+    "category": "tv",
+    "name": "LG 4K Flexible OLED TV (15021276350)",
+    "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/8/8b/LG_4K_Flexible_OLED_TV_%2815021276350%29.jpg/500px-LG_4K_Flexible_OLED_TV_%2815021276350%29.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"
+  },
+  {
+    "id": "tv_202",
+    "category": "tv",
+    "name": "OLED Displays",
+    "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/d/df/OLED_Displays.jpg/500px-OLED_Displays.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"
+  },
+  {
+    "id": "tv_203",
+    "category": "tv",
+    "name": "OLED dot Matrix Samsung Galaxy S20 Ultra 5G A016 - 20220625 1202",
+    "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/5/53/OLED_dot_Matrix_Samsung_Galaxy_S20_Ultra_5G_A016_-_20220625_120212.png/500px-OLED_dot_Matrix_Samsung_Galaxy_S20_Ultra_5G_A016_-_20220625_120212.png?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"
+  },
+  {
+    "id": "tv_204",
+    "category": "tv",
+    "name": "Oled tv",
+    "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/0/0b/Oled_tv.jpg/500px-Oled_tv.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"
+  },
+  {
+    "id": "tv_205",
+    "category": "tv",
+    "name": "Close UP photo of lg c1 oled",
+    "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/6/64/Close_UP_photo_of_lg_c1_oled.jpg/500px-Close_UP_photo_of_lg_c1_oled.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"
+  },
+  {
+    "id": "tv_206",
+    "category": "tv",
+    "name": "OLED SUBPIXELS",
+    "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/d/d6/OLED_SUBPIXELS.jpg/500px-OLED_SUBPIXELS.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"
+  },
+  {
+    "id": "tv_207",
+    "category": "tv",
+    "name": "OLED screen of Nantong Rail Transit Line 1",
+    "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/2/2c/OLED_screen_of_Nantong_Rail_Transit_Line_1.jpg/500px-OLED_screen_of_Nantong_Rail_Transit_Line_1.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"
+  },
+  {
+    "id": "tv_208",
+    "category": "tv",
+    "name": "IPhone OLED",
+    "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/f/f1/IPhone_OLED.jpeg/500px-IPhone_OLED.jpeg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"
+  },
+  {
+    "id": "tv_209",
+    "category": "tv",
+    "name": "Switch OLED",
+    "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/1/1b/Switch_OLED.jpg/500px-Switch_OLED.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"
+  },
+  {
+    "id": "tv_210",
+    "category": "tv",
+    "name": "Samsung Smart TV remote",
+    "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/1/10/Samsung_Smart_TV_remote.JPG/500px-Samsung_Smart_TV_remote.JPG?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"
+  },
+  {
+    "id": "tv_211",
+    "category": "tv",
+    "name": "Samsung Smart TV 2012 (E-Series)",
+    "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/6/67/Samsung_Smart_TV_2012_%28E-Series%29.jpg/500px-Samsung_Smart_TV_2012_%28E-Series%29.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"
+  },
+  {
+    "id": "tv_212",
+    "category": "tv",
+    "name": "SAMSUNG AIR CONDITIONER OUTDOOR UNIT",
+    "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/5/59/SAMSUNG_AIR_CONDITIONER_OUTDOOR_UNIT.jpg/500px-SAMSUNG_AIR_CONDITIONER_OUTDOOR_UNIT.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"
+  },
+  {
+    "id": "tv_213",
+    "category": "tv",
+    "name": "SAMSUNG EP-T4510 45W POWER ADAPER BLACK",
+    "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/0/00/SAMSUNG_EP-T4510_45W_POWER_ADAPER_BLACK.jpg/500px-SAMSUNG_EP-T4510_45W_POWER_ADAPER_BLACK.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"
+  },
+  {
+    "id": "tv_214",
+    "category": "tv",
+    "name": "SAMSUNG SOUNDBAR HW-J250",
+    "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/b/b9/SAMSUNG_SOUNDBAR_HW-J250.jpg/500px-SAMSUNG_SOUNDBAR_HW-J250.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"
+  },
+  {
+    "id": "tv_215",
+    "category": "tv",
+    "name": "LG IPS LCD 4K TV & SAMSUNG SOUNDBAR HW-J250",
+    "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/d/df/LG_IPS_LCD_4K_TV_%26_SAMSUNG_SOUNDBAR_HW-J250.jpg/500px-LG_IPS_LCD_4K_TV_%26_SAMSUNG_SOUNDBAR_HW-J250.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"
+  },
+  {
+    "id": "tv_216",
+    "category": "tv",
+    "name": "LG IPS LCD 4K TV & SAMSUNG SOUNDBAR HW-J250 (2)",
+    "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/a/a9/LG_IPS_LCD_4K_TV_%26_SAMSUNG_SOUNDBAR_HW-J250_%282%29.jpg/500px-LG_IPS_LCD_4K_TV_%26_SAMSUNG_SOUNDBAR_HW-J250_%282%29.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"
+  },
+  {
+    "id": "tv_217",
+    "category": "tv",
+    "name": "LG IPS LCD 4K TV & SAMSUNG SOUNDBAR HW-J250 & LG GRAM 15Z970",
+    "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/a/ad/LG_IPS_LCD_4K_TV_%26_SAMSUNG_SOUNDBAR_HW-J250_%26_LG_GRAM_15Z970.jpg/500px-LG_IPS_LCD_4K_TV_%26_SAMSUNG_SOUNDBAR_HW-J250_%26_LG_GRAM_15Z970.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"
+  },
+  {
+    "id": "tv_218",
+    "category": "tv",
+    "name": "LG IPS LCD 4K TV & SAMSUNG SOUNDBAR HW-J250 & LG GRAM 15Z970 (2)",
+    "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/c/cd/LG_IPS_LCD_4K_TV_%26_SAMSUNG_SOUNDBAR_HW-J250_%26_LG_GRAM_15Z970_%282%29.jpg/500px-LG_IPS_LCD_4K_TV_%26_SAMSUNG_SOUNDBAR_HW-J250_%26_LG_GRAM_15Z970_%282%29.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"
+  },
+  {
+    "id": "tv_219",
+    "category": "tv",
+    "name": "LG G6, SAMSUNG Galaxy S22 Ultra, SAMSUNG Galaxy S10 5G, SAMSUNG ",
+    "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/4/42/LG_G6%2C_SAMSUNG_Galaxy_S22_Ultra%2C_SAMSUNG_Galaxy_S10_5G%2C_SAMSUNG_Galaxy_Watch.jpg/500px-LG_G6%2C_SAMSUNG_Galaxy_S22_Ultra%2C_SAMSUNG_Galaxy_S10_5G%2C_SAMSUNG_Galaxy_Watch.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"
+  },
+  {
+    "id": "tv_220",
+    "category": "tv",
+    "name": "SAMSUNG Galaxy S22 Ultra, LG G6, iPhone SE3, SAMSUNG Galaxy S10 ",
+    "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/c/cb/SAMSUNG_Galaxy_S22_Ultra%2C_LG_G6%2C_iPhone_SE3%2C_SAMSUNG_Galaxy_S10_5G.jpg/500px-SAMSUNG_Galaxy_S22_Ultra%2C_LG_G6%2C_iPhone_SE3%2C_SAMSUNG_Galaxy_S10_5G.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"
+  },
+  {
+    "id": "tv_221",
+    "category": "tv",
+    "name": "LG IPS LCD 4K TV & SAMSUNG SOUNDBAR HW-J250 & LG GRAM 15Z970 (3)",
+    "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/a/a3/LG_IPS_LCD_4K_TV_%26_SAMSUNG_SOUNDBAR_HW-J250_%26_LG_GRAM_15Z970_%283%29.jpg/500px-LG_IPS_LCD_4K_TV_%26_SAMSUNG_SOUNDBAR_HW-J250_%26_LG_GRAM_15Z970_%283%29.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"
+  },
+  {
+    "id": "tv_222",
+    "category": "tv",
+    "name": "SAMSUNG SOUNDBAR HW-J250 (2)",
+    "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/a/a6/SAMSUNG_SOUNDBAR_HW-J250_%282%29.jpg/500px-SAMSUNG_SOUNDBAR_HW-J250_%282%29.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"
+  },
+  {
+    "id": "tv_223",
+    "category": "tv",
+    "name": "LG GRAM 15Z970, SAMSUNG PROTABLE SSD T7 SHIELD 4TB & SAMSUNG SAT",
+    "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/2/2e/LG_GRAM_15Z970%2C_SAMSUNG_PROTABLE_SSD_T7_SHIELD_4TB_%26_SAMSUNG_SATA_SSD_870_QVO_1TB.jpg/500px-LG_GRAM_15Z970%2C_SAMSUNG_PROTABLE_SSD_T7_SHIELD_4TB_%26_SAMSUNG_SATA_SSD_870_QVO_1TB.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"
+  },
+  {
+    "id": "tv_224",
+    "category": "tv",
+    "name": "Samsung Electronics 2023-08 1693138160",
+    "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/d/dc/Samsung_Electronics_2023-08_1693138160.jpg/500px-Samsung_Electronics_2023-08_1693138160.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"
+  },
+  {
+    "id": "tv_225",
+    "category": "tv",
+    "name": "LG IPS LCD 4K TV & SAMSUNG SOUNDBAR HW-J250 (cropped)",
+    "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/1/14/LG_IPS_LCD_4K_TV_%26_SAMSUNG_SOUNDBAR_HW-J250_%28cropped%29.jpg/500px-LG_IPS_LCD_4K_TV_%26_SAMSUNG_SOUNDBAR_HW-J250_%28cropped%29.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"
+  },
+  {
+    "id": "tv_226",
+    "category": "tv",
+    "name": "Rear of a blue Samsung Galaxy Note 9 (Lavender Purple)",
+    "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/7/72/Rear_of_a_blue_Samsung_Galaxy_Note_9_%28Lavender_Purple%29.jpg/500px-Rear_of_a_blue_Samsung_Galaxy_Note_9_%28Lavender_Purple%29.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"
+  },
+  {
+    "id": "tv_227",
+    "category": "tv",
+    "name": "Samsung download mode in Samsung Exp. 9.5",
+    "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/2/22/Samsung_download_mode_in_Samsung_Exp._9.5.jpg/500px-Samsung_download_mode_in_Samsung_Exp._9.5.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"
+  },
+  {
+    "id": "tv_228",
+    "category": "tv",
+    "name": "Apple TV and Sony flatscreen TV at Macworld-2007-01-10",
+    "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/a/a9/Apple_TV_and_Sony_flatscreen_TV_at_Macworld-2007-01-10.jpg/500px-Apple_TV_and_Sony_flatscreen_TV_at_Macworld-2007-01-10.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"
+  },
+  {
+    "id": "tv_229",
+    "category": "tv",
+    "name": "RFE06 Sony TV JP",
+    "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/d/d9/RFE06_Sony_TV_JP.jpg/500px-RFE06_Sony_TV_JP.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"
+  },
+  {
+    "id": "tv_230",
+    "category": "tv",
+    "name": "Sony Bravia 3D on display at CES 20110106",
+    "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/2/27/Sony_Bravia_3D_on_display_at_CES_20110106.jpg/500px-Sony_Bravia_3D_on_display_at_CES_20110106.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"
+  },
+  {
+    "id": "tv_231",
+    "category": "tv",
+    "name": "Sony Bravia 24 Inch LED TV Model W60",
+    "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/2/28/Sony_Bravia_24_Inch_LED_TV_Model_W60.jpg/500px-Sony_Bravia_24_Inch_LED_TV_Model_W60.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"
+  },
+  {
+    "id": "tv_232",
+    "category": "tv",
+    "name": "SONY Bravia KD 65AG9",
+    "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/2/27/SONY_Bravia_KD_65AG9.jpg/500px-SONY_Bravia_KD_65AG9.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"
+  },
+  {
+    "id": "tv_233",
+    "category": "tv",
+    "name": "TV LCD Sony",
+    "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/7/70/TV_LCD_Sony.JPG/500px-TV_LCD_Sony.JPG?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"
+  },
+  {
+    "id": "tv_234",
+    "category": "tv",
+    "name": "Sony Bravia KDL-40E4020 rear",
+    "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/a/ab/Sony_Bravia_KDL-40E4020_rear.jpg/500px-Sony_Bravia_KDL-40E4020_rear.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"
+  },
+  {
+    "id": "tv_235",
+    "category": "tv",
+    "name": "TV LCD Sony (32CX520)",
+    "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/3/37/TV_LCD_Sony_%2832CX520%29.jpg/500px-TV_LCD_Sony_%2832CX520%29.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"
+  },
+  {
+    "id": "tv_236",
+    "category": "tv",
+    "name": "XrossMenuBar on a Sony BRAVIA TV",
+    "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/0/0b/XrossMenuBar_on_a_Sony_BRAVIA_TV.jpg/500px-XrossMenuBar_on_a_Sony_BRAVIA_TV.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"
+  },
+  {
+    "id": "tv_237",
+    "category": "tv",
+    "name": "Sony Bravia KDL-Z4500",
+    "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/4/49/Sony_Bravia_KDL-Z4500.jpg/500px-Sony_Bravia_KDL-Z4500.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"
+  },
+  {
+    "id": "tv_238",
+    "category": "tv",
+    "name": "HTD Sony DigiDads 5708",
+    "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/a/a6/HTD_Sony_DigiDads_5708.jpg/500px-HTD_Sony_DigiDads_5708.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"
+  },
+  {
+    "id": "tv_239",
+    "category": "tv",
+    "name": "HTD Sony DigiDads 5714",
+    "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/6/6b/HTD_Sony_DigiDads_5714.jpg/500px-HTD_Sony_DigiDads_5714.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"
+  },
+  {
+    "id": "tv_240",
+    "category": "tv",
+    "name": "HTD Sony DigiDads 5711",
+    "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/6/67/HTD_Sony_DigiDads_5711.jpg/500px-HTD_Sony_DigiDads_5711.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"
+  },
+  {
+    "id": "tv_241",
+    "category": "tv",
+    "name": "HTD Sony DigiDads 5707",
+    "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/c/c6/HTD_Sony_DigiDads_5707.jpg/500px-HTD_Sony_DigiDads_5707.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"
+  },
+  {
+    "id": "tv_242",
+    "category": "tv",
+    "name": "HTD Sony DigiDads 5706",
+    "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/d/d2/HTD_Sony_DigiDads_5706.jpg/500px-HTD_Sony_DigiDads_5706.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"
+  },
+  {
+    "id": "tv_243",
+    "category": "tv",
+    "name": "HTD Sony DigiDads 5715",
+    "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/3/3b/HTD_Sony_DigiDads_5715.jpg/500px-HTD_Sony_DigiDads_5715.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"
+  },
+  {
+    "id": "tv_244",
+    "category": "tv",
+    "name": "HTD Sony DigiDads 5731",
+    "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/0/0b/HTD_Sony_DigiDads_5731.jpg/500px-HTD_Sony_DigiDads_5731.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"
+  },
+  {
+    "id": "tv_245",
+    "category": "tv",
+    "name": "HTD Sony DigiDads 5683 DSC00119",
+    "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/d/db/HTD_Sony_DigiDads_5683_DSC00119.jpg/500px-HTD_Sony_DigiDads_5683_DSC00119.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"
+  },
+  {
+    "id": "tv_246",
+    "category": "tv",
+    "name": "Samsung UN105S9 20140127",
+    "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/c/c2/Samsung_UN105S9_20140127.jpg/500px-Samsung_UN105S9_20140127.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"
+  },
+  {
+    "id": "tv_247",
+    "category": "tv",
+    "name": "Advantech CRV-430JP 20201101",
+    "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/2/2c/Advantech_CRV-430JP_20201101.jpg/500px-Advantech_CRV-430JP_20201101.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"
+  },
+  {
+    "id": "tv_248",
+    "category": "tv",
+    "name": "LG 4K TV IPS LCD DISPLAY RGBW DOT MATRIX",
+    "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/1/1b/LG_4K_TV_IPS_LCD_DISPLAY_RGBW_DOT_MATRIX.jpg/500px-LG_4K_TV_IPS_LCD_DISPLAY_RGBW_DOT_MATRIX.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"
+  },
+  {
+    "id": "tv_249",
+    "category": "tv",
+    "name": "Regza Refurbished",
+    "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/9/97/Regza_Refurbished.jpg/500px-Regza_Refurbished.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"
+  },
+  {
+    "id": "tv_250",
+    "category": "tv",
+    "name": "4K EL TV Displays at Yodobashi Umeda",
+    "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/a/a0/4K_EL_TV_Displays_at_Yodobashi_Umeda.jpg/500px-4K_EL_TV_Displays_at_Yodobashi_Umeda.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"
+  },
+  {
+    "id": "tv_251",
+    "category": "tv",
+    "name": "Criterion Collection display, DVDs, Blu-rays, CDs, and books in ",
+    "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/3/33/Criterion_Collection_display%2C_DVDs%2C_Blu-rays%2C_CDs%2C_and_books_in_Barnes_%26_Noble_in_Tampa%2C_Florida%2C_US%2C_on_2_July_2026.jpg/500px-Criterion_Collection_display%2C_DVDs%2C_Blu-rays%2C_CDs%2C_and_books_in_Barnes_%26_Noble_in_Tampa%2C_Florida%2C_US%2C_on_2_July_2026.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"
+  }
+]
