@@ -1487,12 +1487,42 @@ try {
   }
 } catch (_) {}
 
+async function getRealMemoryStats() {
+  const totalBytes = os.totalmem();
+  let availableBytes = os.freemem();
+  if (process.platform === 'darwin') {
+    try {
+      const vmRes = await runCmd('vm_stat', [], 1500);
+      if (vmRes.ok && vmRes.stdout) {
+        const psMatch = vmRes.stdout.match(/page size of (\d+) bytes/i);
+        const pageSize = psMatch ? Number(psMatch[1]) : 4096;
+        const getPages = (label) => {
+          const m = vmRes.stdout.match(new RegExp(`${label}:\\s+(\\d+)`, 'i'));
+          return m ? Number(m[1]) : 0;
+        };
+        const availPages = getPages('Pages free') + getPages('Pages inactive') + getPages('Pages speculative') + getPages('Pages purgeable');
+        if (availPages > 0) availableBytes = availPages * pageSize;
+      }
+    } catch (_) {}
+  } else if (process.platform === 'linux') {
+    try {
+      const meminfo = fs.readFileSync('/proc/meminfo', 'utf8');
+      const m = meminfo.match(/MemAvailable:\s+(\d+)\s+kB/i);
+      if (m) availableBytes = Number(m[1]) * 1024;
+    } catch (_) {}
+  }
+  const totalMemGb = Number((totalBytes / (1024 ** 3)).toFixed(1));
+  const freeMemGb = Number(Math.min(totalMemGb, Math.max(0, availableBytes / (1024 ** 3))).toFixed(1));
+  const usedMemGb = Number(Math.max(0, totalMemGb - freeMemGb).toFixed(1));
+  const memPercent = totalMemGb > 0 ? Math.round((usedMemGb / totalMemGb) * 100) : 0;
+  return { totalMemGb, freeMemGb, usedMemGb, memPercent };
+}
+
 async function getRealOsStatus() {
   const platform = process.platform;
   const netInfo = getNetworkInterfaceInfo();
   const cpus = os.cpus() || [];
-  const totalMemGb = Number((os.totalmem() / (1024 ** 3)).toFixed(1));
-  const freeMemGb = Number((os.freemem() / (1024 ** 3)).toFixed(1));
+  const { totalMemGb, freeMemGb } = await getRealMemoryStats();
 
   let outputVolume = null;
   let muted = false;
@@ -2428,10 +2458,7 @@ function createAppServer() {
           else detectedCategory = 'computer';
         }
 
-        const totalMemGb = Number((os.totalmem() / (1024 ** 3)).toFixed(1));
-        const freeMemGb = Number((os.freemem() / (1024 ** 3)).toFixed(1));
-        const usedMemGb = Number(Math.max(0, totalMemGb - freeMemGb).toFixed(1));
-        const memPercent = totalMemGb > 0 ? Math.round((usedMemGb / totalMemGb) * 100) : 0;
+        const { totalMemGb, freeMemGb, usedMemGb, memPercent } = await getRealMemoryStats();
 
         let diskTotalGb = null;
         let diskFreeGb = null;
