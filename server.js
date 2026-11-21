@@ -2472,34 +2472,52 @@ function createAppServer() {
           matched = catalog.find((x) => x.id === 'macbookpro-16-2021-space-gray') || catalog.find((x) => x.category === 'computer');
         }
 
+        // Friendly display name in Portuguese (never raw .local hostname)
+        let friendlyDeviceTitle = matched ? matched.name.replace(/\b20\d{2}\b/g, '').replace(/\s+/g, ' ').trim() : (productName || 'Dispositivo irisTV');
+        if (/^MacBookPro16,1$/i.test(hwModel)) friendlyDeviceTitle = 'MacBook Pro 16"';
+        else if (/^MacBookPro/i.test(hwModel)) friendlyDeviceTitle = 'MacBook Pro';
+        else if (/^MacBookAir/i.test(hwModel)) friendlyDeviceTitle = 'MacBook Air';
+        else if (/^iMac/i.test(hwModel)) friendlyDeviceTitle = 'iMac';
+        else if (/^Macmini/i.test(hwModel)) friendlyDeviceTitle = 'Mac mini';
+        else if (/^MacStudio/i.test(hwModel)) friendlyDeviceTitle = 'Mac Studio';
+        else if (/^MacPro/i.test(hwModel)) friendlyDeviceTitle = 'Mac Pro';
+        else if (process.platform === 'linux') {
+          friendlyDeviceTitle = (productName && !/default|to be filled|o\.e\.m/i.test(productName))
+            ? productName
+            : (detectedCategory === 'tv' ? 'Smart TV irisOS' : detectedCategory === 'tvbox' ? 'TV Box irisOS' : 'Computador irisOS');
+        }
+
         const upSec = Math.floor(os.uptime());
         const upH = Math.floor(upSec / 3600);
         const upM = Math.floor((upSec % 3600) / 60);
+        const load1 = Number((os.loadavg()[0] || 0).toFixed(2));
+        const loadLabel = load1 < 2 ? 'Leve' : (load1 < 5 ? 'Moderado' : 'Alto');
 
         return sendJson(req, res, 200, {
           ok: true,
           detectedCategory,
           matchedPhotoUrl: matched ? matched.url : `assets/devices/hero-${detectedCategory}.webp`,
-          matchedDeviceName: matched ? matched.name : (productName || host),
+          matchedDeviceName: friendlyDeviceTitle,
           hardware: {
-            productName: productName || host,
-            hwModel: hwModel || `${process.platform}/${process.arch}`,
-            hostname: host,
-            platform: process.platform,
+            productName: friendlyDeviceTitle,
+            hwModel: hwModel || (process.platform === 'darwin' ? 'Mac' : 'PC / TV Box'),
+            hostname: host.replace(/\.local$/i, ''),
+            platform: process.platform === 'darwin' ? 'macOS' : (process.platform === 'linux' ? 'irisOS Linux' : process.platform),
             osRelease: os.release(),
-            arch: process.arch,
+            arch: process.arch === 'x64' ? '64 bits' : process.arch,
             nodeVersion: process.version,
             cpuModel: cpus[0]?.model || `${process.arch} CPU`,
             cpuCores: cpus.length || 1,
             cpuSpeedMhz: cpus[0]?.speed || null,
             loadAvg: os.loadavg().map((n) => Number(n.toFixed(2))),
+            loadLabel,
             totalMemGb,
             freeMemGb,
             usedMemGb,
             memPercent,
             diskTotalGb,
             diskFreeGb,
-            uptimeFormatted: `${upH}h ${upM}m`
+            uptimeFormatted: upH > 0 ? `${upH}h ${upM}min` : `${upM} min`
           }
         });
       } catch (e) {

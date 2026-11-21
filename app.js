@@ -5890,15 +5890,16 @@
       const isMacHost = /mac|darwin/i.test(info.hostPlatform || navigator.platform || '');
       const defaultCat = isMacHost ? 'computer' : 'tvbox';
       const heroPhoto = `assets/devices/hero-${defaultCat}.webp`;
-      const heroTitle = info.hostname || (defaultCat === 'computer' ? 'Computador irisTV' : 'TV Box irisOS');
+      const heroTitle = defaultCat === 'computer' ? 'Computador irisTV' : defaultCat === 'tv' ? 'Smart TV irisOS' : 'TV Box irisOS';
       const catLabel = defaultCat === 'computer' ? 'Computador' : defaultCat === 'tv' ? 'Smart TV' : 'TV Box';
       const primaryGpu = (info.gpus && info.gpus[0]) || info.gpu || {};
-      const gpuName = primaryGpu.name || 'GPU Acelerada';
-      const gpuExtra = [primaryGpu.vram, primaryGpu.metal].filter(Boolean).join(' • ') || 'Aceleração de Hardware 60 FPS';
+      const gpuName = primaryGpu.name || 'Placa Gráfica Integrada';
+      const gpuExtra = [primaryGpu.vram, primaryGpu.metal].filter(Boolean).join(' • ') || 'Aceleração por Hardware a 60 FPS';
       const memTotal = info.memory?.totalGb || '--';
       const memFree = info.memory?.freeGb || '--';
       const osAudio = info.audio || {};
-      const osVolTxt = typeof osAudio.outputVolume === 'number' ? (osAudio.outputMuted ? 'Mudo' : `${osAudio.outputVolume}%`) : 'Padrão do Sistema';
+      const osVolTxt = typeof osAudio.outputVolume === 'number' ? (osAudio.outputMuted ? 'Sem som (Mudo)' : `${osAudio.outputVolume}%`) : 'Padrão do Sistema';
+      const dpr = window.devicePixelRatio || 1;
       panelHtml = `
         <div class="device-hero-card">
           <div class="device-hero-photo-wrap">
@@ -5907,36 +5908,36 @@
           <div>
             <span id="stg-device-hero-badge" class="device-hero-badge">${catLabel}</span>
             <h3 id="stg-device-hero-title" class="device-hero-title">${escHtml(heroTitle)}</h3>
-            <p id="stg-device-hero-sub" class="device-hero-sub">${escHtml(info.osName || 'irisOS')} • Versão ${escHtml(info.version || '2.0')}</p>
+            <p id="stg-device-hero-sub" class="device-hero-sub">irisTV • Versão ${escHtml(info.version || '2.0')}</p>
             <div class="device-specs-grid">
               <div class="device-spec-item"><span class="device-spec-label">Processador</span><span class="device-spec-val" id="spec-cpu">${escHtml(info.cpuModel || 'Detectando...')}</span></div>
               <div class="device-spec-item"><span class="device-spec-label">Memória RAM</span><span class="device-spec-val" id="spec-ram">${escHtml(`${memTotal} GB (${memFree} GB livres)`)}</span></div>
               <div class="device-spec-item"><span class="device-spec-label">Placa Gráfica</span><span class="device-spec-val" id="spec-gpu">${escHtml(gpuName)}</span></div>
-              <div class="device-spec-item"><span class="device-spec-label">Tela &amp; Rede</span><span class="device-spec-val" id="spec-net">${window.screen?.width || 1920}x${window.screen?.height || 1080} • ${escHtml(info.network?.ip || '127.0.0.1')}</span></div>
+              <div class="device-spec-item"><span class="device-spec-label">Tela e Rede</span><span class="device-spec-val" id="spec-net">${window.screen?.width || 1920}x${window.screen?.height || 1080} • ${escHtml(info.network?.ip || '127.0.0.1')}</span></div>
             </div>
           </div>
         </div>
 
         <div class="settings-group">
-          <div class="settings-group-title">Processador &amp; Memória</div>
-          ${settingRowMarkup({ title: 'Modelo da CPU', desc: 'Arquitetura e núcleos físicos/lógicos', controlHtml: `<span class="stg-stat-pill" id="dev-cpu-detail">${escHtml(info.cpuModel || 'Carregando...')}</span>` })}
-          ${settingRowMarkup({ title: 'Uso de Memória RAM', desc: 'Capacidade total instalada e memória disponível', controlHtml: `<span class="stg-stat-pill" id="dev-ram-detail">${escHtml(`${memTotal} GB total • ${memFree} GB livres`)}</span>` })}
-          ${settingRowMarkup({ title: 'Carga do Sistema (Load Avg)', desc: 'Média de carga de CPU (1m / 5m / 15m)', controlHtml: `<span class="stg-stat-pill" id="dev-load-detail">Verificando...</span>` })}
+          <div class="settings-group-title">Processador e Memória</div>
+          ${settingRowMarkup({ title: 'Capacidade do Processador', desc: 'Quantidade de núcleos e velocidade de processamento', controlHtml: `<span class="stg-stat-pill" id="dev-cpu-detail">${escHtml(info.cpuModel || 'Carregando...')}</span>` })}
+          ${settingRowMarkup({ title: 'Uso de Memória RAM', desc: 'Quanto da memória instalada está sendo usada agora', controlHtml: `<span class="stg-stat-pill" id="dev-ram-detail">${escHtml(`${memTotal} GB total • ${memFree} GB livres`)}</span>` })}
+          ${settingRowMarkup({ title: 'Carga do Processador', desc: 'Nível de esforço atual do aparelho', controlHtml: `<span class="stg-stat-pill" id="dev-load-detail">Verificando...</span>` })}
         </div>
 
         <div class="settings-group">
-          <div class="settings-group-title">Gráficos, Tela &amp; Áudio</div>
-          ${settingRowMarkup({ title: 'GPU Ativa', desc: escHtml(gpuExtra), controlHtml: `<span class="stg-stat-pill">${escHtml(gpuName)}</span>` })}
-          ${settingRowMarkup({ title: 'Resolução &amp; Escala', desc: `Profundidade de cor ${window.screen?.colorDepth || 24}-bit • DPR ${window.devicePixelRatio || 1}x`, controlHtml: `<span class="stg-stat-pill">${window.screen?.width || 1920} × ${window.screen?.height || 1080}</span>` })}
-          ${settingRowMarkup({ title: 'Saída de Áudio', desc: 'Controle de volume integrado ao sistema operacional', controlHtml: `<span class="stg-stat-pill">${escHtml(osVolTxt)}</span>` })}
+          <div class="settings-group-title">Imagem, Tela e Som</div>
+          ${settingRowMarkup({ title: 'Placa Gráfica (Vídeo)', desc: escHtml(gpuExtra), controlHtml: `<span class="stg-stat-pill">${escHtml(gpuName)}</span>` })}
+          ${settingRowMarkup({ title: 'Resolução da Tela', desc: `Qualidade de cores ${window.screen?.colorDepth || 24} bits • Nitidez ${dpr}x`, controlHtml: `<span class="stg-stat-pill">${window.screen?.width || 1920} × ${window.screen?.height || 1080}</span>` })}
+          ${settingRowMarkup({ title: 'Volume do Sistema', desc: 'Nível atual da saída de som do aparelho', controlHtml: `<span class="stg-stat-pill">${escHtml(osVolTxt)}</span>` })}
         </div>
 
         <div class="settings-group">
-          <div class="settings-group-title">Sistema, Armazenamento &amp; Rede</div>
-          ${settingRowMarkup({ title: 'Modelo de Hardware &amp; Kernel', desc: 'Identificação da placa / máquina e versão do núcleo', controlHtml: `<span class="stg-stat-pill" id="dev-hw-detail">${escHtml(info.hostPlatform || '--')}</span>` })}
-          ${settingRowMarkup({ title: 'Armazenamento Principal', desc: 'Espaço disponível no volume do sistema', controlHtml: `<span class="stg-stat-pill" id="dev-disk-detail">Verificando...</span>` })}
-          ${settingRowMarkup({ title: 'Rede &amp; Conectividade', desc: `Interface ${escHtml(info.network?.iface || 'en0')} • SSID ${escHtml(info.network?.ssid || 'Rede Local')}`, controlHtml: `<span class="stg-stat-pill">${escHtml(info.network?.ip || '127.0.0.1')}</span>` })}
-          ${settingRowMarkup({ title: 'Tempo Ligado (Uptime) &amp; Runtime', desc: `irisTV • Motor Node.js ${escHtml(info.nodeVersion || '')}`, controlHtml: `<span class="stg-stat-pill" id="dev-uptime-detail">Verificando...</span>` })}
+          <div class="settings-group-title">Sistema, Armazenamento e Rede</div>
+          ${settingRowMarkup({ title: 'Sistema e Modelo', desc: 'Identificação interna do aparelho e sistema operacional', controlHtml: `<span class="stg-stat-pill" id="dev-hw-detail">Verificando...</span>` })}
+          ${settingRowMarkup({ title: 'Espaço de Armazenamento', desc: 'Espaço livre disponível no disco principal', controlHtml: `<span class="stg-stat-pill" id="dev-disk-detail">Verificando...</span>` })}
+          ${settingRowMarkup({ title: 'Conexão de Rede', desc: `Rede ${escHtml(info.network?.ssid || 'Local')} • Porta ${escHtml(info.network?.iface || 'en0')}`, controlHtml: `<span class="stg-stat-pill">${escHtml(info.network?.ip || '127.0.0.1')}</span>` })}
+          ${settingRowMarkup({ title: 'Tempo Ligado', desc: 'Há quanto tempo este aparelho está ligado sem reiniciar', controlHtml: `<span class="stg-stat-pill" id="dev-uptime-detail">Verificando...</span>` })}
         </div>
       `;
     } else if (sec === 'developer') {
@@ -6029,15 +6030,15 @@
           if (badge && data.detectedCategory) {
             badge.textContent = data.detectedCategory === 'computer' ? 'Computador' : data.detectedCategory === 'tv' ? 'Smart TV' : 'TV Box';
           }
-          if (hTitle && (hw.hostname || hw.productName)) hTitle.textContent = hw.hostname || hw.productName;
+          if (hTitle && (data.matchedDeviceName || hw.productName)) hTitle.textContent = data.matchedDeviceName || hw.productName;
           if (cpuEl && hw.cpuModel) cpuEl.textContent = `${hw.cpuModel} (${hw.cpuCores} núcleos)`;
           if (ramEl && hw.totalMemGb) ramEl.textContent = `${hw.totalMemGb} GB (${hw.freeMemGb} GB livres)`;
           if (cpuDetail && hw.cpuModel) cpuDetail.textContent = `${hw.cpuCores} núcleos • ${hw.arch}${hw.cpuSpeedMhz ? ` • ${(hw.cpuSpeedMhz / 1000).toFixed(2)} GHz` : ''}`;
           if (ramDetail && hw.totalMemGb) ramDetail.textContent = `${hw.usedMemGb} / ${hw.totalMemGb} GB (${hw.memPercent}% em uso)`;
-          if (loadDetail && Array.isArray(hw.loadAvg)) loadDetail.textContent = hw.loadAvg.join(' / ');
-          if (hwDetail) hwDetail.textContent = `${hw.hwModel || hw.platform} • Kernel ${hw.osRelease || '--'}`;
+          if (loadDetail) loadDetail.textContent = `${hw.loadLabel || 'Normal'} (${Array.isArray(hw.loadAvg) ? hw.loadAvg[0] : '0'})`;
+          if (hwDetail) hwDetail.textContent = `${hw.platform || 'Sistema'} • ${hw.hwModel || ''}`;
           if (diskDetail) diskDetail.textContent = hw.diskTotalGb ? `${hw.diskFreeGb} GB livres de ${hw.diskTotalGb} GB` : 'Volume do sistema ativo';
-          if (uptimeDetail) uptimeDetail.textContent = `${hw.uptimeFormatted || '--'} • ${hw.nodeVersion || ''}`;
+          if (uptimeDetail) uptimeDetail.textContent = hw.uptimeFormatted || '--';
         } catch (_) {}
       })();
     }
