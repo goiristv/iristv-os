@@ -2439,7 +2439,7 @@ function createAppServer() {
             id: item.id,
             category: item.category,
             name: item.name,
-            thumbUrl: `/api/os/device-photo?id=${encodeURIComponent(item.id)}`
+            thumbUrl: item.url
           }))
         });
       } catch (e) {

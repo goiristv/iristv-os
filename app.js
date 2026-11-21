@@ -5890,7 +5890,7 @@
       const savedDev = (() => { try { return JSON.parse(localStorage.getItem('iristv_device_photo_v1') || 'null'); } catch (_) { return null; } })();
       const isMacHost = /mac|darwin/i.test(info.hostPlatform || navigator.platform || '');
       const defaultCat = savedDev?.category || (isMacHost ? 'computer' : 'tvbox');
-      const heroPhoto = savedDev?.thumbUrl || `assets/devices/hero-${defaultCat}.jpg`;
+      const heroPhoto = savedDev?.thumbUrl || `assets/devices/hero-${defaultCat}.webp`;
       const heroTitle = savedDev?.name || info.hostname || (defaultCat === 'computer' ? 'Computador irisTV' : defaultCat === 'tv' ? 'Smart TV irisOS' : 'TV Box irisOS');
       const catLabel = defaultCat === 'computer' ? 'Computador' : defaultCat === 'tv' ? 'Smart TV' : 'TV Box';
       const gpuName = (info.gpus && info.gpus[0]?.name) || info.gpu?.name || 'GPU Acelerada';
@@ -6014,7 +6014,7 @@
             const heroImg = wrap.querySelector('#stg-device-hero-img');
             const badge = wrap.querySelector('#stg-device-hero-badge');
             const hTitle = wrap.querySelector('#stg-device-hero-title');
-            if (heroImg) heroImg.src = `assets/devices/hero-${data.detectedCategory}.jpg`;
+            if (heroImg) heroImg.src = `assets/devices/hero-${data.detectedCategory}.webp`;
             if (badge) badge.textContent = data.detectedCategory === 'computer' ? 'Computador' : data.detectedCategory === 'tv' ? 'Smart TV' : 'TV Box';
             if (hTitle && hw.productName) hTitle.textContent = hw.productName;
           }
